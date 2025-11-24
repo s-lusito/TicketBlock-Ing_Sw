@@ -16,6 +16,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 // Indica a Spring che questa classe contiene definizioni di beans e configurazioni
+
+/* ApplicationConfig
+ - Classe di configurazione che fornisce i componenti (bean) usati da Spring Security.
+ - UserDetailsService: cerca l'utente nel database tramite email.
+ - AuthenticationProvider: controlla che email e password siano corrette.
+ - AuthenticationManager: gestisce il processo di autenticazione.
+ - PasswordEncoder: usa BCrypt per criptare e verificare le password.
+*/
+
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {

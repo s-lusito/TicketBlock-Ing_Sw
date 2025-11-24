@@ -15,6 +15,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/* JwtAuthenticationFilter
+ - Estende OncePerRequestFilter: eseguito una volta per ogni richiesta HTTP.
+ - Funzione:
+   1. Legge header "Authorization" e verifica formato "Bearer <token>".
+   2. Usando JwtService estrae lo username dal token.
+   3. Se l'utente non è già autenticato carica UserDetails dal UserDetailsService.
+   4. Se il token è valido crea un UsernamePasswordAuthenticationToken e lo imposta nel SecurityContext.
+   5. Chiama sempre filterChain.doFilter(...) per proseguire la catena dei filtri.
+ - Nota: il filtro viene aggiunto prima di UsernamePasswordAuthenticationFilter nella SecurityConfiguration.
+ - Se il token è mancante o invalido la richiesta prosegue non autenticata.
+*/
 
 @Component
 @RequiredArgsConstructor // crea un costruttore con i campi final
@@ -23,23 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
 
-    /**
-     * Questo metodo viene eseguito una volta per ogni richiesta HTTP grazie a OncePerRequestFilter.
-     * Serve per intercettare la richiesta prima che arrivi al Controller e gestire l'autenticazione tramite JWT.
-     *
-     * Funzioni principali:
-     *  1. Estrarre l'header "Authorization" dalla richiesta.
-     *  2. Verificare se contiene un token JWT valido (formato: "Bearer <token>").
-     *  3. Se il token è valido:
-     *      - estrarre lo username dal token;
-     *      - caricare i relativi UserDetails;
-     *      - creare un oggetto di autenticazione;
-     *      - inserirlo nel SecurityContext, così Spring sa che l'utente è autenticato.
-     *  4. In ogni caso, chiamare filterChain.doFilter(...) per permettere il proseguimento
-     *     della richiesta verso il prossimo filtro o verso il controller.
-     *
-     * Se non viene chiamato filterChain.doFilter(), la richiesta rimane bloccata e non arriva al controller.
-     */
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -49,19 +44,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response); //passa al filtro successivo
             return;
         }
         jwt = authHeader.substring(7); //inizia dopo 7 caratteri
         userEmail = jwtService.extractUsername(jwt);
-        //verifico se è già autenticato
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        //verifico se è già autenticato
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) { //se l'utente è valido e non è già loggato
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
             if(jwtService.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()); //rappresenta utente autenticato per spring
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                SecurityContextHolder.getContext().setAuthentication(authToken); //Inserisce il token appena creato nel SecurityContext di Spring, rendendo l’utente autenticato per il resto della richiesta.
             }
         }
         filterChain.doFilter(request, response);

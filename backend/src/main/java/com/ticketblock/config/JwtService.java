@@ -14,6 +14,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/* JwtService
+ - Servizio per gestione JWT:
+   - generateToken(...): costruisce un JWT con subject = username, issuedAt, expiration e firma HS256.
+   - extractUsername / extractClaim: helper per leggere claims (dati) dal token.
+   - isTokenValid: verifica che il token appartenga all'utente e non sia scaduto.
+   - la costante di expiration è impostata con 1000*60*60*24 (24 ore)
+*/
+
 @Service
 public class JwtService {
 
@@ -47,7 +55,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24)) //il token vale per 24h
+                .setExpiration(new Date(System.currentTimeMillis() + 1000*60*60*24)) //il token vale per 24h
                 .signWith(getSignKey(),SignatureAlgorithm.HS256)
                 .compact();
 

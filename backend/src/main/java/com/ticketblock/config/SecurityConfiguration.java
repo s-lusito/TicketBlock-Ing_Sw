@@ -14,6 +14,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import static org.springframework.http.HttpMethod.*;
 
+/* SecurityConfiguration
+ - Definisce SecurityFilterChain:
+   - CSRF disabilitato (si usa JWT, non cookie di sessione).
+   - WHITE_LIST_URL: rotte pubbliche (es. /api/v1/auth/**, swagger, docs).
+   - Protezione: /api/v1/management/** riservata a utenti con authority "ADMIN"; tutte le altre richiedono autenticazione.
+   - SessionManagement: SessionCreationPolicy.STATELESS (nessuna sessione server-side, JWT stateless).
+   - Aggiunge JwtAuthenticationFilter prima di UsernamePasswordAuthenticationFilter per autenticare richieste via token.
+   - Logout: URL /api/v1/auth/logout che pulisce il SecurityContext.
+*/
+
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -53,7 +64,7 @@ public class SecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Aggiunge il filtro JWT prima del filtro standard di Spring per username/password
+                // Aggiunge il filtro JWT prima del filtro standard di Spring per username/password, in modo che si verifichi prima la presenza del token
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // Configurazione del logout
