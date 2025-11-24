@@ -22,6 +22,10 @@ import java.util.function.Function;
    - la costante di expiration è impostata con 1000*60*60*24 (24 ore)
 */
 
+/**
+ * Service for managing JSON Web Tokens (JWT). This class provides functionalities
+ * to generate, validate, and extract data (claims) from JWTs.
+ */
 @Service
 public class JwtService {
 

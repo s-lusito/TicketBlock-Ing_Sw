@@ -25,6 +25,27 @@ import static org.springframework.http.HttpMethod.*;
 */
 
 
+/**
+ * SecurityConfiguration is a configuration class that sets up the security settings
+ * for the application using Spring Security.
+ *
+ * Responsibilities and Features:
+ * - Disables Cross-Site Request Forgery (CSRF) protection as JWT is being used for authentication.
+ * - Configures a set of public routes (whitelisted URLs) that are accessible without authentication.
+ * - Defines authorization rules for specific endpoints, such as restricting access to certain resources
+ *   based on user roles (e.g., "ADMIN").
+ * - Enforces a stateless session management policy due to JWT usage.
+ * - Integrates the custom JwtAuthenticationFilter to validate JWT tokens in HTTP requests before the
+ *   standard Spring Security filters are applied.
+ * - Configures a logout endpoint to clear the SecurityContext upon logout.
+ *
+ * Components:
+ * - JwtAuthenticationFilter: Custom filter that extracts and validates JWT tokens from incoming requests.
+ *
+ * Beans:
+ * - securityFilterChain: Defines the SecurityFilterChain, which sets up the security rules
+ *   and integrates the JWT authentication mechanism for the application.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

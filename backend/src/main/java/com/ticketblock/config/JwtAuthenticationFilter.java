@@ -27,6 +27,28 @@ import java.io.IOException;
  - Se il token è mancante o invalido la richiesta prosegue non autenticata.
 */
 
+/**
+ * This class extends OncePerRequestFilter and provides functionality to filter incoming
+ * HTTP requests to validate and process JSON Web Tokens (JWT) for user authentication.
+ *
+ * It uses the JwtService component to extract and validate JWT tokens and
+ * the UserDetailsService to fetch user details based on the token's subject (username).
+ * If the token is valid and the user is not already authenticated,
+ * it sets the authentication in the SecurityContext for the current request lifecycle.
+ *
+ * Responsibilities:
+ * - Extracts the JWT token from the Authorization header of the HTTP request.
+ * - Validates the extracted JWT token using the JwtService.
+ * - Authenticates the user based on the token and user details obtained from UserDetailsService.
+ * - Propagates the request to the next filter in the chain if the token is missing,
+ *   invalid, or the user is already authenticated.
+ *
+ * Note:
+ * - This filter ensures that only one filter execution occurs per request by leveraging
+ *   the OncePerRequestFilter base class functionality.
+ * - If the Authorization header or Bearer token is not present, the request is directly passed
+ *   to the next filter in the chain without any modification.
+ */
 @Component
 @RequiredArgsConstructor // crea un costruttore con i campi final
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

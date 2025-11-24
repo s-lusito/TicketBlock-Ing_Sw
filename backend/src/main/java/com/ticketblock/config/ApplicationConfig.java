@@ -25,6 +25,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  - PasswordEncoder: usa BCrypt per criptare e verificare le password.
 */
 
+/**
+ * Configuration class for application-level beans and security configurations.
+ * This class defines the essential beans required for authentication and password encoding.
+ */
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
