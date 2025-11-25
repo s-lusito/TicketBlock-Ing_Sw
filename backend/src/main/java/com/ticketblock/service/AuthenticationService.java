@@ -34,11 +34,17 @@ public class AuthenticationService {
         if (request.getRole().equals(Role.ADMIN)){
             throw new IllegalArgumentException("You are not allowed to register as admin");
         }
+
+        if(userRepository.findByEmail(request.getEmail()).isPresent()){ //se la mail è già presente
+            throw new IllegalArgumentException("User is already registered");
+        }
+
         var user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
+                .role(request.getRole())
                 .build();
         userRepository.save(user);
         var jwt = jwtService.generateToken(user);
