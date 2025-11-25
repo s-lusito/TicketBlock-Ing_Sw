@@ -1,4 +1,4 @@
-package com.ticketblock.config;
+package com.ticketblock.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
