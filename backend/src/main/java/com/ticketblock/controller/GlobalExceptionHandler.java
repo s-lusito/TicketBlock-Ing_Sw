@@ -33,11 +33,13 @@ public class GlobalExceptionHandler {
     //cattura in automatico questo tipo di eccezioni lanciate, senza bisogno del try catch
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException exception) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponse errorResponse= ErrorResponse
                 .builder()
-                .message(exception.getMessage())
+                .message("User not found")
+                .status(status.value())
                 .build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     // Gestisci token scaduto
