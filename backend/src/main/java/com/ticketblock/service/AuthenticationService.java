@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +31,6 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse register(RegisterRequest request) {
-        if (request.getRole().equals(Role.ADMIN)){
-            throw new IllegalArgumentException("You are not allowed to register as admin");
-        }
 
         if(userRepository.findByEmail(request.getEmail()).isPresent()){ //se la mail è già presente
             throw new IllegalArgumentException("User is already registered");
@@ -43,7 +41,7 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .role(request.getRole())
+                .role(Role.valueOf(request.getRole()))
                 .build();
         userRepository.save(user);
         var jwt = jwtService.generateToken(user);

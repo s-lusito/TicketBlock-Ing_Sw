@@ -65,12 +65,23 @@ public class GlobalExceptionHandler {
     // Gestisci anche eccezioni generiche
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGenericException(Exception exception) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorResponse errorResponse= ErrorResponse.builder()
                 .message("Internal Server Error")
+                .status(status.value())
                 .build();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException exception) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse= ErrorResponse.builder()
+                .message(exception.getMessage())
+                .status(status.value())
+                .build();
+        return ResponseEntity.status(status).body(errorResponse);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {

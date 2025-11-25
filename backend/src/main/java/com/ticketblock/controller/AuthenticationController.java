@@ -3,8 +3,10 @@ package com.ticketblock.controller;
 import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
+import com.ticketblock.entity.Role;
 import com.ticketblock.service.AuthenticationService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +23,29 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
+        isRoleValid(request.getRole());
         return ResponseEntity.ok(authenticationService.register(request));
+    }
+
+    private void isRoleValid(@NotNull(message = "Role is required") String role) {
+        String exceptionMsg = "Role must be one of [ROLE_USER, ROLE_ADMIN]";
+        try {
+            Role role1 = Role.valueOf(role);
+            if (role1.equals(Role.ADMIN)) {
+                throw new IllegalArgumentException(exceptionMsg);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(exceptionMsg);
+        }
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
+
+
+
 
 
 
