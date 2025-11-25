@@ -1,5 +1,6 @@
 package com.ticketblock.config;
 
+import com.ticketblock.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

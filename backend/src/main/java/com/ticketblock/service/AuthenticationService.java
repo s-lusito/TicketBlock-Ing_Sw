@@ -1,6 +1,5 @@
 package com.ticketblock.service;
 
-import com.ticketblock.config.JwtService;
 import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
