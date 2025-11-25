@@ -4,6 +4,7 @@ import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
 import com.ticketblock.entity.Role;
+import com.ticketblock.exception.InvalidRoleException;
 import com.ticketblock.service.AuthenticationService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -28,14 +29,13 @@ public class AuthenticationController {
     }
 
     private void isRoleValid(@NotNull(message = "Role is required") String role) {
-        String exceptionMsg = "Role must be one of [ROLE_USER, ROLE_ADMIN]";
         try {
             Role role1 = Role.valueOf(role);
             if (role1.equals(Role.ADMIN)) {
-                throw new IllegalArgumentException(exceptionMsg);
+                throw new InvalidRoleException();
             }
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(exceptionMsg);
+            throw new InvalidRoleException();
         }
     }
 

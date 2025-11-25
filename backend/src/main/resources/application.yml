@@ -15,6 +15,15 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+# Log su file e livello di log per com.ticketblock
+logging:
+  file:
+    name: backend/logs/ticketblock.log
+  level:
+    com:
+      ticketblock: DEBUG
+
+
 
 
 
