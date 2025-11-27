@@ -45,6 +45,8 @@ public class AuthenticationController {
     }
 
 
+    //per fare il logout basta che il frontend elimina il token
+
 
 
 
