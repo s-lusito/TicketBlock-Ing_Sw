@@ -3,7 +3,7 @@ package com.ticketblock.controller;
 import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
-import com.ticketblock.entity.Role;
+import com.ticketblock.entity.enumeration.Role;
 import com.ticketblock.exception.InvalidRoleException;
 import com.ticketblock.service.AuthenticationService;
 import jakarta.validation.Valid;

@@ -1,5 +1,6 @@
 package com.ticketblock.entity;
 
+import com.ticketblock.entity.enumeration.TicketStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

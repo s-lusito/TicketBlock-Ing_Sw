@@ -1,5 +1,6 @@
 package com.ticketblock.entity;
 
+import com.ticketblock.entity.enumeration.RowSector;
 import jakarta.persistence.*;
 import lombok.*;
 
