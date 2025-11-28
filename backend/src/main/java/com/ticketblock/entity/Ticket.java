@@ -4,6 +4,7 @@ import com.ticketblock.entity.enumeration.TicketStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -16,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Integer id;
 
     @ManyToOne()

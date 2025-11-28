@@ -1,10 +1,7 @@
 package com.ticketblock.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -16,7 +13,9 @@ import java.util.List;
 public class Venue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private int id;
+
     @Column(nullable = false)
     private String venueName;
 

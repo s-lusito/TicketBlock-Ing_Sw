@@ -13,6 +13,7 @@ import java.util.Set;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private int id;
     @Column(nullable = false)
     private String eventName;
@@ -32,7 +33,6 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JoinColumn(nullable = false, updatable = false)
     private Venue venue;
 

@@ -16,14 +16,15 @@ public class Seat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @EqualsAndHashCode.Include
     private int id;
+
     @Column(nullable = false)
     private String seatNumber;
 
     @ManyToOne (fetch = FetchType.LAZY) //non carica anche la row dal db finchè non serve, evita caricamenti inutili
     @JoinColumn(nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude //questo evita di dover richiamere a loro volta gli altri metodi tostring a catena
+    @ToString.Exclude//questo evita di dover richiamere a loro volta gli altri metodi tostring a catena
     private Row row;
 
     @OneToMany(mappedBy = "seat")

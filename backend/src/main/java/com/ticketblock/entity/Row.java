@@ -16,7 +16,9 @@ import java.util.List;
 public class Row {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private int id;
+
     @Column(nullable = false)
     private String rowLetter;
 
@@ -26,7 +28,6 @@ public class Row {
 
     @ManyToOne(fetch = FetchType.LAZY)// molte file associate a una venue
     @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     private Venue venue;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "row")
