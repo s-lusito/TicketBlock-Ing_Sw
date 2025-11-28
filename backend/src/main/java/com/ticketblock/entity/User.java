@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -38,6 +39,12 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<Ticket> tickets;
+
+    @OneToMany(mappedBy = "organizer")
+    private Set<Event> events;
 
 
     @Override

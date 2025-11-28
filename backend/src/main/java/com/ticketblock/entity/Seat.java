@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -23,4 +25,7 @@ public class Seat {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Row row;
+
+    @OneToMany(mappedBy = "seat")
+    private Set<Ticket> tickets;
 }
