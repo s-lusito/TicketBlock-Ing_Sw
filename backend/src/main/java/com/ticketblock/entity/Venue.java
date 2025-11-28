@@ -1,5 +1,6 @@
 package com.ticketblock.entity;
 
+import com.ticketblock.entity.enumeration.RowSector;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +18,7 @@ public class Venue {
     private int id;
 
     @Column(nullable = false)
-    private String venueName;
+    private String name;
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "venue")
     private Address address;
@@ -25,6 +26,12 @@ public class Venue {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "venue")
     private List<Row> rows;
 
+    public List<Row> getStandardrows(){
+        return rows.stream().filter(row -> row.getSector().equals(RowSector.STANDARD)).toList();
+    }
 
+    public List<Row> getViprows(){
+        return rows.stream().filter(row -> row.getSector().equals(RowSector.VIP)).toList();
+    }
 
 }
