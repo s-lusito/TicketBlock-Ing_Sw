@@ -34,6 +34,9 @@ public class Ticket {
     @JoinColumn()
     private User organizer;
 
+    @Column(nullable = false)
+    private Boolean resellable;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TicketStatus ticketStatus = TicketStatus.SELLING;
