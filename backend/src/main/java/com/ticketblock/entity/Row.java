@@ -10,21 +10,22 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = {"venue_id","row_Letter"})
+        uniqueConstraints = @UniqueConstraint(columnNames = {"venue_id","letter"})
 )
 public class Row {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
-    private String rowLetter;
+    private String letter;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private RowSector rowSector = RowSector.STANDARD;
+    private RowSector sector = RowSector.STANDARD;
 
     @ManyToOne(fetch = FetchType.LAZY)// molte file associate a una venue
     @ToString.Exclude

@@ -22,7 +22,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
-    private int userId;
+    private Integer userId;
 
     public static final int MAX_EMAIL_LENGTH = 50;
     public static final int MAX_NAME_LENGTH = 50;

@@ -17,7 +17,7 @@ public class Seat {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
     private String seatNumber;
