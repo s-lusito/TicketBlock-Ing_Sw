@@ -1,6 +1,8 @@
 package com.ticketblock.entity;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,7 +30,9 @@ public class Event {
 
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @JoinColumn(nullable = false, updatable = false)
     private Venue venue;
 

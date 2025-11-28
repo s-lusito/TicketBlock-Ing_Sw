@@ -1,9 +1,7 @@
 package com.ticketblock.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Set;
 
@@ -22,8 +20,10 @@ public class Seat {
     @Column(nullable = false)
     private String seatNumber;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY) //non carica anche la row dal db finchè non serve, evita caricamenti inutili
     @JoinColumn(nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude //questo evita di dover richiamere a loro volta gli altri metodi tostring a catena
     private Row row;
 
     @OneToMany(mappedBy = "seat")

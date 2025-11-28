@@ -25,7 +25,6 @@ public class Ticket {
     @JoinColumn()
     private Seat seat;
 
-
     @ManyToOne()
     @JoinColumn()
     private User owner;

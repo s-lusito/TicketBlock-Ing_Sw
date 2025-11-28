@@ -1,9 +1,7 @@
 package com.ticketblock.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -25,10 +23,11 @@ public class Row {
     @Enumerated(EnumType.STRING)
     private RowSector rowSector = RowSector.STANDARD;
 
-    @ManyToOne// molte file associate a una venue
+    @ManyToOne(fetch = FetchType.LAZY)// molte file associate a una venue
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Venue venue;
 
-    @Column(nullable = false)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "row")
     private List<Seat> seats;
 

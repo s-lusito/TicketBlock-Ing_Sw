@@ -23,7 +23,6 @@ public class Venue {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "venue")
     private Address address;
 
-    @Column(nullable = false)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "venue")
     private List<Row> rows;
 
