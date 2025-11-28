@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Arena Grande Spettacoli",
+    "address": {
+      "street": "Piazza degli Eventi 50",
+      "city": "Milan",
+      "state": "Lombardy"
+    },
+    "rows": [
+      {
+        "letter": "A",
+        "sector": "STANDARD",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}, {"seatNumber": "5"},
+          {"seatNumber": "6"}, {"seatNumber": "7"}, {"seatNumber": "8"}, {"seatNumber": "9"}, {"seatNumber": "10"}
+        ]
+      },
+      {
+        "letter": "B",
+        "sector": "STANDARD",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}, {"seatNumber": "5"},
+          {"seatNumber": "6"}, {"seatNumber": "7"}, {"seatNumber": "8"}, {"seatNumber": "9"}, {"seatNumber": "10"},
+          {"seatNumber": "11"}, {"seatNumber": "12"}, {"seatNumber": "13"}, {"seatNumber": "14"}, {"seatNumber": "15"}
+        ]
+      },
+      {
+        "letter": "C",
+        "sector": "STANDARD",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}, {"seatNumber": "5"}
+        ]
+      },
+      {
+        "letter": "D",
+        "sector": "STANDARD",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}, {"seatNumber": "5"},
+          {"seatNumber": "6"}, {"seatNumber": "7"}, {"seatNumber": "8"}, {"seatNumber": "9"}, {"seatNumber": "10"}
+        ]
+      },
+      {
+        "letter": "E",
+        "sector": "VIP",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}, {"seatNumber": "5"}
+        ]
+      },
+      {
+        "letter": "F",
+        "sector": "VIP",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}
+        ]
+      },
+      {
+        "letter": "G",
+        "sector": "VIP",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Olympic Theatre",
+    "address": {
+      "street": "Piazza Gentile da Fabriano 17",
+      "city": "Rome",
+      "state": "Lazio"
+    },
+    "rows": [
+      {
+        "letter": "A",
+        "sector": "STANDARD",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}, {"seatNumber": "5"},
+          {"seatNumber": "6"}, {"seatNumber": "7"}, {"seatNumber": "8"}, {"seatNumber": "9"}, {"seatNumber": "10"}
+        ]
+      },
+      {
+        "letter": "B",
+        "sector": "STANDARD",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}, {"seatNumber": "5"},
+          {"seatNumber": "6"}, {"seatNumber": "7"}, {"seatNumber": "8"}, {"seatNumber": "9"}, {"seatNumber": "10"}
+        ]
+      },
+      {
+        "letter": "C",
+        "sector": "VIP",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}
+        ]
+      }
+    ]
+  }
+]
