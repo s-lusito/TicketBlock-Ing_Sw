@@ -2,6 +2,7 @@ package com.ticketblock.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Set;
@@ -35,10 +36,10 @@ public class Event {
     private Set<Ticket> tickets;
 
     @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
-    private Integer standardTicketPrice;
+    private BigDecimal standardTicketPrice; //big decimal è preferito a float o double essendo più preciso
 
     @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
-    private Integer vipTicketPrice;
+    private BigDecimal vipTicketPrice;
 
 }
 
