@@ -31,10 +31,7 @@ public class Ticket {
     @ManyToOne()
     @JoinColumn()
     private User owner;
-
-    @ManyToOne()
-    @JoinColumn()
-    private User organizer;
+    
 
     @Column(nullable = false)
     private Boolean resellable;
