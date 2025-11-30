@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * A data transfer object used for authenticating a user.
  *
- * This class includes the necessary details required for a user registration process,
- * including the user's first name, last name, email, and password.
-
+ * This class includes the email and password required for user authentication.
  */
 @Data
 @Builder

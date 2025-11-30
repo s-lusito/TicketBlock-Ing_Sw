@@ -2,14 +2,12 @@ package com.ticketblock.dto.Response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.FieldResult;
-import jakarta.persistence.GeneratedValue;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.List;

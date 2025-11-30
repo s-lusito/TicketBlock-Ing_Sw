@@ -1,7 +1,6 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/ticketblock
-
     username: team
     password: password
     driver-class-name: org.postgresql.Driver

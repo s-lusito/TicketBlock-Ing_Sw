@@ -7,7 +7,6 @@ import com.ticketblock.entity.Role;
 import com.ticketblock.exception.InvalidRoleException;
 import com.ticketblock.service.AuthenticationService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,14 +23,14 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
-        isRoleValid(request.getRole());
+        validateRole(request.getRole());
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
-    private void isRoleValid(@NotNull(message = "Role is required") String role) {
+    private void validateRole(String role) {
         try {
-            Role role1 = Role.valueOf(role);
-            if (role1.equals(Role.ADMIN)) {
+            Role requestedRole = Role.valueOf(role);
+            if (requestedRole.equals(Role.ADMIN)) {
                 throw new InvalidRoleException();
             }
         } catch (IllegalArgumentException e) {
