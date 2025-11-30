@@ -2,9 +2,6 @@ package com.ticketblock.mapper;
 
 import com.ticketblock.dto.Response.RowDto;
 import com.ticketblock.entity.Row;
-import com.ticketblock.entity.enumeration.RowSector;
-
-import java.util.List;
 
 
 public class RowMapper {

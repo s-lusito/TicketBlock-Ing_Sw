@@ -1,14 +1,7 @@
 package com.ticketblock.mapper;
 
-import com.ticketblock.dto.Response.RowDto;
-import com.ticketblock.dto.Response.SeatDto;
 import com.ticketblock.dto.Response.VenueDto;
-import com.ticketblock.entity.Row;
 import com.ticketblock.entity.Venue;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 public class VenueMapper {

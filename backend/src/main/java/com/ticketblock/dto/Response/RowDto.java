@@ -1,9 +1,6 @@
 package com.ticketblock.dto.Response;
 
-import com.ticketblock.entity.Seat;
-import com.ticketblock.entity.Venue;
 import com.ticketblock.entity.enumeration.RowSector;
-import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
