@@ -20,7 +20,7 @@ public class Seat {
     private Integer id;
 
     @Column(nullable = false)
-    private String seatNumber;
+    private Integer seatNumber;
 
     @ManyToOne (fetch = FetchType.LAZY) //non carica anche la row dal db finchè non serve, evita caricamenti inutili
     @JoinColumn(nullable = false)
