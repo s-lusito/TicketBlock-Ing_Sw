@@ -1,6 +1,5 @@
 package com.ticketblock.dto.Request;
 
-import com.ticketblock.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 
 /**
  * A data transfer object used for registering a new user.
@@ -23,11 +21,14 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 public class RegisterRequest {
     @NotBlank(message = "First name is required")
+    @Size(max = 50, message = "First name must not exceed 50 characters")
     private String firstName;
     @NotBlank(message = "Last name is required")
+    @Size(max = 50, message = "Last name must not exceed 50 characters")
     private String lastName;
     @Email(message = "Not a valid email")
     @NotBlank(message = "Email is required")
+    @Size(max = 50, message = "Email must not exceed 50 characters")
     private String email;
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must have at least 8 characters" )
