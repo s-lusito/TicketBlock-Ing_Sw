@@ -3,6 +3,7 @@ package com.ticketblock.controller;
 import com.ticketblock.dto.Response.ApiFieldError;
 import com.ticketblock.dto.Response.ErrorResponse;
 import com.ticketblock.exception.InvalidRoleException;
+import com.ticketblock.exception.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -129,11 +130,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleInvalidRoleException(InvalidRoleException exception) {
         log.warn(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ErrorResponse errorResponse= ErrorResponse.builder()
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .message(exception.getMessage())
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
+    }
+
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException exception) {
+        log.warn(exception.getMessage(), exception);
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(exception.getMessage())
+                .status(status.value())
+                .build();
+        return ResponseEntity.status(status).body(errorResponse);
+
     }
 
 
