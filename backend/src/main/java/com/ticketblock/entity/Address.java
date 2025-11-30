@@ -12,7 +12,7 @@ import lombok.*;
 public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer addressId;
+    private Integer id;
     @Column(nullable = false)
     private String street;
     @Column(nullable = false)
