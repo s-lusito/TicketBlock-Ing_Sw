@@ -4,10 +4,12 @@ import com.ticketblock.dto.Response.ApiFieldError;
 import com.ticketblock.dto.Response.ErrorResponse;
 import com.ticketblock.exception.InvalidRoleException;
 import com.ticketblock.exception.ResourceNotFoundException;
+import com.ticketblock.exception.VenueNotAvailableException;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -136,6 +138,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(errorResponse);
     }
 
+    @ExceptionHandler(VenueNotAvailableException.class)
+    public ResponseEntity<?> handleVenueNotAvailableException(VenueNotAvailableException exception) {
+        log.warn(exception.getMessage(), exception);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(exception.getMessage())
+                .status(status.value())
+                .build();
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException exception) {
@@ -147,6 +160,20 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
 
+    }
+
+    /**
+     * Manages exceptions related to malformed JSON requests.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception) {
+        log.warn(exception.getMessage(), exception);
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message("Malformed JSON request")
+                .status(status.value())
+                .build();
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
 
