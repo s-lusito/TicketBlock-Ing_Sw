@@ -4,6 +4,8 @@ import com.ticketblock.entity.enumeration.TicketStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,6 +35,11 @@ public class Ticket {
 
     @Column(nullable = false)
     private Boolean resellable;
+
+    // updatable = false garantisce l'immutabilità del prezzo
+    // Una volta salvato nel DB, non potrà più essere modificato
+    @Column(nullable = false, updatable = false)
+    private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
