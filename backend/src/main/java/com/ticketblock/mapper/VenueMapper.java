@@ -1,6 +1,7 @@
 package com.ticketblock.mapper;
 
 import com.ticketblock.dto.Response.VenueDto;
+import com.ticketblock.dto.Response.VenueSummaryDto;
 import com.ticketblock.entity.Venue;
 
 
@@ -19,6 +20,14 @@ public class VenueMapper {
                 )
                 .build();
 
+    }
+
+    public static VenueSummaryDto toSummaryDto(Venue venue) {
+        return VenueSummaryDto.builder()
+                .id(venue.getId())
+                .name(venue.getName())
+                .addressDto(AddressMapper.toDto(venue.getAddress()))
+                .build();
     }
 
 

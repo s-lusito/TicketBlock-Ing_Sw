@@ -15,7 +15,7 @@ public class EventMapper {
                         UserMapper.toDto(event.getOrganizer())
                 )
                 .venue(
-                        VenueMapper.toDto(event.getVenue())
+                        VenueMapper.toSummaryDto(event.getVenue())
                 )
                 .standardTicketPrice(event.getStandardTicketPrice())
                 .vipTicketPrice(event.getVipTicketPrice())

@@ -6,6 +6,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -40,7 +42,8 @@ public class Event {
     private Venue venue;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "event")
-    private Set<Ticket> tickets;
+    @Builder.Default
+    private List<Ticket> tickets = new ArrayList<>();
 
     @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
     private BigDecimal standardTicketPrice; //big decimal è preferito a float o double essendo più preciso

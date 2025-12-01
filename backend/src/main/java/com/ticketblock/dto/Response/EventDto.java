@@ -20,7 +20,7 @@ public class EventDto {
     private UserDto organizer;
     private LocalDate localDate;
     private LocalTime localTime;
-    private VenueDto venue;
+    private VenueSummaryDto venue;
     private BigDecimal standardTicketPrice;
     private BigDecimal vipTicketPrice;
 }
