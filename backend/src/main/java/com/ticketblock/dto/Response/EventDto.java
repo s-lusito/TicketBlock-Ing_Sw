@@ -17,8 +17,9 @@ public class EventDto {
     private Integer id;
     private String name;
     private UserDto organizer;
-    private LocalDate localDate;
-    private LocalTime localTime;
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private VenueSummaryDto venue;
     private BigDecimal standardTicketPrice;
     private BigDecimal vipTicketPrice;

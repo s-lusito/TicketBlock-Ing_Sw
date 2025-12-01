@@ -27,11 +27,14 @@ public class Event {
     private User organizer;
 
 
-    @Column(name = "local_date", columnDefinition = "DATE")
-    private LocalDate localDate;
+    @Column(columnDefinition = "DATE")
+    private LocalDate date;
 
-    @Column(name = "local_time", columnDefinition = "TIME")
-    private LocalTime localTime;
+    @Column(columnDefinition = "TIME")
+    private LocalTime startTime;
+
+    @Column(columnDefinition = "TIME")
+    private LocalTime endTime;
 
 
 

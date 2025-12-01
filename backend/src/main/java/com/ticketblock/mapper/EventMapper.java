@@ -9,8 +9,9 @@ public class EventMapper {
         return EventDto.builder()
                 .id(event.getId())
                 .name(event.getEventName())
-                .localDate(event.getLocalDate())
-                .localTime(event.getLocalTime())
+                .date(event.getDate())
+                .startTime(event.getStartTime())
+                .endTime(event.getEndTime())
                 .organizer(
                         UserMapper.toDto(event.getOrganizer())
                 )
@@ -26,8 +27,9 @@ public class EventMapper {
     public static Event toEntity(EventCreationRequest eventCreationRequest) {
         return Event.builder()
                 .eventName(eventCreationRequest.getName())
-                .localDate(eventCreationRequest.getLocalDate())
-                .localTime(eventCreationRequest.getLocalTime())
+                .date(eventCreationRequest.getDate())
+                .endTime(eventCreationRequest.getEndTime())
+                .startTime(eventCreationRequest.getStartTime())
                 .standardTicketPrice(eventCreationRequest.getStandardTicketPrice())
                 .vipTicketPrice(eventCreationRequest.getVipTicketPrice())
                 .build();
