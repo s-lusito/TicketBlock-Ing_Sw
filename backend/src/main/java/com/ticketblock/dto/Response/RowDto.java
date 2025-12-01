@@ -9,7 +9,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class RowDto {
-    @EqualsAndHashCode.Include
     private Integer id;
 
     private String letter;
