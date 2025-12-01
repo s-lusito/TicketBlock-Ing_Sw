@@ -9,6 +9,7 @@ import java.util.Set;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(
         uniqueConstraints = @UniqueConstraint(columnNames = {"row_id","seat_number"})
 )
@@ -23,7 +24,7 @@ public class Seat {
     private Integer seatNumber;
 
     @ManyToOne (fetch = FetchType.LAZY) //non carica anche la row dal db finchè non serve, evita caricamenti inutili
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "row_id")
     @ToString.Exclude//questo evita di dover richiamere a loro volta gli altri metodi tostring a catena
     private Row row;
 

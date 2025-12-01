@@ -26,7 +26,7 @@ public class VenueMapper {
         return VenueSummaryDto.builder()
                 .id(venue.getId())
                 .name(venue.getName())
-                .addressDto(AddressMapper.toDto(venue.getAddress()))
+                .address(AddressMapper.toDto(venue.getAddress()))
                 .build();
     }
 

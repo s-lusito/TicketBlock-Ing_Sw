@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class VenueSummaryDto {
     private Integer id;
     private String name;
-    private AddressDto addressDto;
+    private AddressDto address;
 }

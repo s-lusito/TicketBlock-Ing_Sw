@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Entity
 @Builder
 @Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = {"event_id","seat_id"}) //ogni ticket deve aver euna combinazione unica di evento e posto fisico
+        uniqueConstraints = @UniqueConstraint(columnNames = {"event_id","seat_id"}) //ogni ticket deve aver una combinazione unica di evento e posto fisico
 )
 public class Ticket {
     @Id
@@ -21,11 +21,11 @@ public class Ticket {
     private Integer id;
 
     @ManyToOne()
-    @JoinColumn
+    @JoinColumn(name = "event_id")
     private Event event;
 
     @ManyToOne()
-    @JoinColumn()
+    @JoinColumn(name = "seat_id")
     private Seat seat;
 
     @ManyToOne()

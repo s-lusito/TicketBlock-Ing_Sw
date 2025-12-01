@@ -44,11 +44,11 @@ public class DataInitializer implements CommandLineRunner {  //CommandLineRunner
         Resource resource = resourceLoader.getResource("classpath:data/venue_data.json");
 
         try (InputStream inputStream = resource.getInputStream()) {
-            // legge gli elementi e li m
+            // legge gli elementi e li mappa in oggetti Venue
             List<Venue> venuesFromJSON = objectMapper.readValue(inputStream, new TypeReference<List<Venue>>() {
             });
-            //come secondo parametro di readValue si mette il tipo ( se fosse una singola vanue, Venue.class
-            //Tuttavia avedendo una lsita, per indicare il tipo della lista di dati si crea una classe anonima, che mantiene l'informazione sul tipo del generico fra i suoi dati
+            //come secondo parametro di readValue si mette il tipo ( se fosse una singola venue, Venue.class
+            //Tuttavia avendo una lista, per indicare il tipo della lista di dati si crea una classe anonima, che mantiene l'informazione sul tipo del generico fra i suoi dati
             // senza typeReference non sarebbe possibile accedere al tipo dei dati visto che a runtime java effettua il type erasure ( List<Venue>.class darebbe solo l'info che è una List
 
             // Imposto manualmente le relazioni bidirezionali mancanti

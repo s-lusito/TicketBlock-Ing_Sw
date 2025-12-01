@@ -28,6 +28,7 @@ public class Row {
     private RowSector sector = RowSector.STANDARD;
 
     @ManyToOne(fetch = FetchType.LAZY)// molte file associate a una venue
+    @JoinColumn(nullable = false)
     @ToString.Exclude
     private Venue venue;
 

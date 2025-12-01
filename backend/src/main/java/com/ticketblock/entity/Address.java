@@ -24,7 +24,7 @@ public class Address {
     private String state;
 
     @OneToOne
-
+    @JoinColumn(name = "venue_id")
     private Venue venue;
 
 }

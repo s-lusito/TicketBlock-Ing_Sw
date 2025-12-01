@@ -1,6 +1,5 @@
 package com.ticketblock.dto.Response;
 
-import com.ticketblock.entity.Seat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

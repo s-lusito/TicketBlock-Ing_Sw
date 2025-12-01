@@ -26,11 +26,11 @@ public class Venue {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "venue")
     private List<Row> rows;
 
-    public List<Row> getStandardrows(){
+    public List<Row> getStandardRows(){
         return rows.stream().filter(row -> row.getSector().equals(RowSector.STANDARD)).toList();
     }
 
-    public List<Row> getViprows(){
+    public List<Row> getVipRows(){
         return rows.stream().filter(row -> row.getSector().equals(RowSector.VIP)).toList();
     }
 
