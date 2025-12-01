@@ -70,8 +70,10 @@ public class SecurityConfiguration {
                         // Rotte "whitelist" aperte a tutti (es. login, registrazione, API pubbliche)
                         .requestMatchers(WHITE_LIST_URL).permitAll()
 
-                        // Esempio: proteggi endpoint di management per ADMIN
+                        // Protegge endpoint di management per ADMIN
                         .requestMatchers("/api/v1/management/**").hasAuthority("ADMIN")
+                        // Protegge endpoint di gestione eventi per ORGANIZER
+                        .requestMatchers("/api/v1/events/**").hasAuthority("ORGANIZER")
 
                         // Tutte le altre richieste richiedono autenticazione
                         .anyRequest().authenticated()
