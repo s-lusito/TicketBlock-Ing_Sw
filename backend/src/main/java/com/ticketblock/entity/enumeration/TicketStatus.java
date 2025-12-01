@@ -1,7 +1,7 @@
 package com.ticketblock.entity.enumeration;
 
 public enum TicketStatus {
-    SELLING,
+    AVAILABLE,
     SOLD,
     INVALIDATED,
 }

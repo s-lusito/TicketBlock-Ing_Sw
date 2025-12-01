@@ -43,7 +43,7 @@ public class Ticket {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TicketStatus ticketStatus = TicketStatus.SELLING;
+    private TicketStatus ticketStatus = TicketStatus.AVAILABLE;
 
 
 
