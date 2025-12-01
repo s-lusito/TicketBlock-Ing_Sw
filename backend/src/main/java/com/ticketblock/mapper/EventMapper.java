@@ -20,6 +20,7 @@ public class EventMapper {
                 )
                 .standardTicketPrice(event.getStandardTicketPrice())
                 .vipTicketPrice(event.getVipTicketPrice())
+                .imageUrl(event.getImageUrl())
                 .build();
 
     }
@@ -32,6 +33,7 @@ public class EventMapper {
                 .startTime(eventCreationRequest.getStartTime())
                 .standardTicketPrice(eventCreationRequest.getStandardTicketPrice())
                 .vipTicketPrice(eventCreationRequest.getVipTicketPrice())
+                .imageUrl(eventCreationRequest.getImageUrl())
                 .build();
     }
 }

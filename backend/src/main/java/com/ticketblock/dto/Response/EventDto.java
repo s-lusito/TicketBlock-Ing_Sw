@@ -20,6 +20,7 @@ public class EventDto {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
+    private String imageUrl;
     private VenueSummaryDto venue;
     private BigDecimal standardTicketPrice;
     private BigDecimal vipTicketPrice;

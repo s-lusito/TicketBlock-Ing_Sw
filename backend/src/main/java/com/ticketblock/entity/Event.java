@@ -36,6 +36,8 @@ public class Event {
     @Column(columnDefinition = "TIME")
     private LocalTime endTime;
 
+    private String imageUrl;
+
 
 
     @ManyToOne(fetch = FetchType.LAZY)
