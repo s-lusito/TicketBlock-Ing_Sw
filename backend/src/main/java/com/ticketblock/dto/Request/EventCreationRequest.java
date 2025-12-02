@@ -35,9 +35,11 @@ public class EventCreationRequest {
     @NotNull
     private Integer venueId;
     @Positive
+    @NotNull
     @NumberFormat(style = NumberFormat.Style.CURRENCY)
     private BigDecimal standardTicketPrice;
     @Positive
+    @NotNull
     @NumberFormat(style = NumberFormat.Style.CURRENCY)
     private BigDecimal vipTicketPrice;
 
