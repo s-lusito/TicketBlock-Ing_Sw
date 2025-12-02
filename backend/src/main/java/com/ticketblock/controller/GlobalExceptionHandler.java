@@ -4,6 +4,7 @@ import com.ticketblock.dto.Response.ApiFieldError;
 import com.ticketblock.dto.Response.ErrorResponse;
 import com.ticketblock.exception.InvalidRoleException;
 import com.ticketblock.exception.ResourceNotFoundException;
+import com.ticketblock.exception.UnauthorizedActionException;
 import com.ticketblock.exception.VenueNotAvailableException;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
@@ -169,6 +170,16 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .message(exception.getMostSpecificCause().getMessage()) //TODO specificare di più
+                .status(status.value())
+                .build();
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+    @ExceptionHandler(UnauthorizedActionException.class)
+    public ResponseEntity<?> handleUnauthorizedActionException(UnauthorizedActionException exception) {
+        log.warn(exception.getMessage(), exception);
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(exception.getMessage())
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
