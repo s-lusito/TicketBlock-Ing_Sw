@@ -168,7 +168,7 @@ public class GlobalExceptionHandler {
         log.warn(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .message("Malformed JSON request") //TODO specificare di più
+                .message(exception.getMostSpecificCause().getMessage()) //TODO specificare di più
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
