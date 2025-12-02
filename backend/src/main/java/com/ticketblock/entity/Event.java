@@ -47,7 +47,6 @@ public class Event {
     private Venue venue;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "event")
-    @Builder.Default
     private List<Ticket> tickets;
 
     @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
