@@ -2,7 +2,6 @@ package com.ticketblock.controller;
 
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
-import com.ticketblock.entity.Event;
 import com.ticketblock.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

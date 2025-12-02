@@ -1,10 +1,9 @@
 package com.ticketblock.service;
 
 import com.ticketblock.dto.Response.VenueDto;
-import com.ticketblock.entity.Venue;
 import com.ticketblock.exception.ResourceNotFoundException;
-import com.ticketblock.repository.VenueRepository;
 import com.ticketblock.mapper.VenueMapper;
+import com.ticketblock.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

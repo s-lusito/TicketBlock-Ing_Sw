@@ -1,7 +1,5 @@
 package com.ticketblock.dto.Request;
 
-import com.ticketblock.dto.Response.UserDto;
-import com.ticketblock.dto.Response.VenueDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

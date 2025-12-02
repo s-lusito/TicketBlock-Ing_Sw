@@ -13,7 +13,6 @@ import com.ticketblock.repository.UserRepository;
 import com.ticketblock.repository.VenueRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
