@@ -6,6 +6,7 @@ import com.ticketblock.entity.*;
 import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.ResourceNotFoundException;
+import com.ticketblock.exception.UnauthorizedActionException;
 import com.ticketblock.exception.VenueNotAvailableException;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
@@ -110,8 +111,15 @@ public class EventService {
     }
 
     public EventDto removeEventById(int eventId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User loggedUser = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email:" + email + " not found"));
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event with id:" + eventId + " not found"));
+
+        // verifico che l'utente sia l'organizzatore dell'evento
+        if (!loggedUser.equals(event.getOrganizer())) {
+            throw new UnauthorizedActionException("User are not authorized to delete this event, since is not the organizer");
+        }
         eventRepository.delete(event);
         return EventMapper.toDto(event);
     }
