@@ -1,5 +1,6 @@
 package com.ticketblock.entity;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -47,7 +48,7 @@ public class Event {
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "event")
     @Builder.Default
-    private List<Ticket> tickets = new ArrayList<>();
+    private List<Ticket> tickets;
 
     @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
     private BigDecimal standardTicketPrice; //big decimal è preferito a float o double essendo più preciso
@@ -55,6 +56,8 @@ public class Event {
     @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
     private BigDecimal vipTicketPrice;
 
+    @PostConstruct
+    public void init() {
+        this.tickets = new ArrayList<>();
+    }
 }
-
-
