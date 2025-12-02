@@ -3,13 +3,16 @@ package com.ticketblock.controller;
 import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
-import com.ticketblock.entity.Role;
+import com.ticketblock.entity.enumeration.Role;
 import com.ticketblock.exception.InvalidRoleException;
 import com.ticketblock.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,16 +1,15 @@
 package com.ticketblock.entity;
 
+import com.ticketblock.entity.enumeration.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 @Entity
@@ -22,7 +21,8 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int userId;
+    @EqualsAndHashCode.Include
+    private Integer userId;
 
     public static final int MAX_EMAIL_LENGTH = 50;
     public static final int MAX_NAME_LENGTH = 50;
@@ -38,6 +38,12 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<Ticket> tickets;
+
+    @OneToMany(mappedBy = "organizer")
+    private Set<Event> events;
 
 
     @Override
