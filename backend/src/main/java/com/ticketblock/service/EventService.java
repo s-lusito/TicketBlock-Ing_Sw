@@ -14,7 +14,6 @@ import com.ticketblock.repository.VenueRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -77,21 +76,21 @@ public class EventService {
         }
     }
 
-    private static void verifyVenueAvailability(Venue venue, EventCreationRequest newEvent) {
-        for (Event existingEvent : venue.getEvents()) {
-            if (existingEvent.getDate().equals(newEvent.getDate())) {
+    private void verifyVenueAvailability(Venue venue, EventCreationRequest newEvent) {
+        int hourBuffer = 1; //buffer di un'ora tra eventi
+        List<Event> events = eventRepository.findAllByDateAndVenue(newEvent.getDate(), venue);
+        for (Event existingEvent : events) {
                 //se la data coincide, verifico se gli orari si sovrappongono:
-
                 boolean compatible =
-                        newEvent.getEndTime().isBefore(existingEvent.getStartTime()) || //l'evento nuovo finisce prima che inizi quello esistente
-                                newEvent.getStartTime().isAfter(existingEvent.getEndTime()); //l'evento nuovo inizia dopo che finisce quello esistente
+                        newEvent.getEndTime().isBefore(existingEvent.getStartTime().minusHours(hourBuffer)) || //l'evento nuovo finisce un'ora prima che inizi quello esistente
+                                newEvent.getStartTime().isAfter(existingEvent.getEndTime().plusHours(hourBuffer)); //l'evento nuovo inizia dopo un'ora che finisce quello esistente
 
                 if (!compatible) {
                     throw new VenueNotAvailableException("Venue is not available at the selected date and time");
                 }
             }
         }
-    }
+
 
     private static void createTickets(Venue venue, Event event) {
         for (Row row : venue.getRows()) {
