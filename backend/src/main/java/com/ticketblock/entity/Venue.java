@@ -26,6 +26,9 @@ public class Venue {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "venue")
     private List<Row> rows;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "venue")
+    private List<Event> events;
+
     public List<Row> getStandardRows(){
         return rows.stream().filter(row -> row.getSector().equals(RowSector.STANDARD)).toList();
     }
