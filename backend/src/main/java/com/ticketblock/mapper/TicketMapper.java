@@ -8,7 +8,7 @@ public class TicketMapper {
         return TicketDto.builder()
                 .id(ticket.getId())
                 .seat(SeatMapper.toDto(ticket.getSeat()))
-                .owner(UserMapper.toDto(ticket.getOwner()))
+                .owner(ticket.getOwner() != null ? UserMapper.toDto(ticket.getOwner()) : null)
                 .resellable(ticket.getResellable())
                 .ticketStatus(ticket.getTicketStatus().name())
                 .price(ticket.getPrice())

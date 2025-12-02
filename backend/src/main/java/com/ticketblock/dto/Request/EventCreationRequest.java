@@ -1,7 +1,5 @@
 package com.ticketblock.dto.Request;
 
-import com.ticketblock.dto.Response.UserDto;
-import com.ticketblock.dto.Response.VenueDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -35,9 +33,11 @@ public class EventCreationRequest {
     @NotNull
     private Integer venueId;
     @Positive
+    @NotNull
     @NumberFormat(style = NumberFormat.Style.CURRENCY)
     private BigDecimal standardTicketPrice;
     @Positive
+    @NotNull
     @NumberFormat(style = NumberFormat.Style.CURRENCY)
     private BigDecimal vipTicketPrice;
 

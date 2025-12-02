@@ -1,5 +1,6 @@
 package com.ticketblock.entity;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,11 +28,16 @@ public class Event {
     private User organizer;
 
 
-    @Column(name = "local_date", columnDefinition = "DATE")
-    private LocalDate localDate;
+    @Column(columnDefinition = "DATE")
+    private LocalDate date;
 
-    @Column(name = "local_time", columnDefinition = "TIME")
-    private LocalTime localTime;
+    @Column(columnDefinition = "TIME")
+    private LocalTime startTime;
+
+    @Column(columnDefinition = "TIME")
+    private LocalTime endTime;
+
+    private String imageUrl;
 
 
 
@@ -50,6 +56,8 @@ public class Event {
     @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
     private BigDecimal vipTicketPrice;
 
+    @PostConstruct
+    public void init() {
+        this.tickets = new ArrayList<>();
+    }
 }
-
-
