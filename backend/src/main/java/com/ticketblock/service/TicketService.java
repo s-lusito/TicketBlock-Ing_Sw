@@ -9,6 +9,7 @@ import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.ResourceNotFoundException;
 import com.ticketblock.exception.UnauthorizedActionException;
+import com.ticketblock.exception.UnavailableTicketException;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.repository.UserRepository;
@@ -48,7 +49,7 @@ public class TicketService {
         BigDecimal totalPrice = new BigDecimal("0");
         for (Ticket ticket : tickets) {
             if (ticket.getTicketStatus() != TicketStatus.AVAILABLE) {
-                throw new UnauthorizedActionException("One or more tickets are not available for purchase");
+                throw new UnavailableTicketException("One or more tickets are not available for purchase");
             }
             if (ticketFeeMap.get(ticket.getId())) { // accetta la fee
                 totalPrice = totalPrice.add(ticket.getPrice().multiply(feePercentage)); // aggiungo la fee al prezzo

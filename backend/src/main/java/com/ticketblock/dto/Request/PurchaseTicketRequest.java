@@ -1,5 +1,6 @@
 package com.ticketblock.dto.Request;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -17,6 +18,8 @@ import java.util.HashMap;
 @Builder
 public class PurchaseTicketRequest {
     @NotNull
+    @NotEmpty
+    @Size(min = 1)
     private HashMap<Integer, Boolean> ticketFeeMap;
     @NotNull
     @CreditCardNumber
