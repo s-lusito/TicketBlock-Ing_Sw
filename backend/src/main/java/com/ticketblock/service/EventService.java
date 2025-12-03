@@ -57,8 +57,7 @@ public class EventService {
         verifyVenueAvailability(venue, eventCreationRequest);
 
         //recupero l'organizzatore dall'utente loggato
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User organizer = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email:" + email + " not found"));
+        User organizer = securityService.getLoggedInUser();
         event.setOrganizer(organizer);
 
         //ora creo i ticket dell'evento
