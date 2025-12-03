@@ -2,8 +2,14 @@ package com.ticketblock.controller;
 
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
+import com.ticketblock.dto.Response.TicketDto;
+import com.ticketblock.entity.enumeration.RowSector;
+import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.service.EventService;
+import com.ticketblock.service.TicketService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +22,7 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final TicketService ticketService;
 
     @GetMapping
     public ResponseEntity<?> getAllEvents() {
@@ -39,6 +46,15 @@ public class EventController {
     public ResponseEntity<?> deleteEvent(@PathVariable Integer id) {
         eventService.removeEventById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("{id}/tickets")
+    public ResponseEntity<?> getTicketFromEvent(@PathVariable Integer eventId,
+                                                @RequestParam(required = false) TicketStatus ticketStatus,
+                                                @RequestParam(required = false) RowSector ticketSector
+                                                ) {
+        List<TicketDto> tickets= ticketService.getTicketsFromEvent(eventId, ticketStatus, ticketSector);
+        return ResponseEntity.ok(tickets);
     }
 
 
