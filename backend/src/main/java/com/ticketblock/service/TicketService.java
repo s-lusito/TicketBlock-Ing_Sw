@@ -29,8 +29,8 @@ public class TicketService {
     private final SecurityService securityService;
     private final UserRepository userRepository;
 
-    public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus, RowSector rowSector) {
-        return ticketRepository.findByEventId(eventId, ticketStatus, rowSector).stream().map(TicketMapper::toDto).toList();
+    public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
+        return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
     }
 
     @Transactional

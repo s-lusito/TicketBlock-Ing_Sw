@@ -49,11 +49,11 @@ public class EventController {
     }
 
     @GetMapping("{id}/tickets")
-    public ResponseEntity<?> getTicketFromEvent(@PathVariable Integer eventId,
+    public ResponseEntity<?> getTicketFromEvent(@PathVariable Integer id,
                                                 @RequestParam(required = false) TicketStatus ticketStatus,
                                                 @RequestParam(required = false) RowSector ticketSector
                                                 ) {
-        List<TicketDto> tickets= ticketService.getTicketsFromEvent(eventId, ticketStatus, ticketSector);
+        List<TicketDto> tickets= ticketService.getTicketsFromEvent(id, ticketStatus);
         return ResponseEntity.ok(tickets);
     }
 

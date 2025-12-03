@@ -27,6 +27,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final VenueRepository venueRepository;
     private final UserRepository userRepository;
+    private final SecurityService securityService;
 
     public List<EventDto> getAllEvents() {
         return eventRepository.findAll().
@@ -111,8 +112,7 @@ public class EventService {
     }
 
     public EventDto removeEventById(int eventId) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User loggedUser = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User with email:" + email + " not found"));
+        User loggedUser = securityService.getLoggedInUser();
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException("Event with id:" + eventId + " not found"));
 
