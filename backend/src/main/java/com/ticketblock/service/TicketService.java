@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -42,13 +43,19 @@ public class TicketService {
         List<Integer> ticketIds = ticketFeeMap.keySet().stream().toList();
 
         List<Ticket> tickets = ticketRepository.findAllByIdIn(ticketIds);
+
+        //recupero l'eventId del primo ticket per confrontarlo con gli altri
+        Integer eventId = tickets.getFirst().getEvent().getId();
+
         if (tickets.size() != ticketIds.size()) { // controllo che tutti i ticket siano stati trovati
             throw new ResourceNotFoundException("One or more tickets not found for the provided ids");
         }
 
-        BigDecimal totalPrice = new BigDecimal("0");
+        // Inizializza totalPrice come un BigDecimal pari a zero ma con scala fissa a 2 decimali e con politica di arrotondamento RoundingMode.HALF_UP.
+        BigDecimal totalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+
         for (Ticket ticket : tickets) {
-            if (ticket.getTicketStatus() != TicketStatus.AVAILABLE) {
+            if (ticket.getTicketStatus() != TicketStatus.AVAILABLE || !ticket.getEvent().getId().equals(eventId)) { // controllo che il ticket sia disponibile e relativo allo stesso evento
                 throw new UnavailableTicketException("One or more tickets are not available for purchase");
             }
             if (ticketFeeMap.get(ticket.getId())) { // accetta la fee
