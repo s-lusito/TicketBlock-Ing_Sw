@@ -8,10 +8,7 @@ import com.ticketblock.entity.Event;
 import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
 import com.ticketblock.entity.enumeration.TicketStatus;
-import com.ticketblock.exception.ResourceNotFoundException;
-import com.ticketblock.exception.ForbiddenActionException;
-import com.ticketblock.exception.UnavailableTicketException;
-import com.ticketblock.exception.UnResellableTicketException;
+import com.ticketblock.exception.*;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
@@ -91,10 +88,7 @@ public class TicketService {
                     .message(String.format("Purchase successful! Total amount charged: %s", totalPrice))
                     .build();
         } else {
-            return PurchaseTicketResponse.builder()
-                    .success(false)
-                    .message("Payment failed. Please check your payment details and try again.")
-                    .build();
+            throw new FailedPaymentException("Payment processing failed");
         }
 
     }

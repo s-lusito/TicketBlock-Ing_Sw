@@ -179,7 +179,7 @@ public class GlobalExceptionHandler {
 
     // CONFLICT 409
 
-    @ExceptionHandler({VenueNotAvailableException.class, UnavailableTicketException.class, UnResellableTicketException.class})
+    @ExceptionHandler({VenueNotAvailableException.class, UnavailableTicketException.class, UnResellableTicketException.class, FailedPaymentException.class})
     public ResponseEntity<?> handleConflictException(AppException exception) {
         log.warn(exception.getMessage(), exception);
         return buildResponseEntity(exception, HttpStatus.CONFLICT);
