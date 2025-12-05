@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleUsernameNotFoundException(UsernameNotFoundException exception) {
         log.warn(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.NOT_FOUND;
-        ErrorResponse errorResponse= ErrorResponse
+        ErrorResponse errorResponse = ErrorResponse
                 .builder()
                 .message("User not found")
                 .status(status.value())
@@ -53,12 +53,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .detail(exception.getMessage())
-                .status(status.value())
-                .build();
-        return ResponseEntity.status(status).body(errorResponse);
+        return buildResponseEntity(exception, HttpStatus.NOT_FOUND);
+
 
     }
 
@@ -82,7 +78,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException exception) {
         log.error(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.UNAUTHORIZED;
-        ErrorResponse errorResponse= ErrorResponse.builder()
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .message("Authentication failed: Invalid email or password")
                 .detail("Authentication failed: Invalid email or password")
                 .status(status.value())
@@ -93,12 +89,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ForbiddenActionException.class)
     public ResponseEntity<?> handleForbiddenActionException(ForbiddenActionException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.FORBIDDEN;
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .detail(exception.getMessage())
-                .status(status.value())
-                .build();
-        return ResponseEntity.status(status).body(errorResponse);
+        return buildResponseEntity(exception, HttpStatus.FORBIDDEN);
+
     }
 
     // FORBIDDEN 403 ( Accesso negato: Utente autenticato ma non autorizzato a fare l’azione)
@@ -120,18 +112,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleGenericException(Exception exception) {
         log.error(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        ErrorResponse errorResponse= ErrorResponse.builder()
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .message("Internal Server Error")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
     }
+
     // BAD REQUEST 400
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException exception) {
         log.warn(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        ErrorResponse errorResponse= ErrorResponse.builder()
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .message("Invalid Request")
                 .status(status.value())
                 .build();
@@ -160,12 +153,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidRoleException.class)
     public ResponseEntity<?> handleInvalidRoleException(InvalidRoleException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .detail(exception.getMessage())
-                .status(status.value())
-                .build();
-        return ResponseEntity.status(status).body(errorResponse);
+        return buildResponseEntity(exception, HttpStatus.BAD_REQUEST);
     }
 
 
@@ -180,50 +168,45 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(errorResponse);
     }
 
+    @ExceptionHandler(InvalidDateAndTimeException.class)
+    public ResponseEntity<?> handleInvalidDateAndTimeException(InvalidDateAndTimeException exception) {
+        log.warn(exception.getMessage(), exception);
+        return buildResponseEntity(exception, HttpStatus.BAD_REQUEST);
+
+
+    }
+
 
     // CONFLICT 409
 
     @ExceptionHandler(VenueNotAvailableException.class)
     public ResponseEntity<?> handleVenueNotAvailableException(VenueNotAvailableException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.CONFLICT ;
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .detail(exception.getMessage())
-                .message("Venue is not Available for the selected date and time")
-                .status(status.value())
-                .build();
-        return ResponseEntity.status(status).body(errorResponse);
+        return buildResponseEntity(exception, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(UnavailableTicketException.class)
     public ResponseEntity<?> handleUnavailableTicketException(UnavailableTicketException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.CONFLICT;
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .message(exception.getMessage())
-                .status(status.value())
-                .build();
-        return ResponseEntity.status(status).body(errorResponse);
+        return buildResponseEntity(exception, HttpStatus.CONFLICT);
     }
-
-
-
-
-
 
 
     @ExceptionHandler
     public ResponseEntity<?> handleUnResellableTicketException(UnResellableTicketException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.CONFLICT;
+        return buildResponseEntity(exception, HttpStatus.CONFLICT);
+
+    }
+
+
+    private ResponseEntity<?> buildResponseEntity(AppException exception, HttpStatus status) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .message(exception.getMessage())
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
-
     }
 
-
-
 }
+

@@ -5,12 +5,12 @@ import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.entity.*;
 import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
+import com.ticketblock.exception.InvalidDateAndTimeException;
 import com.ticketblock.exception.ResourceNotFoundException;
 import com.ticketblock.exception.ForbiddenActionException;
 import com.ticketblock.exception.VenueNotAvailableException;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
-import com.ticketblock.repository.UserRepository;
 import com.ticketblock.repository.VenueRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,6 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final VenueRepository venueRepository;
-    private final UserRepository userRepository;
     private final SecurityService securityService;
 
     public List<EventDto> getAllEvents() {
@@ -38,7 +37,7 @@ public class EventService {
     public EventDto getEventById(int eventId) {
         return eventRepository.findById(eventId)
                 .map(EventMapper::toDto)
-                .orElseThrow(() -> new ResourceNotFoundException("Event with id:" + eventId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event with id:" + eventId + " not found","Event not found"));
     }
 
     @Transactional
@@ -49,7 +48,7 @@ public class EventService {
 
         //recupero il venue
         Venue venue = venueRepository.findById(eventCreationRequest.getVenueId())
-                .orElseThrow(() -> new ResourceNotFoundException("Venue with id:" + eventCreationRequest.getVenueId() + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Venue not found","Venue with id:" + eventCreationRequest.getVenueId() + " not found"));
         event.setVenue(venue);
 
         //verifico che il venue sia disponibile
@@ -68,10 +67,10 @@ public class EventService {
 
     private static void verifyDateAndTime(EventCreationRequest eventCreationRequest) {
         if (eventCreationRequest.getEndTime().isBefore(eventCreationRequest.getStartTime())) {
-            throw new IllegalArgumentException("Event end time cannot be before start time");
+            throw new InvalidDateAndTimeException("Event end time cannot be before start time");
         }
         if (eventCreationRequest.getDate().isBefore(java.time.LocalDate.now())) {
-            throw new IllegalArgumentException("Event date cannot be in the past");
+            throw new InvalidDateAndTimeException("Event date cannot be in the past");
         }
     }
 
@@ -116,7 +115,7 @@ public class EventService {
 
         // verifico che l'utente sia l'organizzatore dell'evento
         if (!loggedUser.equals(event.getOrganizer())) {
-            throw new ForbiddenActionException("User are not authorized to delete this event, since is not the organizer");
+            throw new ForbiddenActionException("User are not authorized to delete this event, since is not the organizer", "You are not authorized to delete this event");
         }
         eventRepository.delete(event);
         return EventMapper.toDto(event);

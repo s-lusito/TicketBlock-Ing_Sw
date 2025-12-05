@@ -91,7 +91,7 @@ public class TicketService {
     @Transactional
     public void resellTicket(Integer ticketId){
         User user = securityService.getLoggedInUser();
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId)));
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
         if (!ticket.getOwner().equals(user))
             throw new ForbiddenActionException("Ticket is not in your account");
 
