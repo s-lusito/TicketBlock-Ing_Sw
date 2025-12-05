@@ -185,12 +185,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnavailableTicketException.class)
     public ResponseEntity<?> handleUnavailableTicketException(UnavailableTicketException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .message(exception.getMessage())
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<?> handleUnResellableTicketException(UnResellableTicketException exception) {
+        log.warn(exception.getMessage(), exception);
+        HttpStatus status = HttpStatus.CONFLICT;  // TODO scegli il codice di errore di questa eccezione
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(exception.getMessage())
+                .status(status.value())
+                .build();
     }
 
 
