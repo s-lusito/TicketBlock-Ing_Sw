@@ -6,7 +6,7 @@ import com.ticketblock.entity.*;
 import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.ResourceNotFoundException;
-import com.ticketblock.exception.UnauthorizedActionException;
+import com.ticketblock.exception.ForbiddenActionException;
 import com.ticketblock.exception.VenueNotAvailableException;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
@@ -14,11 +14,9 @@ import com.ticketblock.repository.UserRepository;
 import com.ticketblock.repository.VenueRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 @Service
@@ -118,7 +116,7 @@ public class EventService {
 
         // verifico che l'utente sia l'organizzatore dell'evento
         if (!loggedUser.equals(event.getOrganizer())) {
-            throw new UnauthorizedActionException("User are not authorized to delete this event, since is not the organizer");
+            throw new ForbiddenActionException("User are not authorized to delete this event, since is not the organizer");
         }
         eventRepository.delete(event);
         return EventMapper.toDto(event);
