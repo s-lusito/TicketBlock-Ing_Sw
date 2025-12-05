@@ -11,6 +11,7 @@ import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.*;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
+import com.ticketblock.utils.MoneyHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +67,8 @@ public class TicketService {
                 throw new UnavailableTicketException("One or more tickets are not available for purchase");
             }
             if (ticketFeeMap.get(ticket.getId())) { // accetta la fee
-                totalPrice = totalPrice.add(ticket.getPrice().multiply(feePercentage)); // aggiungo la fee al prezzo
+                BigDecimal priceWithFee = MoneyHelper.normalizeAmount(totalPrice.multiply(feePercentage));
+                totalPrice = totalPrice.add(priceWithFee); // aggiungo la fee al prezzo
                 ticket.setResellable(true); // imposto resellable a true se accetta la fee
             } else {
                 totalPrice = totalPrice.add(ticket.getPrice());
