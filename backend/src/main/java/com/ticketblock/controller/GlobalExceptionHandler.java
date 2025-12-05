@@ -164,6 +164,7 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .detail(exception.getMostSpecificCause().getMessage()) //TODO specificare di più
+                .userMessage("Invalid request format")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
