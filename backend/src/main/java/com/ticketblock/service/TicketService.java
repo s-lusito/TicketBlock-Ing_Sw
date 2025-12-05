@@ -1,8 +1,10 @@
 package com.ticketblock.service;
 
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
+import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
+import com.ticketblock.entity.Event;
 import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
 import com.ticketblock.entity.enumeration.TicketStatus;
@@ -28,6 +30,8 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final SecurityService securityService;
 
+    private final int MAX_TICKETS_PER_EVENT = 4;
+
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
     }
@@ -41,18 +45,26 @@ public class TicketService {
 
         List<Ticket> tickets = ticketRepository.findAllByIdIn(ticketIds);
 
+
         //recupero l'eventId del primo ticket per confrontarlo con gli altri
-        Integer eventId = tickets.getFirst().getEvent().getId();
+        Event event = tickets.getFirst().getEvent();
 
         if (tickets.size() != ticketIds.size()) { // controllo che tutti i ticket siano stati trovati
             throw new ResourceNotFoundException("One or more tickets not found for the provided ids");
         }
 
+        int eventTickedAlreadyOwned =ticketRepository.countAllByOwnerAndEvent(loggedUser, event);
+
+        if (eventTickedAlreadyOwned + tickets.size()  <= MAX_TICKETS_PER_EVENT ) { // se supera il limite di 4 ticket per evento, lancio eccezione
+            throw new ForbiddenActionException("User cannot purchase more than 4 tickets for the same event", String.format("You already own %d tickets for this event a", eventTickedAlreadyOwned));
+        }
+
+
         // Inizializza totalPrice come un BigDecimal pari a zero ma con scala fissa a 2 decimali e con politica di arrotondamento RoundingMode.HALF_UP.
         BigDecimal totalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 
         for (Ticket ticket : tickets) {
-            if (ticket.getTicketStatus() != TicketStatus.AVAILABLE || !ticket.getEvent().getId().equals(eventId)) { // controllo che il ticket sia disponibile e relativo allo stesso evento
+            if (ticket.getTicketStatus() != TicketStatus.AVAILABLE || !ticket.getEvent().equals(event)) { // controllo che il ticket sia disponibile e relativo allo stesso evento
                 throw new UnavailableTicketException("One or more tickets are not available for purchase");
             }
             if (ticketFeeMap.get(ticket.getId())) { // accetta la fee
