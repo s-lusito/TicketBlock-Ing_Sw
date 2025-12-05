@@ -28,6 +28,9 @@ public class EventCreationRequest {
     private String imageUrl;
 
     @NotNull
+    private LocalDate saleStartDate;
+
+    @NotNull
     private Integer venueId;
     @Positive
     @NotNull

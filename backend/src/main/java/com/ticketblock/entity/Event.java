@@ -1,5 +1,6 @@
 package com.ticketblock.entity;
 
+import com.ticketblock.entity.enumeration.EventSaleStatus;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +22,7 @@ public class Event {
     @EqualsAndHashCode.Include
     private Integer id;
     @Column(nullable = false)
-    private String eventName;
+    private String name;
 
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -37,9 +38,16 @@ public class Event {
     @Column(columnDefinition = "TIME")
     private LocalTime endTime;
 
+
+    @Enumerated(EnumType.STRING)
+    private EventSaleStatus saleStatus;
+
+    @Column(columnDefinition = "DATE")
+    private LocalDate saleStartDate;
+
+
+
     private String imageUrl;
-
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
