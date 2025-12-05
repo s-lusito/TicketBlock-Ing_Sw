@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponse errorResponse = ErrorResponse
                 .builder()
-                .message("User not found")
+                .detail("User not found")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .detail("JWT token has expired")
-                .message("Session has expired, please log in again")
+                .userMessage("Session has expired, please log in again")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
@@ -79,7 +79,7 @@ public class GlobalExceptionHandler {
         log.error(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .message("Authentication failed: Invalid email or password")
+                .userMessage("Authentication failed: Invalid email or password")
                 .detail("Authentication failed: Invalid email or password")
                 .status(status.value())
                 .build();
@@ -99,8 +99,8 @@ public class GlobalExceptionHandler {
         log.warn(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.FORBIDDEN;
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .message("Access denied")
                 .detail("Access denied")
+                .userMessage("Access denied")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
         log.error(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .message("Internal Server Error")
+                .detail("Internal Server Error")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
@@ -125,7 +125,7 @@ public class GlobalExceptionHandler {
         log.warn(exception.getMessage(), exception);
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .message("Invalid Request")
+                .detail("Invalid Request")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
@@ -144,7 +144,7 @@ public class GlobalExceptionHandler {
                             .build()
             );
         }
-        ErrorResponse errorResponse = ErrorResponse.builder().message("Validation Failed").status(status.value()).errors(fieldErrors).build();
+        ErrorResponse errorResponse = ErrorResponse.builder().detail("Validation Failed").status(status.value()).errors(fieldErrors).build();
         return ResponseEntity.status(status).body(errorResponse);
 
 
@@ -188,7 +188,8 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<?> buildResponseEntity(AppException exception, HttpStatus status) {
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .message(exception.getMessage())
+                .detail(exception.getMessage())
+                .userMessage(exception.getUserMessage())
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);

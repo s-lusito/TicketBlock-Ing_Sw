@@ -39,7 +39,7 @@ public class ErrorResponse {
     /**
         * A user-friendly message describing the error, suitable for display to end-users.
      */
-    private String message;
+    private String userMessage;
     /**
         * A detailed description of the error, which may include technical details useful for front-end.
      */

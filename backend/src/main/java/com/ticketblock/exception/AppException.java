@@ -1,5 +1,8 @@
 package com.ticketblock.exception;
 
+import lombok.Getter;
+
+@Getter
 public class AppException extends RuntimeException {
     private String userMessage;
 
@@ -12,7 +15,6 @@ public class AppException extends RuntimeException {
         super(message);
         this.userMessage = message;
     }
-
 
 
 }
