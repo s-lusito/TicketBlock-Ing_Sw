@@ -2,7 +2,10 @@ package com.ticketblock.controller;
 
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
+import com.ticketblock.dto.Response.TicketDto;
+import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.service.EventService;
+import com.ticketblock.service.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final TicketService ticketService;
 
     @GetMapping
     public ResponseEntity<?> getAllEvents() {
@@ -39,6 +43,14 @@ public class EventController {
     public ResponseEntity<?> deleteEvent(@PathVariable Integer id) {
         eventService.removeEventById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("{id}/tickets")
+    public ResponseEntity<?> getTicketFromEvent(@PathVariable Integer id,
+                                                @RequestParam(required = false) TicketStatus ticketStatus
+                                                ) {
+        List<TicketDto> tickets= ticketService.getTicketsFromEvent(id, ticketStatus);
+        return ResponseEntity.ok(tickets);
     }
 
 

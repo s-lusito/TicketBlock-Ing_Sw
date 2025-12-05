@@ -3,6 +3,7 @@ package com.ticketblock.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -72,8 +73,14 @@ public class SecurityConfiguration {
 
                         // Protegge endpoint di management per ADMIN
                         .requestMatchers("/api/v1/management/**").hasAuthority("ADMIN")
-                        // Protegge endpoint di gestione eventi per ORGANIZER
-                        .requestMatchers("/api/v1/events/**").hasAnyAuthority("ORGANIZER", "ADMIN")
+
+                        // Protegge endpoint di gestione biglietti per USER e ADMIN
+                        .requestMatchers("/api/v1/tickets/**").hasAnyAuthority("USER", "ADMIN")
+
+                        // Protegge endpoint di gestione eventi per ORGANIZER e ADMIN
+                        .requestMatchers(HttpMethod.GET,"/api/v1/events/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/v1/events/**").hasAnyAuthority("ORGANIZER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/v1/events/**").hasAnyAuthority("ORGANIZER", "ADMIN")
 
                         // Tutte le altre richieste richiedono autenticazione
                         .anyRequest().authenticated()
