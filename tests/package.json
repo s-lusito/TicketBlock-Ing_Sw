@@ -1,0 +1,13 @@
+{
+  "name": "ticketblock-tests",
+  "version": "1.0.0",
+  "description": "JavaScript test scripts for TicketBlock API",
+  "type": "module",
+  "scripts": {
+    "test:organizer": "node organizer-ticket-test.js",
+    "test:user": "node user-ticket-test.js",
+    "test:all": "node organizer-ticket-test.js && node user-ticket-test.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

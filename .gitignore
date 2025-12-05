@@ -35,3 +35,7 @@ build/
 # Ignore manual tests directory
 sandbox/
 temp/
+
+# Node.js
+node_modules/
+tests/node_modules/
