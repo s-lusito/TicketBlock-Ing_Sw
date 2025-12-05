@@ -35,7 +35,7 @@ public class EventCreationRequest {
     private BigDecimal standardTicketPrice;
     @Positive
     @NotNull
-    @DecimalMin(value = "0.0", inclusive = false, message = "Standard ticket price must be greater than zero")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Vip ticket price must be greater than zero")
     private BigDecimal vipTicketPrice;
 
 }
