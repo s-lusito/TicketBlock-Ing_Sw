@@ -5,6 +5,7 @@ import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
 import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
+import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.ResourceNotFoundException;
 import com.ticketblock.exception.ForbiddenActionException;
@@ -65,6 +66,8 @@ public class TicketService {
             ticket.setTicketStatus(TicketStatus.SOLD); // imposto lo stato a SOLD
             ticket.setOwner(loggedUser); // imposto il proprietario
             ticketRepository.save(ticket);
+
+
         }
 
         // Gestione del pagamento (simulata)
@@ -101,6 +104,8 @@ public class TicketService {
         ticket.setResellable(false);
         ticket.setTicketStatus(TicketStatus.AVAILABLE);
         ticket.setOwner(null);
+        if(ticket.getEvent().getSaleStatus().equals(EventSaleStatus.SOLD_OUT))
+            ticket.getEvent().setSaleStatus(EventSaleStatus.ONGOING);
         ticketRepository.save(ticket);
     }
 

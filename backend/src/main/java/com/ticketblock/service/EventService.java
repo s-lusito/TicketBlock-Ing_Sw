@@ -150,4 +150,16 @@ public class EventService {
         eventRepository.saveAll(events);
     }
 
+    @Scheduled(cron = "0 0 0 * * *") // ogni mezzanotte
+    @Transactional
+    public void closeEventsSale() {
+        List<Event> events = eventRepository.findAllTomorrow();
+
+        for (Event e : events) {
+            e.setSaleStatus(EventSaleStatus.ENDED);
+        }
+
+        eventRepository.saveAll(events);
+    }
+
 }
