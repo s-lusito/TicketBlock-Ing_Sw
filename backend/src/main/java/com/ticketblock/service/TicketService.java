@@ -1,7 +1,6 @@
 package com.ticketblock.service;
 
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
-import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
 import com.ticketblock.entity.Event;
@@ -118,7 +117,7 @@ public class TicketService {
             throw new ForbiddenActionException("Ticket is not in your account");
 
         if(!ticket.getResellable())
-            throw new UnResellableTicketException("This ticket is not resellable");
+            throw new NonResellableTicketException("This ticket is not resellable");
 
         ticket.setResellable(false);
         ticket.setTicketStatus(TicketStatus.AVAILABLE);

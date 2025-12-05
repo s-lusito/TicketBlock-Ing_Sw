@@ -45,6 +45,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = ErrorResponse
                 .builder()
                 .detail("User not found")
+                .userMessage("User not found")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
@@ -127,6 +128,7 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .detail("Invalid Request")
+                .userMessage("Invalid Request")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
@@ -145,7 +147,11 @@ public class GlobalExceptionHandler {
                             .build()
             );
         }
-        ErrorResponse errorResponse = ErrorResponse.builder().detail("Validation Failed").status(status.value()).errors(fieldErrors).build();
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .detail("Validation Failed").userMessage("Provided data are nor valid:")
+                .status(status.value())
+                .errors(fieldErrors)
+                .build();
         return ResponseEntity.status(status).body(errorResponse);
 
 
@@ -181,9 +187,13 @@ public class GlobalExceptionHandler {
 
     // CONFLICT 409
 
-    @ExceptionHandler({VenueNotAvailableException.class, UnavailableTicketException.class, UnResellableTicketException.class, FailedPaymentException.class})
+    @ExceptionHandler({VenueNotAvailableException.class, UnavailableTicketException.class, NonResellableTicketException.class, FailedPaymentException.class})
     public ResponseEntity<?> handleConflictException(AppException exception) {
-        log.warn(exception.getMessage(), exception);
+        if (exception instanceof FailedPaymentException) {
+            log.warn("Payment failed"); // nascondo dal log i dettagli dell'eccezione di pagamento
+        } else {
+            log.warn(exception.getMessage(), exception);
+        }
         return buildResponseEntity(exception, HttpStatus.CONFLICT);
     }
 
