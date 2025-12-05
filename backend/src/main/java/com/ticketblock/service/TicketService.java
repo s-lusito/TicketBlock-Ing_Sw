@@ -113,7 +113,8 @@ public class TicketService {
     public void resellTicket(Integer ticketId){
         User user = securityService.getLoggedInUser();
         Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
-        if (!ticket.getOwner().equals(user))
+
+        if (ticket.getOwner() == null || !ticket.getOwner().equals(user))
             throw new ForbiddenActionException("Ticket is not in your account");
 
         if(!ticket.getResellable())
