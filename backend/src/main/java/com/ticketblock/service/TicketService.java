@@ -41,6 +41,9 @@ public class TicketService {
         List<Integer> ticketIds = ticketFeeMap.keySet().stream().toList();
 
         List<Ticket> tickets = ticketRepository.findAllByIdIn(ticketIds);
+        if (tickets.isEmpty()) {
+            throw new ResourceNotFoundException("No tickets found for the provided ids");
+        }
 
 
         //recupero l'eventId del primo ticket per confrontarlo con gli altri
@@ -50,12 +53,10 @@ public class TicketService {
             throw new ResourceNotFoundException("One or more tickets not found for the provided ids");
         }
 
-        int eventTickedAlreadyOwned =ticketRepository.countAllByOwnerAndEvent(loggedUser, event);
+        verifyTicketOwnershipLimit(loggedUser, event, tickets); // verifica che l'utente non superi il limite di 4 ticket per evento
 
-        if (eventTickedAlreadyOwned + tickets.size()  <= MAX_TICKETS_PER_EVENT ) { // se supera il limite di 4 ticket per evento, lancio eccezione
-            throw new ForbiddenActionException("User cannot purchase more than 4 tickets for the same event", String.format("You already own %d tickets for this event a", eventTickedAlreadyOwned));
-        }
 
+        //CALCOLO PREZZO E AGGIORNO STATI DEI TICKET, VERIFICANDO LA DISPONIBILITÀ E CHE SIANO TUTTI RELATIVI ALLO STESSO EVENTO
 
         // Inizializza totalPrice come un BigDecimal pari a zero ma con scala fissa a 2 decimali e con politica di arrotondamento RoundingMode.HALF_UP.
         BigDecimal totalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
@@ -73,8 +74,9 @@ public class TicketService {
             }
             ticket.setTicketStatus(TicketStatus.SOLD); // imposto lo stato a SOLD
             ticket.setOwner(loggedUser); // imposto il proprietario
-            ticketRepository.save(ticket);
         }
+
+        ticketRepository.saveAll(tickets); // salvo i ticket aggiornati
 
         // Gestione del pagamento (simulata)
         if (managePayment(ticketsRequested.getCreditCardNumber(),
@@ -88,9 +90,20 @@ public class TicketService {
                     .message(String.format("Purchase successful! Total amount charged: %s", totalPrice))
                     .build();
         } else {
-            throw new FailedPaymentException("Payment processing failed");
+            throw new FailedPaymentException("Payment processing failed"); // fa il rollback della transazione
         }
 
+
+
+
+
+    }
+
+    private void verifyTicketOwnershipLimit(User loggedUser, Event event, List<Ticket> tickets) {
+        int eventTickedAlreadyOwned =ticketRepository.countAllByOwnerAndEvent(loggedUser, event);
+        if (eventTickedAlreadyOwned + tickets.size()  <= MAX_TICKETS_PER_EVENT ) { // se supera il limite di 4 ticket per evento, lancio eccezione
+            throw new ForbiddenActionException("User cannot purchase more than 4 tickets for the same event", String.format("You already own %d tickets for this event a", eventTickedAlreadyOwned));
+        }
     }
 
 

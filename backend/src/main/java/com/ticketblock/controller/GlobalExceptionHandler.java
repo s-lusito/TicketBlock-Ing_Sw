@@ -114,6 +114,7 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .detail("Internal Server Error")
+                .userMessage("Internal Server Error")
                 .status(status.value())
                 .build();
         return ResponseEntity.status(status).body(errorResponse);
