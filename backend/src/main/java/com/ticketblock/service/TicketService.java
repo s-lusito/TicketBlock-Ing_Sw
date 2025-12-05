@@ -116,7 +116,7 @@ public class TicketService {
     }
 
 
-
+    @SuppressWarnings("unused") // ignora il warning di parametri non usati
     private static boolean managePayment(String creditCardNumber, String expirationDate, String cvv, String cardHolderName, BigDecimal amount) {
         // Simula la gestione del pagamento
         return true; // Supponiamo che il pagamento sia sempre riuscito

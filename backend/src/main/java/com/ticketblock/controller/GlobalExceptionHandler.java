@@ -139,7 +139,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(VenueNotAvailableException.class)
     public ResponseEntity<?> handleVenueNotAvailableException(VenueNotAvailableException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.BAD_REQUEST;
+        HttpStatus status = HttpStatus.CONFLICT ;
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .message(exception.getMessage())
                 .status(status.value())
@@ -196,11 +196,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<?> handleUnResellableTicketException(UnResellableTicketException exception) {
         log.warn(exception.getMessage(), exception);
-        HttpStatus status = HttpStatus.CONFLICT;  // TODO scegli il codice di errore di questa eccezione
+        HttpStatus status = HttpStatus.CONFLICT;
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .message(exception.getMessage())
                 .status(status.value())
                 .build();
+        return ResponseEntity.status(status).body(errorResponse);
+
     }
 
 
