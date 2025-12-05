@@ -115,7 +115,7 @@ public class EventService {
 
         // verifico che l'utente sia l'organizzatore dell'evento
         if (!loggedUser.equals(event.getOrganizer())) {
-            throw new ForbiddenActionException("User are not authorized to delete this event, since is not the organizer", "You are not authorized to delete this event");
+            throw new ForbiddenActionException("User is not authorized to delete this event, since is not the organizer", "You are not authorized to delete this event");
         }
         eventRepository.delete(event);
         return EventMapper.toDto(event);
