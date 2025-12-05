@@ -5,16 +5,15 @@ import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
 import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
-import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.ResourceNotFoundException;
 import com.ticketblock.exception.UnauthorizedActionException;
 import com.ticketblock.exception.UnavailableTicketException;
+import com.ticketblock.exception.UnResellableTicketException;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +89,22 @@ public class TicketService {
 
     }
 
+
+    @Transactional
+    public void resellTicket(Integer ticketId){
+        User user = securityService.getLoggedInUser();
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId)));
+        if (!ticket.getOwner().equals(user))
+            throw new UnauthorizedActionException("Ticket is not in your account");
+
+        if(!ticket.getResellable())
+            throw new UnResellableTicketException("This ticket is not resellable");
+
+        ticket.setResellable(false);
+        ticket.setTicketStatus(TicketStatus.AVAILABLE);
+        ticket.setOwner(null);
+        ticketRepository.save(ticket);
+    }
 
 
 
