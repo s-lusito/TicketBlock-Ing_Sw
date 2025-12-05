@@ -28,7 +28,6 @@ public class TicketService {
     private final BigDecimal feePercentage = new BigDecimal("1.10");
     private final TicketRepository ticketRepository;
     private final SecurityService securityService;
-    private final UserRepository userRepository;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();

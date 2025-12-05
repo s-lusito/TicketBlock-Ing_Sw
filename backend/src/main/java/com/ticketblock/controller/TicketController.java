@@ -2,11 +2,14 @@ package com.ticketblock.controller;
 
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
+import com.ticketblock.dto.Response.TicketDto;
 import com.ticketblock.service.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +33,8 @@ public class TicketController {
 
     @GetMapping("/mine")
     public ResponseEntity<?> getMineTickets() {
-        return ResponseEntity.ok().build();
+        List<TicketDto> userTickets = ticketService.getLoggedUserTickets();
+        return ResponseEntity.ok(userTickets);
 
     }
 
