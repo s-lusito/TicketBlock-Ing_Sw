@@ -179,24 +179,10 @@ public class GlobalExceptionHandler {
 
     // CONFLICT 409
 
-    @ExceptionHandler(VenueNotAvailableException.class)
-    public ResponseEntity<?> handleVenueNotAvailableException(VenueNotAvailableException exception) {
+    @ExceptionHandler({VenueNotAvailableException.class, UnavailableTicketException.class, UnResellableTicketException.class})
+    public ResponseEntity<?> handleConflictException(AppException exception) {
         log.warn(exception.getMessage(), exception);
         return buildResponseEntity(exception, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(UnavailableTicketException.class)
-    public ResponseEntity<?> handleUnavailableTicketException(UnavailableTicketException exception) {
-        log.warn(exception.getMessage(), exception);
-        return buildResponseEntity(exception, HttpStatus.CONFLICT);
-    }
-
-
-    @ExceptionHandler
-    public ResponseEntity<?> handleUnResellableTicketException(UnResellableTicketException exception) {
-        log.warn(exception.getMessage(), exception);
-        return buildResponseEntity(exception, HttpStatus.CONFLICT);
-
     }
 
 
