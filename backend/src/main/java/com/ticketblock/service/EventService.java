@@ -3,6 +3,7 @@ package com.ticketblock.service;
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.entity.*;
+import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.InvalidDateAndTimeException;
@@ -14,9 +15,11 @@ import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.VenueRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -60,6 +63,11 @@ public class EventService {
 
         //ora creo i ticket dell'evento
         createTickets(venue, event);
+        if(event.getSaleStartDate().isAfter(LocalDate.now())) {
+            event.setSaleStatus(EventSaleStatus.NOT_STARTED);
+        } else {
+            event.setSaleStatus(EventSaleStatus.ONGOING);
+        }
         Event savedEvent = eventRepository.save(event);
         return EventMapper.toDto(savedEvent);
     }
@@ -69,8 +77,16 @@ public class EventService {
         if (eventCreationRequest.getEndTime().isBefore(eventCreationRequest.getStartTime())) {
             throw new InvalidDateAndTimeException("Event end time cannot be before start time");
         }
-        if (eventCreationRequest.getDate().isBefore(java.time.LocalDate.now())) {
+        if (eventCreationRequest.getDate().isBefore(LocalDate.now())) {
             throw new InvalidDateAndTimeException("Event date cannot be in the past");
+        }
+
+        if(eventCreationRequest.getSaleStartDate().isBefore(LocalDate.now())) {
+            throw new InvalidDateAndTimeException("SaleStart date cannot be before event date");
+        }
+
+        if(eventCreationRequest.getSaleStartDate().isAfter(eventCreationRequest.getDate())) {
+            throw new InvalidDateAndTimeException("SaleStart date cannot be after event date");
         }
     }
 
@@ -119,6 +135,19 @@ public class EventService {
         }
         eventRepository.delete(event);
         return EventMapper.toDto(event);
+    }
+
+
+    @Scheduled(cron = "0 0 0 * * *") // ogni mezzanotte
+    @Transactional
+    public void updateEventsSaleStatus() {
+        List<Event> events = eventRepository.findAllToOpenToday();
+
+        for (Event e : events) {
+            e.setSaleStatus(EventSaleStatus.ONGOING);
+        }
+
+        eventRepository.saveAll(events);
     }
 
 }
