@@ -107,6 +107,15 @@ public class TicketService {
     }
 
 
+    public List<TicketDto> getLoggedUserTickets() {
+        User loggedUser = securityService.getLoggedInUser();
+        return loggedUser.getTickets()
+                .stream()
+                .map(TicketMapper::toDto)
+                .toList();
+    }
+
+
 
     private static boolean managePayment(String creditCardNumber, String expirationDate, String cvv, String cardHolderName, BigDecimal amount) {
         // Simula la gestione del pagamento

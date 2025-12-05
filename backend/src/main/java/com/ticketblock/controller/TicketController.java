@@ -28,7 +28,11 @@ public class TicketController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/mine")
+    public ResponseEntity<?> getMineTickets() {
+        return ResponseEntity.ok().build();
 
+    }
 
 
 
