@@ -14,6 +14,7 @@ import com.ticketblock.exception.UnResellableTicketException;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class TicketService {
     private final BigDecimal feePercentage = new BigDecimal("1.10");
     private final TicketRepository ticketRepository;
     private final SecurityService securityService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
@@ -87,6 +89,8 @@ public class TicketService {
                     .message("Payment failed. Please check your payment details and try again.")
                     .build();
         }
+
+        applicationEventPublisher.publishEvent(new TicketsPurchasedEvent(eventId));
 
     }
 

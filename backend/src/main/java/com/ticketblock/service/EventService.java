@@ -162,4 +162,14 @@ public class EventService {
         eventRepository.saveAll(events);
     }
 
+    public void updateStatusIfSoldOut(Event event) {
+        boolean allSold = event.getTickets().stream()
+                .allMatch(ticket -> ticket.getTicketStatus() == TicketStatus.SOLD);
+        if (allSold) {
+            event.setSaleStatus(EventSaleStatus.SOLD_OUT);
+            eventRepository.save(event);
+        }
+    }
+
+
 }
