@@ -74,7 +74,7 @@ public class TicketService {
                 throw new UnavailableTicketException("One or more tickets are not available for purchase");
             }
             if (ticketFeeMap.get(ticket.getId())) { // accetta la fee
-                BigDecimal priceWithFee = MoneyHelper.normalizeAmount(totalPrice.multiply(feePercentage));
+                BigDecimal priceWithFee = MoneyHelper.normalizeAmount(ticket.getPrice().multiply(feePercentage));
                 totalPrice = totalPrice.add(priceWithFee); // aggiungo la fee al prezzo
                 ticket.setResellable(true); // imposto resellable a true se accetta la fee
             } else {
