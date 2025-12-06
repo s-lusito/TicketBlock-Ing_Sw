@@ -10,6 +10,14 @@ const TEST_CARDS = {
     AMEX: '374245455400126'
 };
 
+// Helper function to generate dynamic credit card expiration date (2 years from now)
+function getCardExpirationDate() {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = String(now.getFullYear() + 2).slice(-2);
+    return `${month}/${year}`;
+}
+
 // Test state
 let users = [];
 let organizers = [];
@@ -213,7 +221,7 @@ async function testSoldOutAndReselling(users, events) {
             const purchaseData = {
                 ticketFeeMap: ticketsToPurchase,
                 creditCardNumber: TEST_CARDS.VISA,
-                expirationDate: '12/25',
+                expirationDate: getCardExpirationDate(),
                 cvv: '123',
                 cardHolderName: `${testUsers[0].firstName} ${testUsers[0].lastName}`
             };
@@ -243,7 +251,7 @@ async function testSoldOutAndReselling(users, events) {
             const purchaseData = {
                 ticketFeeMap: ticketsToPurchase,
                 creditCardNumber: TEST_CARDS.MASTERCARD,
-                expirationDate: '11/26',
+                expirationDate: getCardExpirationDate(),
                 cvv: '456',
                 cardHolderName: `${testUsers[1].firstName} ${testUsers[1].lastName}`
             };
@@ -274,7 +282,7 @@ async function testSoldOutAndReselling(users, events) {
             const purchaseData = {
                 ticketFeeMap: ticketsToPurchase,
                 creditCardNumber: TEST_CARDS.AMEX,
-                expirationDate: '10/27',
+                expirationDate: getCardExpirationDate(),
                 cvv: '789',
                 cardHolderName: `${testUsers[2].firstName} ${testUsers[2].lastName}`
             };
@@ -307,7 +315,7 @@ async function testSoldOutAndReselling(users, events) {
         const soldOutPurchase = await apiRequest('POST', '/tickets/purchase', {
             ticketFeeMap: {},
             creditCardNumber: TEST_CARDS.VISA,
-            expirationDate: '12/25',
+            expirationDate: getCardExpirationDate(),
             cvv: '123',
             cardHolderName: 'Test User'
         }, testUsers[0].token);
@@ -342,7 +350,7 @@ async function testSoldOutAndReselling(users, events) {
                 const maxPurchase = await apiRequest('POST', '/tickets/purchase', {
                     ticketFeeMap: allTickets,
                     creditCardNumber: TEST_CARDS.VISA,
-                    expirationDate: '12/25',
+                    expirationDate: getCardExpirationDate(),
                     cvv: '123',
                     cardHolderName: `${testUsers[0].firstName} ${testUsers[0].lastName}`
                 }, testUsers[0].token);
@@ -368,7 +376,7 @@ async function testSoldOutAndReselling(users, events) {
                             const exceedPurchase = await apiRequest('POST', '/tickets/purchase', {
                                 ticketFeeMap: { [event3Tickets[0].id]: false },
                                 creditCardNumber: TEST_CARDS.VISA,
-                                expirationDate: '12/25',
+                                expirationDate: getCardExpirationDate(),
                                 cvv: '123',
                                 cardHolderName: `${testUsers[0].firstName} ${testUsers[0].lastName}`
                             }, testUsers[0].token);
