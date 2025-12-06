@@ -13,6 +13,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for handling user authentication and registration.
+ * 
+ * This service manages user authentication using JWT tokens and handles
+ * new user registration with password encoding. It validates user credentials
+ * and generates JWT tokens for authenticated sessions.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {

@@ -10,6 +10,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * Data Transfer Object for Event information in API responses.
+ * 
+ * This DTO is used to transfer event data including schedule information,
+ * venue details, organizer information, ticket prices, and sale status.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

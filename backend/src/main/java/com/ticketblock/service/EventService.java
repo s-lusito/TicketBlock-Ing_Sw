@@ -22,6 +22,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Service for managing events in the ticketing system.
+ * 
+ * This service handles event creation, retrieval, deletion, and automatic
+ * status updates. It validates event dates and times, checks venue availability,
+ * creates tickets for events, and runs scheduled tasks to update event sale
+ * statuses based on dates.
+ */
 @Service
 @RequiredArgsConstructor
 public class EventService {

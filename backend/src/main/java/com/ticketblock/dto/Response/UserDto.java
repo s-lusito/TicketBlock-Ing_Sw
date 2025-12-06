@@ -6,6 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object for User information in API responses.
+ * 
+ * This DTO is used to transfer user data including name, email,
+ * and role information without exposing sensitive fields like passwords.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

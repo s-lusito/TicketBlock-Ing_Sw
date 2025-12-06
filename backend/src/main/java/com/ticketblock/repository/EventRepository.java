@@ -9,6 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Repository interface for Event entity database operations.
+ * 
+ * Provides standard CRUD operations through JpaRepository and custom
+ * query methods for finding events by date, venue, sale status, and
+ * scheduled sale start dates.
+ */
 public interface EventRepository extends JpaRepository<Event, Integer> {
     List<Event> findAllByDateAndVenue(LocalDate date, Venue venue);
 

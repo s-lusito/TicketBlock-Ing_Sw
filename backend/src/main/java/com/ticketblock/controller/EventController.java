@@ -15,6 +15,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST controller for managing events.
+ * 
+ * This controller provides endpoints for creating, retrieving, and deleting events,
+ * as well as retrieving tickets for specific events. It handles event filtering
+ * by sale status and ticket filtering by status.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/events")

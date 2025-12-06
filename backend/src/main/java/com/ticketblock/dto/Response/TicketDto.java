@@ -7,6 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+/**
+ * Data Transfer Object for Ticket information in API responses.
+ * 
+ * This DTO is used to transfer ticket data including seat information,
+ * owner details, price, resellability status, and ticket status.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -7,6 +7,13 @@ import com.ticketblock.repository.VenueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for managing venues in the ticketing system.
+ * 
+ * This service handles venue-related operations such as retrieving
+ * venue information by ID. Venues contain row and seat information
+ * needed for event ticket generation.
+ */
 @Service
 @RequiredArgsConstructor
 public class VenueService {

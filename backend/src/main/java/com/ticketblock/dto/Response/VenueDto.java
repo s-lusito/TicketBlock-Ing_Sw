@@ -7,6 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * Data Transfer Object for complete Venue information in API responses.
+ * 
+ * This DTO is used to transfer full venue data including name, address,
+ * and complete row/seat layout information.
+ */
 @Data
 @Builder
 @NoArgsConstructor

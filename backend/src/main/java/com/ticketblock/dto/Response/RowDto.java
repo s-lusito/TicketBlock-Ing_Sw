@@ -7,6 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+
+/**
+ * Data Transfer Object for Row information in API responses.
+ * 
+ * This DTO is used to transfer row data including the row letter,
+ * sector classification (STANDARD or VIP), and associated seats.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

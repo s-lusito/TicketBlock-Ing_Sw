@@ -10,6 +10,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+/**
+ * Data Transfer Object for event creation requests.
+ * 
+ * This DTO is used to receive and validate event creation data from clients,
+ * including event details, schedule, venue, and ticket pricing information.
+ * All fields are validated using Jakarta Bean Validation annotations.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

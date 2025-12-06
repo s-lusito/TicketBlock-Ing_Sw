@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for managing venues.
+ * 
+ * This controller provides endpoints for retrieving venue information
+ * including associated rows, seats, and address details.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/venues")

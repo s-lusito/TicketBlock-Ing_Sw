@@ -14,6 +14,14 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+/**
+ * Repository interface for Ticket entity database operations.
+ * 
+ * Provides standard CRUD operations through JpaRepository and custom
+ * query methods for finding tickets by event, status, owner, and for
+ * performing pessimistic locking during ticket purchases to prevent
+ * concurrent modification issues.
+ */
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
 

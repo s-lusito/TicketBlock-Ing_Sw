@@ -8,6 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+/**
+ * Event listener for handling ticket purchase events.
+ * 
+ * This component listens for TicketPurchasedEvent and triggers post-purchase
+ * actions such as checking if an event has sold out after the purchase
+ * transaction has been committed.
+ */
 @Component
 public class TicketEventListener {
 

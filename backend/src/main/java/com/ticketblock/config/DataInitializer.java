@@ -15,6 +15,14 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Data initializer component that loads venue data on application startup.
+ * 
+ * This component implements CommandLineRunner to execute initialization logic
+ * when the application starts. It loads venue data from a JSON file and persists
+ * it to the database if no venues exist, setting up the necessary bidirectional
+ * relationships between venues, addresses, rows, and seats.
+ */
 @Component
 @AllArgsConstructor
 @Slf4j

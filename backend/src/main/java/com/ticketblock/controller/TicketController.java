@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST controller for managing tickets.
+ * 
+ * This controller provides endpoints for purchasing tickets, reselling tickets,
+ * and retrieving tickets owned by the currently authenticated user.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/tickets")

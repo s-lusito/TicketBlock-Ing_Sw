@@ -23,6 +23,14 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Service for managing ticket operations in the ticketing system.
+ * 
+ * This service handles ticket purchasing, reselling, and retrieval operations.
+ * It manages payment processing, validates ticket availability, enforces purchase
+ * limits (maximum 4 tickets per user per event), and handles the resale fee logic
+ * for resellable tickets.
+ */
 @Service
 @RequiredArgsConstructor
 public class TicketService {

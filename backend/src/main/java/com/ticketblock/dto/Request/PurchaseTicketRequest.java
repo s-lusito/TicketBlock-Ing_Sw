@@ -12,6 +12,14 @@ import org.hibernate.validator.constraints.CreditCardNumber;
 
 import java.util.HashMap;
 
+/**
+ * Data Transfer Object for ticket purchase requests.
+ * 
+ * This DTO is used to receive and validate ticket purchase data from clients,
+ * including ticket selections with resale fee preferences and payment information.
+ * The ticketFeeMap contains ticket IDs as keys and boolean values indicating
+ * whether the user accepts the resale fee for each ticket.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
