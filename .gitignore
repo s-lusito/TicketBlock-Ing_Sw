@@ -35,3 +35,8 @@ build/
 # Ignore manual tests directory
 sandbox/
 temp/
+
+
+# blockchain
+blockchain/node_modules/
+blockchain/build/
