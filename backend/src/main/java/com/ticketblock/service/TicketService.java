@@ -1,17 +1,20 @@
 package com.ticketblock.service;
 
+import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
 import com.ticketblock.entity.Event;
 import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
+import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.*;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.utils.MoneyHelper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ public class TicketService {
     private final SecurityService securityService;
 
     private final int MAX_TICKETS_PER_EVENT = 4;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
@@ -48,6 +52,10 @@ public class TicketService {
 
         //recupero l'eventId del primo ticket per confrontarlo con gli altri
         Event event = tickets.getFirst().getEvent();
+
+        if(!event.getSaleStatus().equals(EventSaleStatus.ONGOING)){
+            throw new UnavailableTicketException("Tickets for this event are not available for purchase at this time");
+        }
 
         if (tickets.size() != ticketIds.size()) { // controllo che tutti i ticket siano stati trovati
             throw new ResourceNotFoundException("One or more tickets not found for the provided ids");
@@ -86,6 +94,9 @@ public class TicketService {
                 ticketsRequested.getCardHolderName(),
                 totalPrice))
         {
+            // Pubblica l'evento di acquisto del biglietto
+            applicationEventPublisher.publishEvent(new TicketPurchasedEvent(this, event));
+
             return PurchaseTicketResponse.builder()
                     .success(true)
                     .message(String.format("Purchase successful! Total amount charged: %s", totalPrice))
@@ -122,6 +133,8 @@ public class TicketService {
         ticket.setResellable(false);
         ticket.setTicketStatus(TicketStatus.AVAILABLE);
         ticket.setOwner(null);
+        if(ticket.getEvent().getSaleStatus().equals(EventSaleStatus.SOLD_OUT))
+            ticket.getEvent().setSaleStatus(EventSaleStatus.ONGOING);
         ticketRepository.save(ticket);
     }
 

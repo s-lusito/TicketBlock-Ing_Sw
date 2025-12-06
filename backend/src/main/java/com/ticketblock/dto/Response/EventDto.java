@@ -1,5 +1,6 @@
 package com.ticketblock.dto.Response;
 
+import com.ticketblock.entity.enumeration.EventSaleStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,8 @@ public class EventDto {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
+    private EventSaleStatus eventSaleStatus;
+    private LocalDate saleStartDate;
     private String imageUrl;
     private VenueSummaryDto venue;
     private BigDecimal standardTicketPrice;

@@ -3,6 +3,7 @@ package com.ticketblock.service;
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.entity.*;
+import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.InvalidDateAndTimeException;
@@ -14,21 +15,31 @@ import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.VenueRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class EventService {
 
+    public static final int DAYS_BETWEEN_SALES_START_AND_EVENT = 3;
     private final EventRepository eventRepository;
     private final VenueRepository venueRepository;
     private final SecurityService securityService;
 
-    public List<EventDto> getAllEvents() {
-        return eventRepository.findAll().
+    public List<EventDto> getAllEvents(List<EventSaleStatus> saleStatusList) {
+        if( saleStatusList == null || saleStatusList.isEmpty() ) {
+            return eventRepository.findAll().
+                    stream()
+                    .map(EventMapper::toDto)
+                    .toList();
+        }
+
+        return eventRepository.findAllBySaleStatusIn(saleStatusList).
                 stream()
                 .map(EventMapper::toDto)
                 .toList();
@@ -60,6 +71,11 @@ public class EventService {
 
         //ora creo i ticket dell'evento
         createTickets(venue, event);
+        if(event.getSaleStartDate().isAfter(LocalDate.now())) {
+            event.setSaleStatus(EventSaleStatus.NOT_STARTED);
+        } else {
+            event.setSaleStatus(EventSaleStatus.ONGOING);
+        }
         Event savedEvent = eventRepository.save(event);
         return EventMapper.toDto(savedEvent);
     }
@@ -69,8 +85,16 @@ public class EventService {
         if (eventCreationRequest.getEndTime().isBefore(eventCreationRequest.getStartTime())) {
             throw new InvalidDateAndTimeException("Event end time cannot be before start time");
         }
-        if (eventCreationRequest.getDate().isBefore(java.time.LocalDate.now())) {
+        if (eventCreationRequest.getDate().isBefore(LocalDate.now())) {
             throw new InvalidDateAndTimeException("Event date cannot be in the past");
+        }
+
+        if(eventCreationRequest.getSaleStartDate().isBefore(LocalDate.now())) {
+            throw new InvalidDateAndTimeException("Sale start date cannot be before event date");
+        }
+
+        if(eventCreationRequest.getSaleStartDate().isAfter(eventCreationRequest.getDate().minusDays(DAYS_BETWEEN_SALES_START_AND_EVENT))) {
+            throw new InvalidDateAndTimeException("Sale start date must be at least 3 days before the event date");
         }
     }
 
@@ -120,5 +144,38 @@ public class EventService {
         eventRepository.delete(event);
         return EventMapper.toDto(event);
     }
+
+
+    @Scheduled(cron = "0 0 0 * * *") // ogni mezzanotte
+    @Transactional
+    public void updateEventsSaleStatus() {
+        List<Event> eventsToOpen = eventRepository.findAllToOpenToday();
+        // apri vendite degli eventi la cui data di inizio vendita è oggi
+        for (Event e : eventsToOpen) {
+            e.setSaleStatus(EventSaleStatus.ONGOING);
+        }
+
+        // chiudi vendite degli eventi che si tengono domani
+        List<Event> eventsToClose = eventRepository.findAllByDate(LocalDate.now().plusDays(1));
+
+        for (Event e : eventsToClose) {
+            e.setSaleStatus(EventSaleStatus.ENDED);
+        }
+        eventRepository.saveAll(eventsToClose);
+        eventRepository.saveAll(eventsToOpen);
+    }
+
+
+
+    @Transactional
+    public void updateStatusIfSoldOut(Event event) {
+        boolean allSold = event.getTickets().stream()
+                .allMatch(ticket -> ticket.getTicketStatus().equals(TicketStatus.SOLD));
+        if (allSold) {
+            event.setSaleStatus(EventSaleStatus.SOLD_OUT);
+            eventRepository.save(event);
+        }
+    }
+
 
 }

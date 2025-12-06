@@ -3,6 +3,8 @@ package com.ticketblock.controller;
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.dto.Response.TicketDto;
+import com.ticketblock.entity.enumeration.EventSaleStatus;
+import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.service.EventService;
 import com.ticketblock.service.TicketService;
@@ -22,8 +24,10 @@ public class EventController {
     private final TicketService ticketService;
 
     @GetMapping
-    public ResponseEntity<?> getAllEvents() {
-        List<EventDto> events = eventService.getAllEvents();
+    public ResponseEntity<?> getAllEvents(
+            @RequestParam(required = false) List<EventSaleStatus> saleStatus // Es.  GET /events?status=ONGOING&status=NOT_STARTED
+    ) {
+        List<EventDto> events = eventService.getAllEvents(saleStatus);
         return ResponseEntity.ok(events);
     }
 
