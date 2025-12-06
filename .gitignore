@@ -35,3 +35,7 @@ build/
 # Ignore manual tests directory
 sandbox/
 temp/
+
+### Node ###
+node_modules/
+package-lock.json

@@ -1,0 +1,19 @@
+{
+  "name": "ticketblock-api-tests",
+  "version": "1.0.0",
+  "description": "API tests for TicketBlock application",
+  "main": "api_test.js",
+  "scripts": {
+    "test": "node api_test.js"
+  },
+  "keywords": [
+    "ticketblock",
+    "api",
+    "test"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
