@@ -35,3 +35,7 @@ build/
 # Ignore manual tests directory
 sandbox/
 temp/
+
+# Ignore log files
+**/logs/
+*.log

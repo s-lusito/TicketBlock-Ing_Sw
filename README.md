@@ -203,6 +203,20 @@ All events use Venue ID 1 (Arena Grande Spettacoli) which is pre-loaded from the
 - The database is set to `ddl-auto: create-drop`, so data is reset on backend restart
 - Test results are cumulative - both successful and expected failures are counted
 
+## Known Backend Issues
+
+During testing, a backend validation bug was discovered in `TicketService.verifyTicketOwnershipLimit()`:
+
+```java
+if (eventTickedAlreadyOwned + tickets.size() <= MAX_TICKETS_PER_EVENT) {
+    throw new ForbiddenActionException(...);
+}
+```
+
+The logic is inverted - it throws an exception when the user has 4 or fewer tickets (when they should be allowed to purchase) instead of when they exceed the limit. The condition should be `>` instead of `<=`. This causes ticket purchase tests to fail with the error "User cannot purchase more than 4 tickets for the same event" even when purchasing the first ticket.
+
+**Workaround**: The backend code needs to be fixed by changing the condition from `<=` to `>`.
+
 ## License
 
 ISC
