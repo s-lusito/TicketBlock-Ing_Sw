@@ -12,7 +12,25 @@
 
 const BASE_URL = 'http://localhost:8080/api/v1';
 
-// Utility function to make HTTP requests
+// Test card numbers for validation testing
+const TEST_CARDS = {
+    VISA: '4532015112830366',
+    MASTERCARD: '5425233430109903',
+    INVALID: '1234567890123456'
+};
+
+// Test constants
+const MAX_EVENT_NAME_LENGTH = 50;
+const NON_EXISTENT_ID = 99999;
+
+/**
+ * Makes an HTTP request to the API
+ * @param {string} endpoint - API endpoint path
+ * @param {string} method - HTTP method (GET, POST, DELETE, etc.)
+ * @param {object|null} body - Request body for POST/PUT requests
+ * @param {string|null} token - JWT authentication token
+ * @returns {Promise<{status: number, ok: boolean, data: object|null}>} Response object
+ */
 async function apiRequest(endpoint, method = 'GET', body = null, token = null) {
     const headers = {
         'Content-Type': 'application/json'
@@ -303,7 +321,7 @@ async function testEventEdgeCases(organizer) {
     
     // Test 7: Event name too long (over 50 characters)
     const longNameEvent = {
-        name: 'A'.repeat(51), // 51 characters
+        name: 'A'.repeat(MAX_EVENT_NAME_LENGTH + 1), // 51 characters - exceeds limit
         date: futureDateStr,
         startTime: '20:00:00',
         endTime: '23:00:00',
@@ -406,7 +424,7 @@ async function testTicketPurchases(user, events) {
             ticketFeeMap: {
                 [availableTickets[0].id]: true // true means with fee
             },
-            creditCardNumber: '4532015112830366', // Valid test Visa card
+            creditCardNumber: TEST_CARDS.VISA,
             expirationDate: '12/25',
             cvv: '123',
             cardHolderName: 'User One'
@@ -429,7 +447,7 @@ async function testTicketPurchases(user, events) {
             ticketFeeMap: {
                 [availableTickets[1].id]: false // false means without fee
             },
-            creditCardNumber: '5425233430109903', // Valid test Mastercard
+            creditCardNumber: TEST_CARDS.MASTERCARD,
             expirationDate: '11/26',
             cvv: '456',
             cardHolderName: 'User One'
@@ -453,7 +471,7 @@ async function testTicketPurchases(user, events) {
                 [availableTickets[2].id]: true,  // One with fee
                 [availableTickets[3].id]: false  // One without fee
             },
-            creditCardNumber: '4532015112830366',
+            creditCardNumber: TEST_CARDS.VISA,
             expirationDate: '12/25',
             cvv: '789',
             cardHolderName: 'User One'
@@ -487,7 +505,7 @@ async function testPurchaseLimits(user, events) {
             ticketFeeMap: {
                 [availableTickets[0].id]: true
             },
-            creditCardNumber: '1234567890123456', // Invalid card
+            creditCardNumber: TEST_CARDS.INVALID,
             expirationDate: '12/25',
             cvv: '123',
             cardHolderName: 'Test User'
@@ -505,7 +523,7 @@ async function testPurchaseLimits(user, events) {
             ticketFeeMap: {
                 [availableTickets[0].id]: true
             },
-            creditCardNumber: '4532015112830366',
+            creditCardNumber: TEST_CARDS.VISA,
             expirationDate: '13/25', // Invalid month
             cvv: '123',
             cardHolderName: 'Test User'
@@ -523,7 +541,7 @@ async function testPurchaseLimits(user, events) {
             ticketFeeMap: {
                 [availableTickets[0].id]: true
             },
-            creditCardNumber: '4532015112830366',
+            creditCardNumber: TEST_CARDS.VISA,
             expirationDate: '12/25',
             cvv: '12', // Too short
             cardHolderName: 'Test User'
@@ -538,7 +556,7 @@ async function testPurchaseLimits(user, events) {
     // Test 4: Empty ticket map
     const emptyMap = {
         ticketFeeMap: {},
-        creditCardNumber: '4532015112830366',
+        creditCardNumber: TEST_CARDS.VISA,
         expirationDate: '12/25',
         cvv: '123',
         cardHolderName: 'Test User'
@@ -550,9 +568,9 @@ async function testPurchaseLimits(user, events) {
     // Test 5: Non-existent ticket ID
     const nonExistentTicket = {
         ticketFeeMap: {
-            99999: true // Non-existent ticket ID
+            [NON_EXISTENT_ID]: true
         },
-        creditCardNumber: '4532015112830366',
+        creditCardNumber: TEST_CARDS.VISA,
         expirationDate: '12/25',
         cvv: '123',
         cardHolderName: 'Test User'
@@ -568,7 +586,7 @@ async function testPurchaseLimits(user, events) {
             ticketFeeMap: {
                 [myTickets.data[0].id]: true
             },
-            creditCardNumber: '4532015112830366',
+            creditCardNumber: TEST_CARDS.VISA,
             expirationDate: '12/25',
             cvv: '123',
             cardHolderName: 'Test User'
@@ -584,7 +602,7 @@ async function testPurchaseLimits(user, events) {
             ticketFeeMap: {
                 [availableTickets[0].id]: true
             },
-            creditCardNumber: '4532015112830366',
+            creditCardNumber: TEST_CARDS.VISA,
             expirationDate: '12/25',
             cvv: '123',
             cardHolderName: 'Test User'
@@ -632,7 +650,7 @@ async function additionalTests(users, organizers, events) {
                 ticketFeeMap: {
                     [organizerTickets[0].id]: true
                 },
-                creditCardNumber: '4532015112830366',
+                creditCardNumber: TEST_CARDS.VISA,
                 expirationDate: '12/25',
                 cvv: '123',
                 cardHolderName: 'Organizer One'

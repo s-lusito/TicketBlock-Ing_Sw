@@ -12,7 +12,7 @@ The `api_test.js` script performs the following operations:
 
 ### 2. **Creates 3 Valid Events**
    - Creates 2 events from Organizer 1:
-     - "Concert Rock Festival 2025" (€50 standard, €150 VIP)
+     - "Concert Rock Festival 2026" (€50 standard, €150 VIP)
      - "Jazz Night Special" (€35 standard, €100 VIP)
    - Creates 1 event from Organizer 2:
      - "Comedy Show Extravaganza" (€40 standard, €120 VIP)
@@ -207,15 +207,23 @@ All events use Venue ID 1 (Arena Grande Spettacoli) which is pre-loaded from the
 
 During testing, a backend validation bug was discovered in `TicketService.verifyTicketOwnershipLimit()`:
 
+**Current (incorrect) code:**
 ```java
 if (eventTickedAlreadyOwned + tickets.size() <= MAX_TICKETS_PER_EVENT) {
     throw new ForbiddenActionException(...);
 }
 ```
 
-The logic is inverted - it throws an exception when the user has 4 or fewer tickets (when they should be allowed to purchase) instead of when they exceed the limit. The condition should be `>` instead of `<=`. This causes ticket purchase tests to fail with the error "User cannot purchase more than 4 tickets for the same event" even when purchasing the first ticket.
+**Expected (correct) code:**
+```java
+if (eventTickedAlreadyOwned + tickets.size() > MAX_TICKETS_PER_EVENT) {
+    throw new ForbiddenActionException(...);
+}
+```
 
-**Workaround**: The backend code needs to be fixed by changing the condition from `<=` to `>`.
+The logic is inverted - it throws an exception when the user has 4 or fewer tickets (when they should be allowed to purchase) instead of when they exceed the limit. This causes ticket purchase tests to fail with the error "User cannot purchase more than 4 tickets for the same event" even when purchasing the first ticket.
+
+**Fix Required**: Change the condition operator from `<=` to `>` in the `verifyTicketOwnershipLimit` method in `TicketService.java`.
 
 ## License
 
