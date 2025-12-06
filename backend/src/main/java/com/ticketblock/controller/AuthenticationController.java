@@ -31,6 +31,14 @@ public class AuthenticationController {
     //Se qualche regola non è rispettata Spring blocca l’esecuzione del metodo e restituisce un 400 Bad Request con i messaggi di errore delle annotazioni.
     //request body legge il body della richiesta http e mappa i dati del json sull'oggetto RegisterRequest
 
+    /**
+     * Registers a new user in the system.
+     * 
+     * @param request the registration request containing user details (email, password, firstName, lastName, role)
+     * @return ResponseEntity containing AuthenticationResponse with JWT token
+     * @throws InvalidRoleException if the role is invalid or ADMIN role is attempted
+     * @throws IllegalArgumentException if the email is already registered
+     */
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> registerUser(@Valid @RequestBody RegisterRequest request) {
         validateRole(request.getRole());
@@ -48,6 +56,14 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * Authenticates a user with email and password.
+     * 
+     * @param request the authentication request containing email and password
+     * @return ResponseEntity containing AuthenticationResponse with JWT token
+     * @throws org.springframework.security.authentication.BadCredentialsException if credentials are invalid
+     * @throws org.springframework.security.core.userdetails.UsernameNotFoundException if user is not found
+     */
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(@Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authenticationService.authenticate(request));

@@ -22,6 +22,13 @@ public class VenueController {
 
     private final VenueService venueService;
 
+    /**
+     * Retrieves a venue by its ID with complete row and seat information.
+     * 
+     * @param id the ID of the venue to retrieve
+     * @return ResponseEntity containing VenueDto with venue details, rows, and seats
+     * @throws com.ticketblock.exception.ResourceNotFoundException if venue is not found
+     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getVenueById(@PathVariable Integer id) {
         VenueDto venue = venueService.getVenueByVenueId(id);
