@@ -11,7 +11,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-
+/**
+ * Entity representing a user in the ticketing system.
+ * 
+ * This entity implements Spring Security's UserDetails interface to support
+ * authentication and authorization. Users can have roles (USER, ORGANIZER, ADMIN)
+ * and can own tickets or organize events. The email field serves as the unique
+ * username for authentication.
+ */
 @Entity
 @Builder
 @Data

@@ -11,6 +11,14 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity representing an event in the ticketing system.
+ * 
+ * This entity stores all information about an event including its schedule,
+ * venue, organizer, ticket prices, and sale status. Events have a many-to-one
+ * relationship with venues and users (organizers), and a one-to-many relationship
+ * with tickets.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

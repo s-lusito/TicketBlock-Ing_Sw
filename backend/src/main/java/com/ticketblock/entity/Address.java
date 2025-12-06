@@ -6,7 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+/**
+ * Entity representing a physical address for a venue.
+ * 
+ * This entity stores the location details of a venue including
+ * street, city, and state information.
+ */
 @Entity
 @Data
 @Builder

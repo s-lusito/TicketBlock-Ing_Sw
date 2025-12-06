@@ -6,6 +6,13 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Entity representing a row of seats in a venue.
+ * 
+ * This entity represents a row within a venue, identified by a letter (e.g., A, B, C).
+ * Each row belongs to a sector (STANDARD or VIP) and contains multiple seats.
+ * The combination of venue and letter must be unique.
+ */
 @Data
 @Entity
 @AllArgsConstructor

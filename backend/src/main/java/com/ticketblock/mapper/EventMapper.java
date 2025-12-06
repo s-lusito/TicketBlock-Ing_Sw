@@ -5,6 +5,13 @@ import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.entity.Event;
 import com.ticketblock.utils.MoneyHelper;
 
+/**
+ * Mapper class for converting Event entities to DTOs and creation requests to entities.
+ * 
+ * Provides static methods to transform Event domain objects into EventDto
+ * data transfer objects for API responses, and EventCreationRequest into
+ * Event entities for persistence.
+ */
 public class EventMapper {
     public static EventDto toDto(Event event) {
         return EventDto.builder()

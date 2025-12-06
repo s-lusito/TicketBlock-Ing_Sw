@@ -5,6 +5,13 @@ import lombok.*;
 
 import java.util.Set;
 
+/**
+ * Entity representing an individual seat in a venue row.
+ * 
+ * This entity represents a physical seat within a row, identified by a seat number.
+ * Each seat can have multiple tickets associated with it for different events.
+ * The combination of row and seat number must be unique.
+ */
 @Data
 @Entity
 @AllArgsConstructor

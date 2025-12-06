@@ -6,6 +6,14 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
+/**
+ * Entity representing a ticket for an event.
+ * 
+ * This entity represents a ticket that links an event to a specific seat.
+ * Each ticket has an owner (user), price, status (AVAILABLE, SOLD, INVALIDATED),
+ * and resellable flag. The combination of event and seat must be unique to
+ * ensure the same seat is not sold twice for the same event.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

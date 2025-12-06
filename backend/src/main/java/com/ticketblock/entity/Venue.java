@@ -6,6 +6,13 @@ import lombok.*;
 
 import java.util.List;
 
+/**
+ * Entity representing a venue where events take place.
+ * 
+ * This entity stores information about a physical location that hosts events.
+ * Each venue has an address, rows of seats, and can host multiple events.
+ * Provides helper methods to filter rows by sector (STANDARD or VIP).
+ */
 @Data
 @Entity
 @AllArgsConstructor
