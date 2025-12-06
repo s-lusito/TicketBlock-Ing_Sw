@@ -119,14 +119,27 @@ async function createEvents(organizers) {
         console.log('⚠️  Warning: Could not fetch venue information');
     }
     
+    // Generate future dates dynamically
+    const today = new Date();
+    const futureDate1 = new Date(today);
+    futureDate1.setDate(today.getDate() + 180); // 6 months from now
+    const futureDate2 = new Date(today);
+    futureDate2.setDate(today.getDate() + 220); // ~7 months from now
+    const futureDate3 = new Date(today);
+    futureDate3.setDate(today.getDate() + 250); // ~8 months from now
+    
+    const saleStartDate = new Date(today); // Today - so tickets are available for purchase immediately
+    
+    const formatDate = (date) => date.toISOString().split('T')[0];
+    
     // Event 1 - Organizer 1
     const event1Data = {
-        name: 'Concert Rock Festival 2025',
-        date: '2025-06-15',
+        name: 'Concert Rock Festival 2026',
+        date: formatDate(futureDate1),
         startTime: '20:00:00',
         endTime: '23:00:00',
         imageUrl: 'https://example.com/concert1.jpg',
-        saleStartDate: '2025-01-15',
+        saleStartDate: formatDate(saleStartDate),
         venueId: 1,
         standardTicketPrice: 50.00,
         vipTicketPrice: 150.00
@@ -144,11 +157,11 @@ async function createEvents(organizers) {
     // Event 2 - Organizer 1
     const event2Data = {
         name: 'Jazz Night Special',
-        date: '2025-07-20',
+        date: formatDate(futureDate2),
         startTime: '19:30:00',
         endTime: '22:30:00',
         imageUrl: 'https://example.com/jazz.jpg',
-        saleStartDate: '2025-02-01',
+        saleStartDate: formatDate(saleStartDate),
         venueId: 1,
         standardTicketPrice: 35.00,
         vipTicketPrice: 100.00
@@ -166,11 +179,11 @@ async function createEvents(organizers) {
     // Event 3 - Organizer 2
     const event3Data = {
         name: 'Comedy Show Extravaganza',
-        date: '2025-08-10',
+        date: formatDate(futureDate3),
         startTime: '21:00:00',
         endTime: '23:30:00',
         imageUrl: 'https://example.com/comedy.jpg',
-        saleStartDate: '2025-03-01',
+        saleStartDate: formatDate(saleStartDate),
         venueId: 1,
         standardTicketPrice: 40.00,
         vipTicketPrice: 120.00
@@ -192,6 +205,17 @@ async function createEvents(organizers) {
 async function testEventEdgeCases(organizer) {
     console.log('\n=== Testing Event Creation Edge Cases ===\n');
     
+    // Generate future dates dynamically
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 180);
+    const formatDate = (date) => date.toISOString().split('T')[0];
+    const futureDateStr = formatDate(futureDate);
+    
+    const saleStart = new Date(today);
+    saleStart.setDate(today.getDate() + 1);
+    const saleStartStr = formatDate(saleStart);
+    
     // Test 1: Invalid date (past date)
     const pastDateEvent = {
         name: 'Past Event',
@@ -210,10 +234,10 @@ async function testEventEdgeCases(organizer) {
     // Test 2: Invalid time (end time before start time)
     const invalidTimeEvent = {
         name: 'Invalid Time Event',
-        date: '2025-12-01',
+        date: futureDateStr,
         startTime: '23:00:00',
         endTime: '20:00:00',
-        saleStartDate: '2025-11-01',
+        saleStartDate: saleStartStr,
         venueId: 1,
         standardTicketPrice: 50.00,
         vipTicketPrice: 150.00
@@ -225,10 +249,10 @@ async function testEventEdgeCases(organizer) {
     // Test 3: Negative ticket price
     const negativePrice = {
         name: 'Negative Price Event',
-        date: '2025-12-01',
+        date: futureDateStr,
         startTime: '20:00:00',
         endTime: '23:00:00',
-        saleStartDate: '2025-11-01',
+        saleStartDate: saleStartStr,
         venueId: 1,
         standardTicketPrice: -10.00,
         vipTicketPrice: 150.00
@@ -240,10 +264,10 @@ async function testEventEdgeCases(organizer) {
     // Test 4: Zero ticket price
     const zeroPrice = {
         name: 'Zero Price Event',
-        date: '2025-12-01',
+        date: futureDateStr,
         startTime: '20:00:00',
         endTime: '23:00:00',
-        saleStartDate: '2025-11-01',
+        saleStartDate: saleStartStr,
         venueId: 1,
         standardTicketPrice: 0.00,
         vipTicketPrice: 150.00
@@ -255,7 +279,7 @@ async function testEventEdgeCases(organizer) {
     // Test 5: Missing required fields
     const missingFields = {
         name: 'Incomplete Event',
-        date: '2025-12-01'
+        date: futureDateStr
         // Missing other required fields
     };
     
@@ -265,10 +289,10 @@ async function testEventEdgeCases(organizer) {
     // Test 6: Invalid venue ID
     const invalidVenue = {
         name: 'Invalid Venue Event',
-        date: '2025-12-01',
+        date: futureDateStr,
         startTime: '20:00:00',
         endTime: '23:00:00',
-        saleStartDate: '2025-11-01',
+        saleStartDate: saleStartStr,
         venueId: 99999,
         standardTicketPrice: 50.00,
         vipTicketPrice: 150.00
@@ -280,10 +304,10 @@ async function testEventEdgeCases(organizer) {
     // Test 7: Event name too long (over 50 characters)
     const longNameEvent = {
         name: 'A'.repeat(51), // 51 characters
-        date: '2025-12-01',
+        date: futureDateStr,
         startTime: '20:00:00',
         endTime: '23:00:00',
-        saleStartDate: '2025-11-01',
+        saleStartDate: saleStartStr,
         venueId: 1,
         standardTicketPrice: 50.00,
         vipTicketPrice: 150.00
@@ -293,12 +317,17 @@ async function testEventEdgeCases(organizer) {
     logTest('Event with name over 50 characters should fail', !longNameResponse.ok);
     
     // Test 8: Sale start date after event date
+    const pastSaleDate = new Date(today);
+    pastSaleDate.setDate(today.getDate() - 10);
+    const eventBeforeSale = new Date(today);
+    eventBeforeSale.setDate(today.getDate() + 5);
+    
     const invalidSaleDate = {
         name: 'Invalid Sale Date Event',
-        date: '2025-06-01',
+        date: formatDate(eventBeforeSale),
         startTime: '20:00:00',
         endTime: '23:00:00',
-        saleStartDate: '2025-07-01', // After event date
+        saleStartDate: formatDate(futureDate), // Sale starts after event
         venueId: 1,
         standardTicketPrice: 50.00,
         vipTicketPrice: 150.00
@@ -570,14 +599,22 @@ async function testPurchaseLimits(user, events) {
 async function additionalTests(users, organizers, events) {
     console.log('\n=== Additional Tests ===\n');
     
+    // Generate future dates dynamically
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 180);
+    const formatDate = (date) => date.toISOString().split('T')[0];
+    const saleStart = new Date(today);
+    saleStart.setDate(today.getDate() + 1);
+    
     // Test: User cannot create events
     if (users.length > 0 && users[0]) {
         const userEventAttempt = {
             name: 'User Created Event',
-            date: '2025-12-01',
+            date: formatDate(futureDate),
             startTime: '20:00:00',
             endTime: '23:00:00',
-            saleStartDate: '2025-11-01',
+            saleStartDate: formatDate(saleStart),
             venueId: 1,
             standardTicketPrice: 50.00,
             vipTicketPrice: 150.00
