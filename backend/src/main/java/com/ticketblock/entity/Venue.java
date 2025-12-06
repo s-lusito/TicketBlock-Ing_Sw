@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor //obbligatorio per un entity jpa
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Venue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

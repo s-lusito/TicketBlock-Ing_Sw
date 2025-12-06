@@ -10,6 +10,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(
         uniqueConstraints = @UniqueConstraint(columnNames = {"row_id","seat_number"})
 )

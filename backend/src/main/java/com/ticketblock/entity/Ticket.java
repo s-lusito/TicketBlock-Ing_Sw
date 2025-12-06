@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Entity
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(
         uniqueConstraints = @UniqueConstraint(columnNames = {"event_id","seat_id"}) //ogni ticket deve aver una combinazione unica di evento e posto fisico
 )
