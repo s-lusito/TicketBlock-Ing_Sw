@@ -160,7 +160,7 @@ public class EventService {
     @Scheduled(cron = "0 0 0 * * *") // ogni mezzanotte
     @Transactional
     public void closeEventsSale() {
-        List<Event> events = eventRepository.findAllTomorrow();
+        List<Event> events = eventRepository.findAllByDate(LocalDate.now().plusDays(1)); // chiudi vendite con data di domani
 
         for (Event e : events) {
             e.setSaleStatus(EventSaleStatus.ENDED);

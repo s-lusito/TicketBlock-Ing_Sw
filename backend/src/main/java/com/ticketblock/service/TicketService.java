@@ -9,10 +9,7 @@ import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.TicketStatus;
-import com.ticketblock.exception.ResourceNotFoundException;
-import com.ticketblock.exception.ForbiddenActionException;
-import com.ticketblock.exception.UnavailableTicketException;
-import com.ticketblock.exception.UnResellableTicketException;
+import com.ticketblock.exception.*;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.utils.MoneyHelper;
@@ -34,6 +31,7 @@ public class TicketService {
     private final SecurityService securityService;
 
     private final int MAX_TICKETS_PER_EVENT = 4;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();

@@ -15,9 +15,10 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     @Query("SELECT e FROM Event e WHERE e.saleStatus = 'NOT_STARTED' AND e.saleStartDate = CURRENT_DATE")
     List<Event> findAllToOpenToday();
 
-    @Query("SELECT e FROM Event e WHERE e.date = CURRENT_DATE + 1")
-    List<Event> findAllTomorrow();
+
 
 
     List<Event> findAllBySaleStatusIn(List<EventSaleStatus> saleStatusList);
+
+    List<Event> findAllByDate(LocalDate date);
 }
