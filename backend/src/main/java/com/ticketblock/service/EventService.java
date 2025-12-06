@@ -26,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventService {
 
+    public static final int DAYS_BETWEEN_SALES_START_AND_EVENT = 3;
     private final EventRepository eventRepository;
     private final VenueRepository venueRepository;
     private final SecurityService securityService;
@@ -89,11 +90,11 @@ public class EventService {
         }
 
         if(eventCreationRequest.getSaleStartDate().isBefore(LocalDate.now())) {
-            throw new InvalidDateAndTimeException("SaleStart date cannot be before event date");
+            throw new InvalidDateAndTimeException("Sale start date cannot be before event date");
         }
 
-        if(eventCreationRequest.getSaleStartDate().isAfter(eventCreationRequest.getDate())) {
-            throw new InvalidDateAndTimeException("SaleStart date cannot be after event date");
+        if(eventCreationRequest.getSaleStartDate().isAfter(eventCreationRequest.getDate().minusDays(DAYS_BETWEEN_SALES_START_AND_EVENT))) {
+            throw new InvalidDateAndTimeException("Sale start date must be at least 3 days before the event date");
         }
     }
 
