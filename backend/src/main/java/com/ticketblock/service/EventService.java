@@ -165,12 +165,12 @@ public class EventService {
         eventRepository.saveAll(eventsToOpen);
     }
 
-   
+
 
     @Transactional
     public void updateStatusIfSoldOut(Event event) {
         boolean allSold = event.getTickets().stream()
-                .allMatch(ticket -> ticket.getTicketStatus() == TicketStatus.SOLD);
+                .allMatch(ticket -> ticket.getTicketStatus().equals(TicketStatus.SOLD));
         if (allSold) {
             event.setSaleStatus(EventSaleStatus.SOLD_OUT);
             eventRepository.save(event);
