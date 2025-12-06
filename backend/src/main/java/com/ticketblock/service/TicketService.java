@@ -98,9 +98,12 @@ public class TicketService {
             // Pubblica l'evento di acquisto del biglietto
             applicationEventPublisher.publishEvent(new TicketPurchasedEvent(this, event));
 
+            // TODO: Trasfermento denaro conto venditore( organizzatore o precedente proprietario)
+
             return PurchaseTicketResponse.builder()
                     .success(true)
                     .message(String.format("Purchase successful! Total amount charged: %s", totalPrice))
+                    .totalPrice(totalPrice)
                     .build();
         } else {
             throw new FailedPaymentException("Payment processing failed"); // fa il rollback della transazione

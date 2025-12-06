@@ -53,7 +53,8 @@ public class SecurityConfiguration {
             "/api/v1/auth/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/api/v1/debug/**"
+            "/api/v1/debug/**",
+            "/api/v1/venues/**"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
