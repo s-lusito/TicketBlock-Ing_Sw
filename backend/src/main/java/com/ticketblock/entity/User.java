@@ -14,7 +14,10 @@ import java.util.Set;
 
 @Entity
 @Builder
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
