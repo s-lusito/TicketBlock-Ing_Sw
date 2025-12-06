@@ -4,6 +4,7 @@ import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
+import com.ticketblock.entity.Event;
 import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
@@ -46,7 +47,7 @@ public class TicketService {
         List<Ticket> tickets = ticketRepository.findAllByIdIn(ticketIds);
 
         //recupero l'eventId del primo ticket per confrontarlo con gli altri
-        Integer eventId = tickets.getFirst().getEvent().getId();
+        Event event = tickets.get(0).getEvent();
 
         if (tickets.size() != ticketIds.size()) { // controllo che tutti i ticket siano stati trovati
             throw new ResourceNotFoundException("One or more tickets not found for the provided ids");
@@ -56,7 +57,7 @@ public class TicketService {
         BigDecimal totalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 
         for (Ticket ticket : tickets) {
-            if (ticket.getTicketStatus() != TicketStatus.AVAILABLE || !ticket.getEvent().getId().equals(eventId)) { // controllo che il ticket sia disponibile e relativo allo stesso evento
+            if (ticket.getTicketStatus() != TicketStatus.AVAILABLE || !ticket.getEvent().equals(event)) { // controllo che il ticket sia disponibile e relativo allo stesso evento
                 throw new UnavailableTicketException("One or more tickets are not available for purchase");
             }
             if (ticketFeeMap.get(ticket.getId())) { // accetta la fee
@@ -80,7 +81,9 @@ public class TicketService {
                 ticketsRequested.getCardHolderName(),
                 totalPrice))
         {
-            applicationEventPublisher.publishEvent(new TicketPurchasedEvent(this, eventId));
+            // Pubblica l'evento di acquisto del biglietto
+            applicationEventPublisher.publishEvent(new TicketPurchasedEvent(this, event));
+
             return PurchaseTicketResponse.builder()
                     .success(true)
                     .message(String.format("Purchase successful! Total amount charged: %s", totalPrice))
