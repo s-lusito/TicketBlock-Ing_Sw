@@ -55,9 +55,9 @@ public class TicketService {
     /**
      * Processes a ticket purchase transaction.
      * 
-     * Validates ticket availability, enforces purchase limits (max 4 per event),
-     * calculates total price including optional resale fees, processes payment,
-     * and publishes a TicketPurchasedEvent on success.
+     * This method validates ticket availability, enforces purchase limits,
+     * calculates the total price with optional resale fees, processes payment,
+     * and publishes a success event.
      * 
      * @param ticketsRequested the purchase request containing ticket IDs, fee preferences, and payment info
      * @return PurchaseTicketResponse containing success status and total amount charged

@@ -38,7 +38,7 @@ public class JwtService {
      * @return the username stored in the token's subject claim
      */
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject); //il subject è lo username
+        return extractClaim(token, Claims::getSubject);
     }
 
     /**

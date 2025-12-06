@@ -190,10 +190,11 @@ public class EventService {
 
 
     /**
-     * Scheduled task that updates event sale statuses at midnight.
+     * Scheduled task that updates event sale statuses daily at midnight.
      * 
-     * Opens sales for events whose sale start date is today and closes sales
-     * for events happening tomorrow.
+     * This method runs on a cron schedule ("0 0 0 * * *") and performs two operations:
+     * - Opens sales for events whose sale start date is today
+     * - Closes sales for events happening tomorrow
      */
     @Scheduled(cron = "0 0 0 * * *") // ogni mezzanotte
     @Transactional
