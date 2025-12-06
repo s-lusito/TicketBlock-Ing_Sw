@@ -50,7 +50,7 @@ public class TicketController {
      * Requires USER or ADMIN role and ticket ownership.
      * 
      * @param id the ID of the ticket to resell
-     * @return ResponseEntity with no content (200)
+     * @return ResponseEntity with empty body and 200 OK status
      * @throws com.ticketblock.exception.ResourceNotFoundException if ticket is not found
      * @throws com.ticketblock.exception.ForbiddenActionException if user doesn't own the ticket
      * @throws com.ticketblock.exception.NonResellableTicketException if ticket is not resellable

@@ -15,10 +15,19 @@ This document provides comprehensive information for frontend developers on how 
 
 ## Base URL
 
-All API endpoints are prefixed with:
+The base URL varies by environment:
+
+**Development (local):**
 ```
 http://localhost:8080/api/v1
 ```
+
+**Production:**
+```
+https://your-domain.com/api/v1
+```
+
+Replace `{BASE_URL}` with the appropriate environment URL in all examples below.
 
 ---
 
