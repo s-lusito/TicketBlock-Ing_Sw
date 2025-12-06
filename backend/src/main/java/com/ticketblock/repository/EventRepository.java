@@ -2,6 +2,7 @@ package com.ticketblock.repository;
 
 import com.ticketblock.entity.Event;
 import com.ticketblock.entity.Venue;
+import com.ticketblock.entity.enumeration.EventSaleStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,4 +18,6 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     @Query("SELECT e FROM Event e WHERE e.date = CURRENT_DATE + 1")
     List<Event> findAllTomorrow();
 
+
+    List<Event> findAllBySaleStatusIn(List<EventSaleStatus> saleStatusList);
 }

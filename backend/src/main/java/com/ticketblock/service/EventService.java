@@ -30,8 +30,15 @@ public class EventService {
     private final VenueRepository venueRepository;
     private final SecurityService securityService;
 
-    public List<EventDto> getAllEvents() {
-        return eventRepository.findAll().
+    public List<EventDto> getAllEvents(List<EventSaleStatus> saleStatusList) {
+        if( saleStatusList == null || saleStatusList.isEmpty() ) {
+            return eventRepository.findAll().
+                    stream()
+                    .map(EventMapper::toDto)
+                    .toList();
+        }
+
+        return eventRepository.findAllBySaleStatusIn(saleStatusList).
                 stream()
                 .map(EventMapper::toDto)
                 .toList();
