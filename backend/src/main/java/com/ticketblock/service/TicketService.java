@@ -49,6 +49,10 @@ public class TicketService {
         //recupero l'eventId del primo ticket per confrontarlo con gli altri
         Event event = tickets.get(0).getEvent();
 
+        if(!event.getSaleStatus().equals(EventSaleStatus.ONGOING)){
+            throw new UnavailableTicketException("Tickets for this event are not available for purchase at this time");
+        }
+
         if (tickets.size() != ticketIds.size()) { // controllo che tutti i ticket siano stati trovati
             throw new ResourceNotFoundException("One or more tickets not found for the provided ids");
         }
