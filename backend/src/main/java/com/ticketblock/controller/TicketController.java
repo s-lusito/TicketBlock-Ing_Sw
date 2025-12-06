@@ -30,7 +30,7 @@ public class TicketController {
         ticketService.resellTicket(id);
         return ResponseEntity.ok().build();
     }
-
+    // restituisce i biglietti dell'utente loggato
     @GetMapping("/mine")
     public ResponseEntity<?> getMineTickets() {
         List<TicketDto> userTickets = ticketService.getLoggedUserTickets();
