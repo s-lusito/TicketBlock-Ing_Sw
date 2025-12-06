@@ -57,10 +57,10 @@ async function runTicketTests() {
           "1": false,
           "2": true
         },
-        creditCardNumber: '4532015112830366',
-        expirationDate: '12/25',
-        cvv: '123',
-        cardHolderName: 'Test User'
+        creditCardNumber: config.testCreditCard.creditCardNumber,
+        expirationDate: config.testCreditCard.expirationDate,
+        cvv: config.testCreditCard.cvv,
+        cardHolderName: config.testCreditCard.cardHolderName
       });
       
       assert.equal(response.status, 200, 'Should return 200 OK');
