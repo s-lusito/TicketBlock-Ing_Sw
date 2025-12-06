@@ -94,5 +94,22 @@
         ]
       }
     ]
+  },
+  {
+    "name": "Mini Teatro Test",
+    "address": {
+      "street": "Via del Test 1",
+      "city": "Test City",
+      "state": "Testing"
+    },
+    "rows": [
+      {
+        "letter": "A",
+        "sector": "STANDARD",
+        "seats": [
+          {"seatNumber": "1"}, {"seatNumber": "2"}, {"seatNumber": "3"}, {"seatNumber": "4"}
+        ]
+      }
+    ]
   }
 ]
