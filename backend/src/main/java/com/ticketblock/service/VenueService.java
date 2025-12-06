@@ -19,6 +19,13 @@ import org.springframework.stereotype.Service;
 public class VenueService {
     private final VenueRepository venueRepository;
 
+    /**
+     * Retrieves a venue by its ID with complete row and seat information.
+     * 
+     * @param venueId the ID of the venue to retrieve
+     * @return VenueDto object containing venue details with rows and seats
+     * @throws ResourceNotFoundException if the venue is not found
+     */
     public VenueDto getVenueByVenueId(Integer venueId) {
          return venueRepository.findById(venueId)
                  .map(VenueMapper::toDto)

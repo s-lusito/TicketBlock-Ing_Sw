@@ -31,15 +31,37 @@ public class JwtService {
 
     private static final String SECRET_KEY = "97455b1a39ee9b4154fb89450975da9803964501de7ffaa8e41022c232f2c3ea";
 
+    /**
+     * Extracts the username (subject) from a JWT token.
+     * 
+     * @param token the JWT token to extract username from
+     * @return the username stored in the token's subject claim
+     */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject); //il subject è lo username
     }
 
+    /**
+     * Generates a JWT token for a user with default claims.
+     * 
+     * @param userDetails the user details to generate the token for
+     * @return the generated JWT token as a string
+     */
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
 
+    /**
+     * Validates a JWT token against user details.
+     * 
+     * Checks if the token's username matches the provided user details and
+     * that the token has not expired.
+     * 
+     * @param token the JWT token to validate
+     * @param userDetails the user details to validate against
+     * @return true if the token is valid, false otherwise
+     */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
@@ -53,6 +75,13 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    /**
+     * Generates a JWT token with custom claims.
+     * 
+     * @param extraClaims additional claims to include in the token
+     * @param userDetails the user details to generate the token for
+     * @return the generated JWT token as a string
+     */
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts
                 .builder()
@@ -65,6 +94,14 @@ public class JwtService {
 
     }
 
+    /**
+     * Extracts a specific claim from a JWT token using a resolver function.
+     * 
+     * @param <T> the type of the claim to extract
+     * @param token the JWT token to extract the claim from
+     * @param claimsResolver function to resolve the specific claim from all claims
+     * @return the extracted claim value
+     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);

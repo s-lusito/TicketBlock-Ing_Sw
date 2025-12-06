@@ -39,6 +39,12 @@ public class EventService {
     private final VenueRepository venueRepository;
     private final SecurityService securityService;
 
+    /**
+     * Retrieves all events, optionally filtered by sale status.
+     * 
+     * @param saleStatusList list of sale statuses to filter by, or null/empty for all events
+     * @return list of EventDto objects
+     */
     public List<EventDto> getAllEvents(List<EventSaleStatus> saleStatusList) {
         if( saleStatusList == null || saleStatusList.isEmpty() ) {
             return eventRepository.findAll().
@@ -53,12 +59,31 @@ public class EventService {
                 .toList();
     }
 
+    /**
+     * Retrieves a specific event by its ID.
+     * 
+     * @param eventId the ID of the event to retrieve
+     * @return EventDto object containing event details
+     * @throws ResourceNotFoundException if the event is not found
+     */
     public EventDto getEventById(int eventId) {
         return eventRepository.findById(eventId)
                 .map(EventMapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Event with id:" + eventId + " not found","Event not found"));
     }
 
+    /**
+     * Creates a new event in the system with automatic ticket generation.
+     * 
+     * Validates event dates and times, checks venue availability, creates tickets
+     * for all seats in the venue, and sets the initial sale status.
+     * 
+     * @param eventCreationRequest the event creation request with all event details
+     * @return EventDto object containing the created event details
+     * @throws InvalidDateAndTimeException if dates or times are invalid
+     * @throws ResourceNotFoundException if the venue is not found
+     * @throws VenueNotAvailableException if the venue is already booked
+     */
     @Transactional
     public EventDto createEvent(EventCreationRequest eventCreationRequest) {
         Event event = EventMapper.toEntity(eventCreationRequest);
@@ -140,6 +165,16 @@ public class EventService {
         }
     }
 
+    /**
+     * Deletes an event from the system.
+     * 
+     * Only the event organizer is authorized to delete the event.
+     * 
+     * @param eventId the ID of the event to delete
+     * @return EventDto object containing the deleted event details
+     * @throws ResourceNotFoundException if the event is not found
+     * @throws ForbiddenActionException if the user is not the organizer
+     */
     public EventDto removeEventById(int eventId) {
         User loggedUser = securityService.getLoggedInUser();
         Event event = eventRepository.findById(eventId)
@@ -154,6 +189,12 @@ public class EventService {
     }
 
 
+    /**
+     * Scheduled task that updates event sale statuses at midnight.
+     * 
+     * Opens sales for events whose sale start date is today and closes sales
+     * for events happening tomorrow.
+     */
     @Scheduled(cron = "0 0 0 * * *") // ogni mezzanotte
     @Transactional
     public void updateEventsSaleStatus() {
@@ -175,6 +216,11 @@ public class EventService {
 
 
 
+    /**
+     * Updates the event status to SOLD_OUT if all tickets are sold.
+     * 
+     * @param event the event to check and update
+     */
     @Transactional
     public void updateStatusIfSoldOut(Event event) {
         boolean allSold = event.getTickets().stream()

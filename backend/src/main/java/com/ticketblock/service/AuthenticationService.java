@@ -28,6 +28,14 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+    /**
+     * Authenticates a user with email and password credentials.
+     * 
+     * @param request the authentication request containing email and password
+     * @return AuthenticationResponse containing the JWT token
+     * @throws UsernameNotFoundException if the user is not found
+     * @throws org.springframework.security.authentication.BadCredentialsException if credentials are invalid
+     */
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())); //autentico
         var user =  userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new UsernameNotFoundException("User not found")); //prelevo dal db
@@ -36,6 +44,13 @@ public class AuthenticationService {
 
     }
 
+    /**
+     * Registers a new user in the system.
+     * 
+     * @param request the registration request containing user details
+     * @return AuthenticationResponse containing the JWT token for the new user
+     * @throws IllegalArgumentException if the email is already registered
+     */
     public AuthenticationResponse register(RegisterRequest request) {
 
         if(userRepository.findByEmail(request.getEmail()).isPresent()){ //se la mail è già presente

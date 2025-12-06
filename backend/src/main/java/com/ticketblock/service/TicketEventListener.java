@@ -24,6 +24,14 @@ public class TicketEventListener {
         this.eventService = eventService;
     }
 
+    /**
+     * Event handler triggered after a ticket purchase transaction is committed.
+     * 
+     * Checks if all tickets for the event are sold and updates the event status
+     * to SOLD_OUT if necessary.
+     * 
+     * @param ticketPurchasedEvent the event containing information about the ticket purchase
+     */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onTicketPurchased(TicketPurchasedEvent ticketPurchasedEvent) {
         eventService.updateStatusIfSoldOut(ticketPurchasedEvent.getEvent());

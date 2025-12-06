@@ -17,6 +17,12 @@ import org.springframework.stereotype.Service;
 public class SecurityService {
 
 
+    /**
+     * Retrieves the currently authenticated user from the security context.
+     * 
+     * @return User object representing the logged-in user
+     * @throws RuntimeException if the user is not authenticated or principal is invalid
+     */
     public User getLoggedInUser(){
         var auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {

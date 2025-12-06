@@ -41,10 +41,31 @@ public class TicketService {
     private final int MAX_TICKETS_PER_EVENT = 4;
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * Retrieves tickets for a specific event, optionally filtered by status.
+     * 
+     * @param eventId the ID of the event
+     * @param ticketStatus the ticket status to filter by, or null for all tickets
+     * @return list of TicketDto objects
+     */
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
     }
 
+    /**
+     * Processes a ticket purchase transaction.
+     * 
+     * Validates ticket availability, enforces purchase limits (max 4 per event),
+     * calculates total price including optional resale fees, processes payment,
+     * and publishes a TicketPurchasedEvent on success.
+     * 
+     * @param ticketsRequested the purchase request containing ticket IDs, fee preferences, and payment info
+     * @return PurchaseTicketResponse containing success status and total amount charged
+     * @throws ResourceNotFoundException if tickets are not found
+     * @throws UnavailableTicketException if tickets are not available or event sales are closed
+     * @throws ForbiddenActionException if user exceeds the 4-ticket limit per event
+     * @throws FailedPaymentException if payment processing fails
+     */
     @Transactional
     public PurchaseTicketResponse purchaseTickets(PurchaseTicketRequest ticketsRequested) {
         User loggedUser = securityService.getLoggedInUser();
@@ -127,6 +148,17 @@ public class TicketService {
     }
 
 
+    /**
+     * Resells a ticket back to the marketplace.
+     * 
+     * Makes the ticket available for purchase again. Only tickets marked as
+     * resellable (purchased with the resale fee) can be resold.
+     * 
+     * @param ticketId the ID of the ticket to resell
+     * @throws ResourceNotFoundException if the ticket is not found
+     * @throws ForbiddenActionException if the user doesn't own the ticket
+     * @throws NonResellableTicketException if the ticket is not resellable
+     */
     @Transactional
     public void resellTicket(Integer ticketId){
         User user = securityService.getLoggedInUser();
@@ -147,6 +179,11 @@ public class TicketService {
     }
 
 
+    /**
+     * Retrieves all tickets owned by the currently logged-in user.
+     * 
+     * @return list of TicketDto objects owned by the user
+     */
     public List<TicketDto> getLoggedUserTickets() {
         User loggedUser = securityService.getLoggedInUser();
         return loggedUser.getTickets()
