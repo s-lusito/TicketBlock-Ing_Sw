@@ -1,5 +1,6 @@
 package com.ticketblock.service;
 
+import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
@@ -79,6 +80,7 @@ public class TicketService {
                 ticketsRequested.getCardHolderName(),
                 totalPrice))
         {
+            applicationEventPublisher.publishEvent(new TicketPurchasedEvent(this, eventId));
             return PurchaseTicketResponse.builder()
                     .success(true)
                     .message(String.format("Purchase successful! Total amount charged: %s", totalPrice))
@@ -90,7 +92,6 @@ public class TicketService {
                     .build();
         }
 
-        applicationEventPublisher.publishEvent(new TicketsPurchasedEvent(eventId));
 
     }
 

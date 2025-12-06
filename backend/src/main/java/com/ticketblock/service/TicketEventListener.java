@@ -1,5 +1,6 @@
 package com.ticketblock.service;
 
+import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
 import com.ticketblock.entity.Event;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ public class TicketEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional
-    public void onTicketPurchased(Event event) {
-        eventService.updateStatusIfSoldOut(event );
+    public void onTicketPurchased(TicketPurchasedEvent ticketPurchasedEvent) {
+        eventService.updateStatusIfSoldOut(ticketPurchasedEvent.getEvent());
     }
 }
