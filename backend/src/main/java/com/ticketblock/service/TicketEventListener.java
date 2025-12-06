@@ -18,7 +18,6 @@ public class TicketEventListener {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional
     public void onTicketPurchased(TicketPurchasedEvent ticketPurchasedEvent) {
         eventService.updateStatusIfSoldOut(ticketPurchasedEvent.getEvent());
     }
