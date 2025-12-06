@@ -169,11 +169,12 @@ public class EventService {
 
     @Transactional
     public void updateStatusIfSoldOut(Event event) {
-        boolean allSold = event.getTickets().stream()
+        Event retrivedEvent = eventRepository.findById(event.getId()).orElseThrow(() -> new ResourceNotFoundException("Event with id:" + event.getId() + " not found"));
+        boolean allSold = retrivedEvent.getTickets().stream()
                 .allMatch(ticket -> ticket.getTicketStatus().equals(TicketStatus.SOLD));
         if (allSold) {
-            event.setSaleStatus(EventSaleStatus.SOLD_OUT);
-            eventRepository.save(event);
+            retrivedEvent.setSaleStatus(EventSaleStatus.SOLD_OUT);
+            eventRepository.save(retrivedEvent);
         }
     }
 

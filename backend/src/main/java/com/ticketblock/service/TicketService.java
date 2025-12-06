@@ -1,6 +1,7 @@
 package com.ticketblock.service;
 
 import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
+import com.ticketblock.ApplicationEvent.TicketReselledEvent;
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
@@ -133,9 +134,10 @@ public class TicketService {
         ticket.setResellable(false);
         ticket.setTicketStatus(TicketStatus.AVAILABLE);
         ticket.setOwner(null);
-        if(ticket.getEvent().getSaleStatus().equals(EventSaleStatus.SOLD_OUT))
-            ticket.getEvent().setSaleStatus(EventSaleStatus.ONGOING);
+
         ticketRepository.save(ticket);
+        applicationEventPublisher.publishEvent(new TicketReselledEvent(this, ticket.getEvent()));
+
     }
 
 
