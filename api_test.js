@@ -382,8 +382,8 @@ async function testSoldOutAndReselling(users, events) {
                             }, testUsers[0].token);
 
                             totalTests++;
-                            // This should fail if user already has 4 tickets from same event
-                            // However, since it's a different event, it should succeed
+                            // The 4-ticket limit is per event, not global
+                            // Since this is a different event, the purchase should succeed
                             if (exceedPurchase.ok) {
                                 logTest('Purchase on Different Event', true, 'Limit is per event');
                                 passedTests++;
