@@ -120,7 +120,7 @@ Start time: 2025-12-06T19:30:00.000Z
 === Creating 3 Valid Events ===
 
 ✅ Create Event 1 (Organizer 1)
-   Event ID: 1, Name: Concert Rock Festival 2025
+   Event ID: 1, Name: Concert Rock Festival 2026
 ✅ Create Event 2 (Organizer 1)
    Event ID: 2, Name: Jazz Night Special
 ✅ Create Event 3 (Organizer 2)

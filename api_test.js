@@ -22,6 +22,11 @@ const TEST_CARDS = {
 // Test constants
 const MAX_EVENT_NAME_LENGTH = 50;
 const NON_EXISTENT_ID = 99999;
+const EVENT_DATE_OFFSET_DAYS = {
+    EVENT1: 180,  // ~6 months from now
+    EVENT2: 220,  // ~7 months from now
+    EVENT3: 250   // ~8 months from now
+};
 
 /**
  * Makes an HTTP request to the API
@@ -140,11 +145,11 @@ async function createEvents(organizers) {
     // Generate future dates dynamically
     const today = new Date();
     const futureDate1 = new Date(today);
-    futureDate1.setDate(today.getDate() + 180); // 6 months from now
+    futureDate1.setDate(today.getDate() + EVENT_DATE_OFFSET_DAYS.EVENT1);
     const futureDate2 = new Date(today);
-    futureDate2.setDate(today.getDate() + 220); // ~7 months from now
+    futureDate2.setDate(today.getDate() + EVENT_DATE_OFFSET_DAYS.EVENT2);
     const futureDate3 = new Date(today);
-    futureDate3.setDate(today.getDate() + 250); // ~8 months from now
+    futureDate3.setDate(today.getDate() + EVENT_DATE_OFFSET_DAYS.EVENT3);
     
     const saleStartDate = new Date(today); // Today - so tickets are available for purchase immediately
     
@@ -320,8 +325,9 @@ async function testEventEdgeCases(organizer) {
     logTest('Event with non-existent venue should fail', !invalidVenueResponse.ok);
     
     // Test 7: Event name too long (over 50 characters)
+    const longName = 'Event with very long name that exceeds maximum length limit'.substring(0, MAX_EVENT_NAME_LENGTH + 1);
     const longNameEvent = {
-        name: 'A'.repeat(MAX_EVENT_NAME_LENGTH + 1), // 51 characters - exceeds limit
+        name: longName, // 51 characters - exceeds limit
         date: futureDateStr,
         startTime: '20:00:00',
         endTime: '23:00:00',
