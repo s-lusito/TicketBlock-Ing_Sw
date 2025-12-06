@@ -15,6 +15,7 @@ import com.ticketblock.exception.UnavailableTicketException;
 import com.ticketblock.exception.UnResellableTicketException;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
+import com.ticketblock.utils.MoneyHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,8 @@ public class TicketService {
     private final BigDecimal feePercentage = new BigDecimal("1.10");
     private final TicketRepository ticketRepository;
     private final SecurityService securityService;
-    private final ApplicationEventPublisher applicationEventPublisher;
+
+    private final int MAX_TICKETS_PER_EVENT = 4;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
@@ -45,9 +47,13 @@ public class TicketService {
         List<Integer> ticketIds = ticketFeeMap.keySet().stream().toList();
 
         List<Ticket> tickets = ticketRepository.findAllByIdIn(ticketIds);
+        if (tickets.isEmpty()) {
+            throw new ResourceNotFoundException("No tickets found for the provided ids");
+        }
+
 
         //recupero l'eventId del primo ticket per confrontarlo con gli altri
-        Event event = tickets.get(0).getEvent();
+        Event event = tickets.getFirst().getEvent();
 
         if(!event.getSaleStatus().equals(EventSaleStatus.ONGOING)){
             throw new UnavailableTicketException("Tickets for this event are not available for purchase at this time");
@@ -57,6 +63,11 @@ public class TicketService {
             throw new ResourceNotFoundException("One or more tickets not found for the provided ids");
         }
 
+        verifyTicketOwnershipLimit(loggedUser, event, tickets); // verifica che l'utente non superi il limite di 4 ticket per evento
+
+
+        //CALCOLO PREZZO E AGGIORNO STATI DEI TICKET, VERIFICANDO LA DISPONIBILITÀ E CHE SIANO TUTTI RELATIVI ALLO STESSO EVENTO
+
         // Inizializza totalPrice come un BigDecimal pari a zero ma con scala fissa a 2 decimali e con politica di arrotondamento RoundingMode.HALF_UP.
         BigDecimal totalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 
@@ -65,7 +76,8 @@ public class TicketService {
                 throw new UnavailableTicketException("One or more tickets are not available for purchase");
             }
             if (ticketFeeMap.get(ticket.getId())) { // accetta la fee
-                totalPrice = totalPrice.add(ticket.getPrice().multiply(feePercentage)); // aggiungo la fee al prezzo
+                BigDecimal priceWithFee = MoneyHelper.normalizeAmount(totalPrice.multiply(feePercentage));
+                totalPrice = totalPrice.add(priceWithFee); // aggiungo la fee al prezzo
                 ticket.setResellable(true); // imposto resellable a true se accetta la fee
             } else {
                 totalPrice = totalPrice.add(ticket.getPrice());
@@ -73,10 +85,9 @@ public class TicketService {
             }
             ticket.setTicketStatus(TicketStatus.SOLD); // imposto lo stato a SOLD
             ticket.setOwner(loggedUser); // imposto il proprietario
-            ticketRepository.save(ticket);
-
-
         }
+
+        ticketRepository.saveAll(tickets); // salvo i ticket aggiornati
 
         // Gestione del pagamento (simulata)
         if (managePayment(ticketsRequested.getCreditCardNumber(),
@@ -93,13 +104,20 @@ public class TicketService {
                     .message(String.format("Purchase successful! Total amount charged: %s", totalPrice))
                     .build();
         } else {
-            return PurchaseTicketResponse.builder()
-                    .success(false)
-                    .message("Payment failed. Please check your payment details and try again.")
-                    .build();
+            throw new FailedPaymentException("Payment processing failed"); // fa il rollback della transazione
         }
 
 
+
+
+
+    }
+
+    private void verifyTicketOwnershipLimit(User loggedUser, Event event, List<Ticket> tickets) {
+        int eventTickedAlreadyOwned =ticketRepository.countAllByOwnerAndEvent(loggedUser, event);
+        if (eventTickedAlreadyOwned + tickets.size()  <= MAX_TICKETS_PER_EVENT ) { // se supera il limite di 4 ticket per evento, lancio eccezione
+            throw new ForbiddenActionException("User cannot purchase more than 4 tickets for the same event", String.format("You already own %d tickets for this event a", eventTickedAlreadyOwned));
+        }
     }
 
 
@@ -107,11 +125,12 @@ public class TicketService {
     public void resellTicket(Integer ticketId){
         User user = securityService.getLoggedInUser();
         Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
-        if (!ticket.getOwner().equals(user))
+
+        if (ticket.getOwner() == null || !ticket.getOwner().equals(user))
             throw new ForbiddenActionException("Ticket is not in your account");
 
         if(!ticket.getResellable())
-            throw new UnResellableTicketException("This ticket is not resellable");
+            throw new NonResellableTicketException("This ticket is not resellable");
 
         ticket.setResellable(false);
         ticket.setTicketStatus(TicketStatus.AVAILABLE);

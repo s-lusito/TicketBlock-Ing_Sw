@@ -26,7 +26,7 @@ public class TicketController {
     }
 
     @PostMapping("/{id}/resell")
-    public ResponseEntity<?> resellTickets(@PathVariable Integer id) {
+    public ResponseEntity<?> resellTicket(@PathVariable Integer id) {
         ticketService.resellTicket(id);
         return ResponseEntity.ok().build();
     }

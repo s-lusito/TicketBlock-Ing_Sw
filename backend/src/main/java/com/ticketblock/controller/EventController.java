@@ -9,8 +9,6 @@ import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.service.EventService;
 import com.ticketblock.service.TicketService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,8 +51,7 @@ public class EventController {
 
     @GetMapping("{id}/tickets")
     public ResponseEntity<?> getTicketFromEvent(@PathVariable Integer id,
-                                                @RequestParam(required = false) TicketStatus ticketStatus,
-                                                @RequestParam(required = false) RowSector ticketSector
+                                                @RequestParam(required = false) TicketStatus ticketStatus
                                                 ) {
         List<TicketDto> tickets= ticketService.getTicketsFromEvent(id, ticketStatus);
         return ResponseEntity.ok(tickets);

@@ -44,6 +44,7 @@ public class ErrorResponse {
         * A detailed description of the error, which may include technical details useful for front-end.
      */
     private String detail;
+
     @Nullable
     private List<ApiFieldError> errors;
 }

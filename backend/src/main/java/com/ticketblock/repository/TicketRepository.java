@@ -2,6 +2,7 @@ package com.ticketblock.repository;
 
 import com.ticketblock.entity.Event;
 import com.ticketblock.entity.Ticket;
+import com.ticketblock.entity.User;
 import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import jakarta.persistence.LockModeType;
@@ -23,4 +24,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE) // serve per bloccare letture e scritture sui record selezionati
     List<Ticket> findAllByIdIn(List<Integer> ids);
+
+    boolean findAllByOwnerAndEvent(User owner, Event event);
+
+    int countAllByOwnerAndEvent(User owner, Event event);
 }
