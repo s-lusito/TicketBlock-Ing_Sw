@@ -113,7 +113,7 @@ public class TicketService {
 
     private void verifyTicketOwnershipLimit(User loggedUser, Event event, List<Ticket> tickets) {
         int eventTickedAlreadyOwned =ticketRepository.countAllByOwnerAndEvent(loggedUser, event);
-        if (eventTickedAlreadyOwned + tickets.size()  <= MAX_TICKETS_PER_EVENT ) { // se supera il limite di 4 ticket per evento, lancio eccezione
+        if (eventTickedAlreadyOwned + tickets.size()  > MAX_TICKETS_PER_EVENT ) { // se supera il limite di 4 ticket per evento, lancio eccezione
             throw new ForbiddenActionException("User cannot purchase more than 4 tickets for the same event", String.format("You already own %d tickets for this event a", eventTickedAlreadyOwned));
         }
     }
