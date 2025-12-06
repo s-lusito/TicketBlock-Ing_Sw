@@ -1,9 +1,9 @@
 package com.ticketblock.service;
 
 import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
-import com.ticketblock.entity.Event;
-import com.ticketblock.entity.enumeration.TicketStatus;
+import com.ticketblock.ApplicationEvent.TicketReselledEvent;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -18,7 +18,15 @@ public class TicketEventListener {
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW) // Questo consente di creare una nuova transazione diversa rispetto a quella originale
     public void onTicketPurchased(TicketPurchasedEvent ticketPurchasedEvent) {
         eventService.updateStatusIfSoldOut(ticketPurchasedEvent.getEvent());
     }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @Transactional(propagation = Propagation.REQUIRES_NEW) // Questo consente di creare una nuova transazione diversa rispetto a quella originale
+    public void onTicketReselled(TicketReselledEvent ticketReselledEvent) {
+        eventService.updateStatusIfSoldOut(ticketReselledEvent.getEvent());
+    }
+
 }

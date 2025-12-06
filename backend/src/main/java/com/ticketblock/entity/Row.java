@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(
         uniqueConstraints = @UniqueConstraint(columnNames = {"venue_id","letter"})
 )

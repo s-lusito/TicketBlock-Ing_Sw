@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
@@ -28,4 +29,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     boolean findAllByOwnerAndEvent(User owner, Event event);
 
     int countAllByOwnerAndEvent(User owner, Event event);
+
+    List<Ticket> findAllByOwner(User loggedUser);
 }

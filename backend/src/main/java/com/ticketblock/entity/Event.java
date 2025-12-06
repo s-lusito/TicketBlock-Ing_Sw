@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

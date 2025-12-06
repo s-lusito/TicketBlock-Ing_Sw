@@ -1,6 +1,7 @@
 package com.ticketblock.service;
 
 import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
+import com.ticketblock.ApplicationEvent.TicketReselledEvent;
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
@@ -74,7 +75,7 @@ public class TicketService {
                 throw new UnavailableTicketException("One or more tickets are not available for purchase");
             }
             if (ticketFeeMap.get(ticket.getId())) { // accetta la fee
-                BigDecimal priceWithFee = MoneyHelper.normalizeAmount(totalPrice.multiply(feePercentage));
+                BigDecimal priceWithFee = MoneyHelper.normalizeAmount(ticket.getPrice().multiply(feePercentage));
                 totalPrice = totalPrice.add(priceWithFee); // aggiungo la fee al prezzo
                 ticket.setResellable(true); // imposto resellable a true se accetta la fee
             } else {
@@ -97,9 +98,12 @@ public class TicketService {
             // Pubblica l'evento di acquisto del biglietto
             applicationEventPublisher.publishEvent(new TicketPurchasedEvent(this, event));
 
+            // TODO: Trasfermento denaro conto venditore( organizzatore o precedente proprietario)
+
             return PurchaseTicketResponse.builder()
                     .success(true)
                     .message(String.format("Purchase successful! Total amount charged: %s", totalPrice))
+                    .totalPrice(totalPrice)
                     .build();
         } else {
             throw new FailedPaymentException("Payment processing failed"); // fa il rollback della transazione
@@ -113,7 +117,7 @@ public class TicketService {
 
     private void verifyTicketOwnershipLimit(User loggedUser, Event event, List<Ticket> tickets) {
         int eventTickedAlreadyOwned =ticketRepository.countAllByOwnerAndEvent(loggedUser, event);
-        if (eventTickedAlreadyOwned + tickets.size()  <= MAX_TICKETS_PER_EVENT ) { // se supera il limite di 4 ticket per evento, lancio eccezione
+        if (eventTickedAlreadyOwned + tickets.size()  > MAX_TICKETS_PER_EVENT ) { // se supera il limite di 4 ticket per evento, lancio eccezione
             throw new ForbiddenActionException("User cannot purchase more than 4 tickets for the same event", String.format("You already own %d tickets for this event a", eventTickedAlreadyOwned));
         }
     }
@@ -133,18 +137,16 @@ public class TicketService {
         ticket.setResellable(false);
         ticket.setTicketStatus(TicketStatus.AVAILABLE);
         ticket.setOwner(null);
-        if(ticket.getEvent().getSaleStatus().equals(EventSaleStatus.SOLD_OUT))
-            ticket.getEvent().setSaleStatus(EventSaleStatus.ONGOING);
+
         ticketRepository.save(ticket);
+        applicationEventPublisher.publishEvent(new TicketReselledEvent(this, ticket.getEvent()));
+
     }
 
 
     public List<TicketDto> getLoggedUserTickets() {
         User loggedUser = securityService.getLoggedInUser();
-        return loggedUser.getTickets()
-                .stream()
-                .map(TicketMapper::toDto)
-                .toList();
+        return ticketRepository.findAllByOwner(loggedUser).stream().map(TicketMapper::toDto).toList();
     }
 
 
