@@ -15,6 +15,7 @@ import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.VenueRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventService {
 
     public static final int DAYS_BETWEEN_SALES_START_AND_EVENT = 3;
@@ -174,9 +176,16 @@ public class EventService {
                 .allMatch(ticket -> ticket.getTicketStatus().equals(TicketStatus.SOLD));
         if (allSold) {
             retrivedEvent.setSaleStatus(EventSaleStatus.SOLD_OUT);
-            eventRepository.save(retrivedEvent);
+            log.debug("Update status of event with id " + event.getId() + " to " + retrivedEvent.getSaleStatus());
         }
+        else if (retrivedEvent.getSaleStatus().equals(EventSaleStatus.SOLD_OUT)) {
+            retrivedEvent.setSaleStatus(EventSaleStatus.ONGOING);
+            log.debug("Update status of event with id " + event.getId() + " to " + retrivedEvent.getSaleStatus());
+
+        }
+            eventRepository.save(retrivedEvent);
     }
+
 
 
 }
