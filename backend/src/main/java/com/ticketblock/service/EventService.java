@@ -149,26 +149,23 @@ public class EventService {
     @Scheduled(cron = "0 0 0 * * *") // ogni mezzanotte
     @Transactional
     public void updateEventsSaleStatus() {
-        List<Event> events = eventRepository.findAllToOpenToday();
-
-        for (Event e : events) {
+        List<Event> eventsToOpen = eventRepository.findAllToOpenToday();
+        // apri vendite degli eventi la cui data di inizio vendita è oggi
+        for (Event e : eventsToOpen) {
             e.setSaleStatus(EventSaleStatus.ONGOING);
         }
 
-        eventRepository.saveAll(events);
-    }
+        // chiudi vendite degli eventi che si tengono domani
+        List<Event> eventsToClose = eventRepository.findAllByDate(LocalDate.now().plusDays(1));
 
-    @Scheduled(cron = "0 0 0 * * *") // ogni mezzanotte
-    @Transactional
-    public void closeEventsSale() {
-        List<Event> events = eventRepository.findAllByDate(LocalDate.now().plusDays(1)); // chiudi vendite con data di domani
-
-        for (Event e : events) {
+        for (Event e : eventsToClose) {
             e.setSaleStatus(EventSaleStatus.ENDED);
         }
-
-        eventRepository.saveAll(events);
+        eventRepository.saveAll(eventsToClose);
+        eventRepository.saveAll(eventsToOpen);
     }
+
+   
 
     @Transactional
     public void updateStatusIfSoldOut(Event event) {
