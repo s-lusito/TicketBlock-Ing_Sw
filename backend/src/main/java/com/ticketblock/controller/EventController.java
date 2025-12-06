@@ -10,6 +10,7 @@ import com.ticketblock.service.EventService;
 import com.ticketblock.service.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/events")
+@Slf4j
 public class EventController {
 
     private final EventService eventService;
@@ -45,7 +47,9 @@ public class EventController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEvent(@PathVariable Integer id) {
+        log.debug("User wants to delete event with id " + id);
         eventService.removeEventById(id);
+        log.debug("Event with id " + id + " has been deleted");
         return ResponseEntity.noContent().build();
     }
 

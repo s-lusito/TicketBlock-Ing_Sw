@@ -146,10 +146,7 @@ public class TicketService {
 
     public List<TicketDto> getLoggedUserTickets() {
         User loggedUser = securityService.getLoggedInUser();
-        return loggedUser.getTickets()
-                .stream()
-                .map(TicketMapper::toDto)
-                .toList();
+        return ticketRepository.findAllByOwner(loggedUser).stream().map(TicketMapper::toDto).toList();
     }
 
 
