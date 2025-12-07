@@ -98,7 +98,7 @@ public class EventService {
         }
 
         if(eventCreationRequest.getSaleStartDate().isBefore(LocalDate.now())) {
-            throw new InvalidDateAndTimeException("Sale start date cannot be before event date");
+            throw new InvalidDateAndTimeException("Sale start date cannot be in the past");
         }
 
         if(eventCreationRequest.getSaleStartDate().isAfter(eventCreationRequest.getDate().minusDays(DAYS_BETWEEN_SALES_START_AND_EVENT))) {
