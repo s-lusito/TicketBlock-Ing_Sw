@@ -13,6 +13,7 @@ import com.ticketblock.exception.ForbiddenActionException;
 import com.ticketblock.exception.VenueNotAvailableException;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
+import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.repository.VenueRepository;
 import com.ticketblock.utils.MoneyHelper;
 import jakarta.transaction.Transactional;
@@ -25,9 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +37,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final VenueRepository venueRepository;
     private final SecurityService securityService;
+    private final TicketRepository ticketRepository;
 
     public List<EventDto> getAllEvents(List<EventSaleStatus> saleStatusList) {
         if( saleStatusList == null || saleStatusList.isEmpty() ) {
@@ -198,10 +198,8 @@ public class EventService {
         User loggedUser = securityService.getLoggedInUser();
         List<Event> events = eventRepository.findAllByOrganizer(loggedUser);
         for (Event e : events){
-            List<Ticket> soldTickets = e.getTickets().stream().filter(ticket -> ticket.getOwner() != null).toList(); // se i biglietti non hanno un owner non sono mai stati venduti
-
-            int standardTicketsSold = Math.toIntExact(e.getTickets().stream().filter(ticket -> ticket.getPrice().equals(ticket.getEvent().getStandardTicketPrice())).count());
-            int vipTicketsSold = Math.toIntExact(e.getTickets().stream().filter(ticket -> ticket.getPrice().equals(ticket.getEvent().getVipTicketPrice())).count());
+            Integer standardTicketsSold = ticketRepository.countSoldTicketsByEventAndPrice(e,e.getStandardTicketPrice());
+            Integer vipTicketsSold = ticketRepository.countSoldTicketsByEventAndPrice(e, e.getVipTicketPrice());
 
             BigDecimal totalSales = getTotalSales(e, standardTicketsSold, vipTicketsSold);
 
