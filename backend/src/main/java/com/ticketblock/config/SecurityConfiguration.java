@@ -80,7 +80,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/tickets/**").hasAnyAuthority("USER", "ADMIN")
 
                         // Protegge endpoint di gestione eventi per ORGANIZER e ADMIN
-                        .requestMatchers("/api/v1/organizer/events**").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers("/api/v1/organizer/events/**").hasAnyAuthority("ORGANIZER", "ADMIN")
 
                         .requestMatchers("/api/v1/events/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/events/**").hasAnyAuthority("ORGANIZER", "ADMIN")
