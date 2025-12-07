@@ -34,7 +34,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     List<Ticket> findAllByOwner(User loggedUser);
 
     /**
-     * Tickets sold by Organizer (Reselled tickets do not count) counted by price
+     * Tickets sold by Organizer (Resold tickets do not count) counted by price
      * @param event
      * @return
      */
