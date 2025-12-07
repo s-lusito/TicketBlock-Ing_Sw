@@ -2,6 +2,7 @@ package com.ticketblock.service;
 
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
+import com.ticketblock.dto.Response.EventSaleDetailsDto;
 import com.ticketblock.entity.*;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.RowSector;
@@ -13,6 +14,7 @@ import com.ticketblock.exception.VenueNotAvailableException;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.VenueRepository;
+import com.ticketblock.utils.MoneyHelper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +23,11 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -187,5 +193,35 @@ public class EventService {
     }
 
 
+    public List<EventSaleDetailsDto> getLoggedOrganizerEventsDetails() {
+        List<EventSaleDetailsDto> eventSaleDetailsDtos = new ArrayList<>();
+        User loggedUser = securityService.getLoggedInUser();
+        List<Event> events = eventRepository.findAllByOrganizer(loggedUser);
+        for (Event e : events){
+            List<Ticket> soldTickets = e.getTickets().stream().filter(ticket -> ticket.getOwner() != null).toList(); // se i biglietti non hanno un owner non sono mai stati venduti
 
+            int standardTicketsSold = Math.toIntExact(e.getTickets().stream().filter(ticket -> ticket.getPrice().equals(ticket.getEvent().getStandardTicketPrice())).count());
+            int vipTicketsSold = Math.toIntExact(e.getTickets().stream().filter(ticket -> ticket.getPrice().equals(ticket.getEvent().getVipTicketPrice())).count());
+
+            BigDecimal totalSales = getTotalSales(e, standardTicketsSold, vipTicketsSold);
+
+            EventSaleDetailsDto eventSaleDetailsDto = EventSaleDetailsDto.builder()
+                    .event(EventMapper.toDto(e))
+                    .standardTicketsSold(standardTicketsSold)
+                    .vipTicketsSold(vipTicketsSold)
+                    .totalSales(totalSales)
+                    .build();
+            eventSaleDetailsDtos.add(eventSaleDetailsDto);
+        }
+
+        return eventSaleDetailsDtos;
+
+    }
+
+    private static BigDecimal getTotalSales(Event e, int standardTicketsSold, int vipTicketsSold) {
+        return MoneyHelper.normalizeAmount(
+                e.getStandardTicketPrice().multiply(BigDecimal.valueOf(standardTicketsSold))
+                        .add(
+                                e.getVipTicketPrice().multiply(BigDecimal.valueOf(vipTicketsSold))));
+    }
 }

@@ -2,12 +2,15 @@ package com.ticketblock.controller;
 
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
+import com.ticketblock.dto.Response.EventSaleDetailsDto;
 import com.ticketblock.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +24,12 @@ public class OrganizerEventController {
     public ResponseEntity<?> createEvent(@Valid @RequestBody EventCreationRequest eventCreationRequest) {
         EventDto createdEvent = eventService.createEvent(eventCreationRequest);
         return ResponseEntity.ok(createdEvent);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllLoggedOrganizerEvents() {
+        List<EventSaleDetailsDto> eventSaleDetailsDtos = eventService.getLoggedOrganizerEventsDetails();
+        return  ResponseEntity.ok(eventSaleDetailsDtos);
     }
 
 

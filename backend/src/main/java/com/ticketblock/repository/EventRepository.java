@@ -1,6 +1,7 @@
 package com.ticketblock.repository;
 
 import com.ticketblock.entity.Event;
+import com.ticketblock.entity.User;
 import com.ticketblock.entity.Venue;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,6 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     List<Event> findAllBySaleStatusIn(List<EventSaleStatus> saleStatusList);
 
     List<Event> findAllByDate(LocalDate date);
+
+    List<Event> findAllByOrganizer(User loggedUser);
 }
