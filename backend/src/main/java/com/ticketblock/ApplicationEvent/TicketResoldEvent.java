@@ -4,7 +4,6 @@ import com.ticketblock.entity.Event;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
-@Getter
 public class TicketResoldEvent extends TicketSaleEvent {
 
     public TicketResoldEvent(Object source, Event event) {

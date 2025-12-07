@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.context.ApplicationEvent;
 
-@Getter
 public class TicketPurchasedEvent extends TicketSaleEvent {
 
     public TicketPurchasedEvent(Object source, Event event) {
