@@ -5,12 +5,11 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class TicketReselledEvent extends ApplicationEvent {
-    private final Event event;
+public abstract class TicketSaleEvent extends ApplicationEvent {
+    protected final Event event;
 
-    public TicketReselledEvent(Object source, Event event) {
+    public TicketSaleEvent(Object source, Event event) {
         super(source);
         this.event = event;
     }
-
 }

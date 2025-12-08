@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,4 +32,20 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     int countAllByOwnerAndEvent(User owner, Event event);
 
     List<Ticket> findAllByOwner(User loggedUser);
+
+    /**
+     * Tickets sold by Organizer (Resold tickets do not count) counted by price
+     * @param event
+     * @return
+     */
+    @Query("""
+    SELECT COUNT(t)
+    FROM Ticket t
+    WHERE t.event = :event
+      AND t.owner IS NOT NULL
+      AND t.price = :price
+    """)
+    Integer countSoldTicketsByEventAndPrice(@Param("event") Event event, @Param("price") BigDecimal price);
+
 }
+

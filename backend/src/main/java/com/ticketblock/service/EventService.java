@@ -2,6 +2,7 @@ package com.ticketblock.service;
 
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
+import com.ticketblock.dto.Response.EventSaleDetailsDto;
 import com.ticketblock.entity.*;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.RowSector;
@@ -12,7 +13,9 @@ import com.ticketblock.exception.ForbiddenActionException;
 import com.ticketblock.exception.VenueNotAvailableException;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
+import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.repository.VenueRepository;
+import com.ticketblock.utils.MoneyHelper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +24,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +37,7 @@ public class EventService {
     private final EventRepository eventRepository;
     private final VenueRepository venueRepository;
     private final SecurityService securityService;
+    private final TicketRepository ticketRepository;
 
     public List<EventDto> getAllEvents(List<EventSaleStatus> saleStatusList) {
         if( saleStatusList == null || saleStatusList.isEmpty() ) {
@@ -92,7 +98,7 @@ public class EventService {
         }
 
         if(eventCreationRequest.getSaleStartDate().isBefore(LocalDate.now())) {
-            throw new InvalidDateAndTimeException("Sale start date cannot be before event date");
+            throw new InvalidDateAndTimeException("Sale start date cannot be in the past");
         }
 
         if(eventCreationRequest.getSaleStartDate().isAfter(eventCreationRequest.getDate().minusDays(DAYS_BETWEEN_SALES_START_AND_EVENT))) {
@@ -187,5 +193,47 @@ public class EventService {
     }
 
 
+    public List<EventSaleDetailsDto> getLoggedOrganizerAllEventsDetails() {
+        List<EventSaleDetailsDto> eventSaleDetailsDtos = new ArrayList<>();
+        User loggedUser = securityService.getLoggedInUser();
+        List<Event> events = eventRepository.findAllByOrganizer(loggedUser);
+        for (Event e : events){
+            EventSaleDetailsDto eventSaleDetailsDto = getEventSaleDetails(e);
+            eventSaleDetailsDtos.add(eventSaleDetailsDto);
+        }
 
+        return eventSaleDetailsDtos;
+
+    }
+
+    public EventSaleDetailsDto getLoggedOrganizerEventDetails(int eventId) {
+        User loggedUser = securityService.getLoggedInUser();
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event with id:" + eventId + " not found"));
+        return getEventSaleDetails(event);
+    }
+
+
+    private EventSaleDetailsDto getEventSaleDetails(Event e) {
+        Integer standardTicketsSold = ticketRepository.countSoldTicketsByEventAndPrice(e, e.getStandardTicketPrice());
+        Integer vipTicketsSold = ticketRepository.countSoldTicketsByEventAndPrice(e, e.getVipTicketPrice());
+
+        BigDecimal totalSales = getTotalSales(e, standardTicketsSold, vipTicketsSold);
+
+        return EventSaleDetailsDto.builder()
+                .event(EventMapper.toDto(e))
+                .standardTicketsSold(standardTicketsSold)
+                .vipTicketsSold(vipTicketsSold)
+                .totalSales(totalSales)
+                .build();
+    }
+
+
+
+
+    private static BigDecimal getTotalSales(Event e, int standardTicketsSold, int vipTicketsSold) {
+        return MoneyHelper.normalizeAmount(
+                e.getStandardTicketPrice().multiply(BigDecimal.valueOf(standardTicketsSold))
+                        .add(
+                                e.getVipTicketPrice().multiply(BigDecimal.valueOf(vipTicketsSold))));
+    }
 }

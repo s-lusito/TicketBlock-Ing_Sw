@@ -1,7 +1,7 @@
 package com.ticketblock.service;
 
 import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
-import com.ticketblock.ApplicationEvent.TicketReselledEvent;
+import com.ticketblock.ApplicationEvent.TicketResoldEvent;
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
@@ -139,7 +139,7 @@ public class TicketService {
         ticket.setOwner(null);
 
         ticketRepository.save(ticket);
-        applicationEventPublisher.publishEvent(new TicketReselledEvent(this, ticket.getEvent()));
+        applicationEventPublisher.publishEvent(new TicketResoldEvent(this, ticket.getEvent()));
 
     }
 

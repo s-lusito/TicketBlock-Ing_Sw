@@ -4,7 +4,6 @@ import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.dto.Response.TicketDto;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
-import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.service.EventService;
 import com.ticketblock.service.TicketService;
@@ -20,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/events")
 @Slf4j
-public class EventController {
+public class PublicEventController {
 
     private final EventService eventService;
     private final TicketService ticketService;
@@ -39,19 +38,6 @@ public class EventController {
         return ResponseEntity.ok(event);
     }
 
-    @PostMapping
-    public ResponseEntity<?> createEvent(@Valid @RequestBody EventCreationRequest eventCreationRequest) {
-        EventDto createdEvent = eventService.createEvent(eventCreationRequest);
-        return ResponseEntity.ok(createdEvent);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEvent(@PathVariable Integer id) {
-        log.debug("User wants to delete event with id " + id);
-        eventService.removeEventById(id);
-        log.debug("Event with id " + id + " has been deleted");
-        return ResponseEntity.noContent().build();
-    }
 
     @GetMapping("{id}/tickets")
     public ResponseEntity<?> getTicketFromEvent(@PathVariable Integer id,

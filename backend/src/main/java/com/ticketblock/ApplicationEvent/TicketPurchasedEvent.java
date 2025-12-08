@@ -6,13 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.context.ApplicationEvent;
 
-@Getter
-public class TicketPurchasedEvent extends ApplicationEvent {
-    private final Event event;
+public class TicketPurchasedEvent extends TicketSaleEvent {
 
     public TicketPurchasedEvent(Object source, Event event) {
-        super(source);
-        this.event = event;
+        super(source,event);
     }
 
 }
