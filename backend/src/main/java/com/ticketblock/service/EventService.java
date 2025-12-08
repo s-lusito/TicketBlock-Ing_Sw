@@ -193,28 +193,42 @@ public class EventService {
     }
 
 
-    public List<EventSaleDetailsDto> getLoggedOrganizerEventsDetails() {
+    public List<EventSaleDetailsDto> getLoggedOrganizerAllEventsDetails() {
         List<EventSaleDetailsDto> eventSaleDetailsDtos = new ArrayList<>();
         User loggedUser = securityService.getLoggedInUser();
         List<Event> events = eventRepository.findAllByOrganizer(loggedUser);
         for (Event e : events){
-            Integer standardTicketsSold = ticketRepository.countSoldTicketsByEventAndPrice(e,e.getStandardTicketPrice());
-            Integer vipTicketsSold = ticketRepository.countSoldTicketsByEventAndPrice(e, e.getVipTicketPrice());
-
-            BigDecimal totalSales = getTotalSales(e, standardTicketsSold, vipTicketsSold);
-
-            EventSaleDetailsDto eventSaleDetailsDto = EventSaleDetailsDto.builder()
-                    .event(EventMapper.toDto(e))
-                    .standardTicketsSold(standardTicketsSold)
-                    .vipTicketsSold(vipTicketsSold)
-                    .totalSales(totalSales)
-                    .build();
+            EventSaleDetailsDto eventSaleDetailsDto = getEventSaleDetails(e);
             eventSaleDetailsDtos.add(eventSaleDetailsDto);
         }
 
         return eventSaleDetailsDtos;
 
     }
+
+    public EventSaleDetailsDto getLoggedOrganizerEventDetails(int eventId) {
+        User loggedUser = securityService.getLoggedInUser();
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new ResourceNotFoundException("Event with id:" + eventId + " not found"));
+        return getEventSaleDetails(event);
+    }
+
+
+    private EventSaleDetailsDto getEventSaleDetails(Event e) {
+        Integer standardTicketsSold = ticketRepository.countSoldTicketsByEventAndPrice(e, e.getStandardTicketPrice());
+        Integer vipTicketsSold = ticketRepository.countSoldTicketsByEventAndPrice(e, e.getVipTicketPrice());
+
+        BigDecimal totalSales = getTotalSales(e, standardTicketsSold, vipTicketsSold);
+
+        return EventSaleDetailsDto.builder()
+                .event(EventMapper.toDto(e))
+                .standardTicketsSold(standardTicketsSold)
+                .vipTicketsSold(vipTicketsSold)
+                .totalSales(totalSales)
+                .build();
+    }
+
+
+
 
     private static BigDecimal getTotalSales(Event e, int standardTicketsSold, int vipTicketsSold) {
         return MoneyHelper.normalizeAmount(

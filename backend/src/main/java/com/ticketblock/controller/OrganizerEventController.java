@@ -27,9 +27,14 @@ public class OrganizerEventController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllLoggedOrganizerEvents() {
-        List<EventSaleDetailsDto> eventSaleDetailsDtos = eventService.getLoggedOrganizerEventsDetails();
+    public ResponseEntity<?> listAllLoggedOrganizerEventsDetails() {
+        List<EventSaleDetailsDto> eventSaleDetailsDtos = eventService.getLoggedOrganizerAllEventsDetails();
         return  ResponseEntity.ok(eventSaleDetailsDtos);
+    }
+
+    public ResponseEntity<?> getLoggedOrganizerEventSaleDetails(@PathVariable Integer eventId) {
+        EventSaleDetailsDto eventSaleDetailsDto = eventService.getLoggedOrganizerEventDetails(eventId);
+        return ResponseEntity.ok(eventSaleDetailsDto);
     }
 
 
