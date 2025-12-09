@@ -44,8 +44,8 @@ public class EventMapper {
         return Event.builder()
                 .name(eventCreationRequest.getName())
                 .date(eventCreationRequest.getDate())
-                .endTime(startTimeSlot.getTime())
-                .startTime(endTimeSlot.getTime())
+                .endTime(endTimeSlot.getTime())
+                .startTime(startTimeSlot.getTime())
                 .saleStartDate(eventCreationRequest.getSaleStartDate())
                 .standardTicketPrice(MoneyHelper.normalizeAmount(eventCreationRequest.getStandardTicketPrice()))
                 .vipTicketPrice(MoneyHelper.normalizeAmount(eventCreationRequest.getVipTicketPrice())) //normalize the amount
