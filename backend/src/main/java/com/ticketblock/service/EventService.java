@@ -75,7 +75,7 @@ public class EventService {
         if(!venueService.isVenueAvailable(
                 venue.getId(),
                 eventCreationRequest.getDate(),
-                TimeSlot.fromIndexOrThrow(eventCreationRequest.getStartSlot()),
+                TimeSlot.fromIndexOrThrow(eventCreationRequest.getStartTimeSlot()),
                 eventCreationRequest.getDuration())) {
             throw new VenueNotAvailableException("Venue not available at selected time");
         }

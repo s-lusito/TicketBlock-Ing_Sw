@@ -23,7 +23,7 @@ public class EventCreationRequest {
     private LocalDate date;
     @PositiveOrZero
     @Max(95)
-    private Integer startSlot;
+    private Integer startTimeSlot;
     @Positive
     private Integer duration;
 

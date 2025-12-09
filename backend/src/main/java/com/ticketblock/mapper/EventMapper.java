@@ -34,7 +34,7 @@ public class EventMapper {
     }
 
     public static Event toEntity(EventCreationRequest eventCreationRequest) {
-        TimeSlot startTimeSlot = TimeSlot.fromIndexOrThrow(eventCreationRequest.getStartSlot());
+        TimeSlot startTimeSlot = TimeSlot.fromIndexOrThrow(eventCreationRequest.getStartTimeSlot());
         if(!startTimeSlot.canAddDuration(eventCreationRequest.getDuration())) {
             throw new InvalidDateAndTimeException("Invalid duration");
         }
