@@ -223,6 +223,10 @@ public enum TimeSlot {
         return (this.index + duration) <= 92;
     }
 
+    public static TimeSlot getLastSlot(){
+        return SLOT_23_00;
+    }
+
 
 
 }

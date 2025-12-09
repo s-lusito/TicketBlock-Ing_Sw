@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -36,7 +37,9 @@ public class VenueService {
 
     public Boolean[] getAvailableSlots(Integer venueId, LocalDate date) {
         List<Event> eventList = eventRepository.findAllByDateAndVenueId(date,venueId);
-        Boolean[] availableSlots = new Boolean[eventList.size()];
+        Boolean[] availableSlots = new Boolean[TimeSlot.getLastSlot().getIndex() +1 ];
+        Arrays.fill(availableSlots, true);
+
         for (Event event : eventList){
             TimeSlot startSlot = TimeSlot.fromTime(event.getStartTime());
             TimeSlot endSlot = TimeSlot.fromTime(event.getEndTime());
