@@ -3,7 +3,12 @@ package com.ticketblock.mapper;
 import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.entity.Event;
+import com.ticketblock.exception.InvalidDateAndTimeException;
 import com.ticketblock.utils.MoneyHelper;
+import com.ticketblock.utils.TimeSlot;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class EventMapper {
     public static EventDto toDto(Event event) {
@@ -29,11 +34,18 @@ public class EventMapper {
     }
 
     public static Event toEntity(EventCreationRequest eventCreationRequest) {
+        TimeSlot startTimeSlot = TimeSlot.fromIndexOrThrow(eventCreationRequest.getStartSlot());
+        if(!startTimeSlot.canAddDuration(eventCreationRequest.getDuration())) {
+            throw new InvalidDateAndTimeException("Invalid duration");
+        }
+
+        TimeSlot endTimeSlot = startTimeSlot.plus(eventCreationRequest.getDuration());
+
         return Event.builder()
                 .name(eventCreationRequest.getName())
                 .date(eventCreationRequest.getDate())
-                .endTime(eventCreationRequest.getEndTime())
-                .startTime(eventCreationRequest.getStartTime())
+                .endTime(startTimeSlot.getTime())
+                .startTime(endTimeSlot.getTime())
                 .saleStartDate(eventCreationRequest.getSaleStartDate())
                 .standardTicketPrice(MoneyHelper.normalizeAmount(eventCreationRequest.getStandardTicketPrice()))
                 .vipTicketPrice(MoneyHelper.normalizeAmount(eventCreationRequest.getVipTicketPrice())) //normalize the amount

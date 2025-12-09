@@ -1,5 +1,6 @@
 package com.ticketblock.dto.Request;
 
+import com.ticketblock.utils.TimeSlot;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,10 +21,11 @@ public class EventCreationRequest {
     private String name;
     @NotNull
     private LocalDate date;
-    @NotNull
-    private LocalTime startTime;
-    @NotNull
-    private LocalTime endTime;
+    @PositiveOrZero
+    @Max(95)
+    private Integer startSlot;
+    @Positive
+    private Integer duration;
 
     private String imageUrl;
 
