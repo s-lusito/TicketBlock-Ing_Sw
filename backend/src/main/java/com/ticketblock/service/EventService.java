@@ -7,10 +7,7 @@ import com.ticketblock.entity.*;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
-import com.ticketblock.exception.InvalidDateAndTimeException;
-import com.ticketblock.exception.ResourceNotFoundException;
-import com.ticketblock.exception.ForbiddenActionException;
-import com.ticketblock.exception.VenueNotAvailableException;
+import com.ticketblock.exception.*;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.TicketRepository;
@@ -103,6 +100,7 @@ public class EventService {
     private static void verifyDateAndTime(Event event) {
 //        if (event.getEndTime().isBefore(event.getStartTime())) { // non più possibile usando il sistema con slot
 //            throw new InvalidDateAndTimeException("Event end time cannot be before start time");
+//            throw new InvalidDateAndTimeException("Event end time cannot be before start time");
 //        }
         if (event.getDate().isBefore(LocalDate.now())) {
             throw new InvalidDateAndTimeException("Event date cannot be in the past");
@@ -145,6 +143,11 @@ public class EventService {
         // verifico che l'utente sia l'organizzatore dell'evento
         if (!loggedUser.equals(event.getOrganizer())) {
             throw new ForbiddenActionException("User is not authorized to delete this event, since is not the organizer", "You are not authorized to delete this event");
+        }
+
+        int tickstSold = ticketRepository.countSoldTicketsByEvent(event);
+        if(tickstSold > 0) {
+            throw new NonRemovableEventException("Organizer has already sold " + tickstSold + " tickets", "You cannot delete this event since you have already sold " + tickstSold + " tickets");
         }
         eventRepository.delete(event);
         return EventMapper.toDto(event);
