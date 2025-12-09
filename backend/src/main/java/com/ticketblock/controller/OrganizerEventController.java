@@ -32,12 +32,11 @@ public class OrganizerEventController {
         return  ResponseEntity.ok(eventSaleDetailsDtos);
     }
 
-    public ResponseEntity<?> getLoggedOrganizerEventSaleDetails(@PathVariable Integer eventId) {
-        EventSaleDetailsDto eventSaleDetailsDto = eventService.getLoggedOrganizerEventDetails(eventId);
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getLoggedOrganizerEventSaleDetails(@PathVariable Integer id) {
+        EventSaleDetailsDto eventSaleDetailsDto = eventService.getLoggedOrganizerEventDetails(id);
         return ResponseEntity.ok(eventSaleDetailsDto);
     }
-
-
 
 
     @DeleteMapping("/{id}")
@@ -47,4 +46,7 @@ public class OrganizerEventController {
         log.debug("Event with id " + id + " has been deleted");
         return ResponseEntity.noContent().build();
     }
+
+
+
 }

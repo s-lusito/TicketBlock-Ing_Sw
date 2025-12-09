@@ -1,5 +1,6 @@
 package com.ticketblock.dto.Request;
 
+import com.ticketblock.utils.TimeSlot;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,10 +21,13 @@ public class EventCreationRequest {
     private String name;
     @NotNull
     private LocalDate date;
+    @PositiveOrZero
+    @Min(value = 32, message = "Time slot range is: 8.00(32) - 23.00(92)")
+    @Max(value = 92, message = "Time slot range is: 8.00(32) - 23.00(92)")
     @NotNull
-    private LocalTime startTime;
-    @NotNull
-    private LocalTime endTime;
+    private Integer startTimeSlot;
+    @Positive
+    private Integer duration;
 
     private String imageUrl;
 

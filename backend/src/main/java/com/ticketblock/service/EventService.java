@@ -7,15 +7,13 @@ import com.ticketblock.entity.*;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
-import com.ticketblock.exception.InvalidDateAndTimeException;
-import com.ticketblock.exception.ResourceNotFoundException;
-import com.ticketblock.exception.ForbiddenActionException;
-import com.ticketblock.exception.VenueNotAvailableException;
+import com.ticketblock.exception.*;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.repository.VenueRepository;
 import com.ticketblock.utils.MoneyHelper;
+import com.ticketblock.utils.TimeSlot;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +36,7 @@ public class EventService {
     private final VenueRepository venueRepository;
     private final SecurityService securityService;
     private final TicketRepository ticketRepository;
+    private final VenueService venueService;
 
     public List<EventDto> getAllEvents(List<EventSaleStatus> saleStatusList) {
         if( saleStatusList == null || saleStatusList.isEmpty() ) {
@@ -63,15 +62,24 @@ public class EventService {
     public EventDto createEvent(EventCreationRequest eventCreationRequest) {
         Event event = EventMapper.toEntity(eventCreationRequest);
         //verifico che le date e gli orari siano corretti
-        verifyDateAndTime(eventCreationRequest);
+        verifyDateAndTime(event);
 
         //recupero il venue
         Venue venue = venueRepository.findById(eventCreationRequest.getVenueId())
                 .orElseThrow(() -> new ResourceNotFoundException("Venue not found","Venue with id:" + eventCreationRequest.getVenueId() + " not found"));
         event.setVenue(venue);
 
+
+
         //verifico che il venue sia disponibile
-        verifyVenueAvailability(venue, eventCreationRequest);
+        if(!venueService.isVenueAvailable(
+                venue.getId(),
+                eventCreationRequest.getDate(),
+                TimeSlot.fromIndexOrThrow(eventCreationRequest.getStartTimeSlot()),
+                eventCreationRequest.getDuration())) {
+            throw new VenueNotAvailableException("Venue not available at selected time");
+        }
+
 
         //recupero l'organizzatore dall'utente loggato
         User organizer = securityService.getLoggedInUser();
@@ -89,37 +97,24 @@ public class EventService {
     }
 
 
-    private static void verifyDateAndTime(EventCreationRequest eventCreationRequest) {
-        if (eventCreationRequest.getEndTime().isBefore(eventCreationRequest.getStartTime())) {
-            throw new InvalidDateAndTimeException("Event end time cannot be before start time");
-        }
-        if (eventCreationRequest.getDate().isBefore(LocalDate.now())) {
+    private static void verifyDateAndTime(Event event) {
+//        if (event.getEndTime().isBefore(event.getStartTime())) { // non più possibile usando il sistema con slot
+//            throw new InvalidDateAndTimeException("Event end time cannot be before start time");
+//            throw new InvalidDateAndTimeException("Event end time cannot be before start time");
+//        }
+        if (event.getDate().isBefore(LocalDate.now())) {
             throw new InvalidDateAndTimeException("Event date cannot be in the past");
         }
 
-        if(eventCreationRequest.getSaleStartDate().isBefore(LocalDate.now())) {
+        if(event.getSaleStartDate().isBefore(LocalDate.now())) {
             throw new InvalidDateAndTimeException("Sale start date cannot be in the past");
         }
 
-        if(eventCreationRequest.getSaleStartDate().isAfter(eventCreationRequest.getDate().minusDays(DAYS_BETWEEN_SALES_START_AND_EVENT))) {
+        if(event.getSaleStartDate().isAfter(event.getDate().minusDays(DAYS_BETWEEN_SALES_START_AND_EVENT))) {
             throw new InvalidDateAndTimeException("Sale start date must be at least 3 days before the event date");
         }
     }
 
-    private void verifyVenueAvailability(Venue venue, EventCreationRequest newEvent) {
-        int hourBuffer = 1; //buffer di un'ora tra eventi
-        List<Event> events = eventRepository.findAllByDateAndVenue(newEvent.getDate(), venue);
-        for (Event existingEvent : events) {
-                //se la data coincide, verifico se gli orari si sovrappongono:
-                boolean compatible =
-                        newEvent.getEndTime().isBefore(existingEvent.getStartTime().minusHours(hourBuffer)) || //l'evento nuovo finisce un'ora prima che inizi quello esistente
-                                newEvent.getStartTime().isAfter(existingEvent.getEndTime().plusHours(hourBuffer)); //l'evento nuovo inizia dopo un'ora che finisce quello esistente
-
-                if (!compatible) {
-                    throw new VenueNotAvailableException("Venue is not available at the selected date and time");
-                }
-            }
-        }
 
 
     private static void createTickets(Venue venue, Event event) {
@@ -148,6 +143,11 @@ public class EventService {
         // verifico che l'utente sia l'organizzatore dell'evento
         if (!loggedUser.equals(event.getOrganizer())) {
             throw new ForbiddenActionException("User is not authorized to delete this event, since is not the organizer", "You are not authorized to delete this event");
+        }
+
+        int tickstSold = ticketRepository.countSoldTicketsByEvent(event);
+        if(tickstSold > 0) {
+            throw new NonRemovableEventException("Organizer has already sold " + tickstSold + " tickets", "You cannot delete this event since you have already sold " + tickstSold + " tickets");
         }
         eventRepository.delete(event);
         return EventMapper.toDto(event);

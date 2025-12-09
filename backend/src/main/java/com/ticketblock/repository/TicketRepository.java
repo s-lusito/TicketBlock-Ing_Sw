@@ -47,5 +47,12 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     """)
     Integer countSoldTicketsByEventAndPrice(@Param("event") Event event, @Param("price") BigDecimal price);
 
+    @Query("""
+    SELECT COUNT(t)
+    FROM Ticket t
+    WHERE t.event = :event
+      AND t.owner IS NOT NULL
+    """)
+    Integer countSoldTicketsByEvent(@Param("event") Event event);
 }
 
