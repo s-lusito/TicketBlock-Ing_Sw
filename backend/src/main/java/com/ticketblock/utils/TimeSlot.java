@@ -13,47 +13,9 @@ import java.util.Optional;
  */
 @Getter
 public enum TimeSlot {
-    // Slot 00:00 - 01:00
-    SLOT_00_00(0, LocalTime.of(0, 0)),
-    SLOT_00_15(1, LocalTime.of(0, 15)),
-    SLOT_00_30(2, LocalTime.of(0, 30)),
-    SLOT_00_45(3, LocalTime.of(0, 45)),
+    // Slot 08:00 - 23:00
 
-    SLOT_01_00(4, LocalTime.of(1, 0)),
-    SLOT_01_15(5, LocalTime.of(1, 15)),
-    SLOT_01_30(6, LocalTime.of(1, 30)),
-    SLOT_01_45(7, LocalTime.of(1, 45)),
-
-    SLOT_02_00(8, LocalTime.of(2, 0)),
-    SLOT_02_15(9, LocalTime.of(2, 15)),
-    SLOT_02_30(10, LocalTime.of(2, 30)),
-    SLOT_02_45(11, LocalTime.of(2, 45)),
-
-    SLOT_03_00(12, LocalTime.of(3, 0)),
-    SLOT_03_15(13, LocalTime.of(3, 15)),
-    SLOT_03_30(14, LocalTime.of(3, 30)),
-    SLOT_03_45(15, LocalTime.of(3, 45)),
-
-    SLOT_04_00(16, LocalTime.of(4, 0)),
-    SLOT_04_15(17, LocalTime.of(4, 15)),
-    SLOT_04_30(18, LocalTime.of(4, 30)),
-    SLOT_04_45(19, LocalTime.of(4, 45)),
-
-    SLOT_05_00(20, LocalTime.of(5, 0)),
-    SLOT_05_15(21, LocalTime.of(5, 15)),
-    SLOT_05_30(22, LocalTime.of(5, 30)),
-    SLOT_05_45(23, LocalTime.of(5, 45)),
-
-    SLOT_06_00(24, LocalTime.of(6, 0)),
-    SLOT_06_15(25, LocalTime.of(6, 15)),
-    SLOT_06_30(26, LocalTime.of(6, 30)),
-    SLOT_06_45(27, LocalTime.of(6, 45)),
-
-    SLOT_07_00(28, LocalTime.of(7, 0)),
-    SLOT_07_15(29, LocalTime.of(7, 15)),
-    SLOT_07_30(30, LocalTime.of(7, 30)),
-    SLOT_07_45(31, LocalTime.of(7, 45)),
-
+   // partire da 32 rende i calcoli matematici indipendenti da un offset, e rende possibile modificare il sistema in futuro
     SLOT_08_00(32, LocalTime.of(8, 0)),
     SLOT_08_15(33, LocalTime.of(8, 15)),
     SLOT_08_30(34, LocalTime.of(8, 30)),
@@ -128,11 +90,8 @@ public enum TimeSlot {
     SLOT_22_15(89, LocalTime.of(22, 15)),
     SLOT_22_30(90, LocalTime.of(22, 30)),
     SLOT_22_45(91, LocalTime.of(22, 45)),
+    SLOT_23_00(92, LocalTime.of(23, 0));
 
-    SLOT_23_00(92, LocalTime.of(23, 0)),
-    SLOT_23_15(93, LocalTime.of(23, 15)),
-    SLOT_23_30(94, LocalTime.of(23, 30)),
-    SLOT_23_45(95, LocalTime.of(23, 45));
 
     private final int index;
     private final LocalTime time;
@@ -255,13 +214,13 @@ public enum TimeSlot {
     }
 
     /**
-     * Checks if this slot + duration stays within the day.
+     * Checks if this slot + duration stays within the opening hours.
      *
      * @param duration Number of slots
      * @return true if valid, false otherwise
      */
     public boolean canAddDuration(int duration) {
-        return (this.index + duration) <= 95;
+        return (this.index + duration) <= 92;
     }
 
 
