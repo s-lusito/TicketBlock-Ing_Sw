@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
-    List<Event> findAllByDateAndVenue(LocalDate date, Venue venue);
+
 
     @Query("SELECT e FROM Event e WHERE e.saleStatus = 'NOT_STARTED' AND e.saleStartDate = CURRENT_DATE")
     List<Event> findAllToOpenToday();
@@ -24,4 +24,7 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
 
     List<Event> findAllByOrganizer(User loggedUser);
 
+    Integer id(Integer id);
+
+    List<Event> findAllByDateAndVenueId(LocalDate date, Integer venueId);
 }

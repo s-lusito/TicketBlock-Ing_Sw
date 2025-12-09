@@ -33,6 +33,7 @@ public class VenueService {
         return  new VenueAvailableSlotsResponse(getAvailableSlots(venueId,date));
     }
 
+
     public Boolean[] getAvailableSlots(Integer venueId, LocalDate date) {
         List<Event> eventList = eventRepository.findAllByDateAndVenueId(date,venueId);
         Boolean[] availableSlots = new Boolean[eventList.size()];
