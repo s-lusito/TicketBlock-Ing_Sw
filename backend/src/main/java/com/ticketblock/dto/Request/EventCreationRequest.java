@@ -22,7 +22,8 @@ public class EventCreationRequest {
     @NotNull
     private LocalDate date;
     @PositiveOrZero
-    @Max(92)
+    @Min(value = 32, message = "Time slot range is: 8.00(32) - 23.00(92)")
+    @Max(value = 92, message = "Time slot range is: 8.00(32) - 23.00(92)")
     @NotNull
     private Integer startTimeSlot;
     @Positive
