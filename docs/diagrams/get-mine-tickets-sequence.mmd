@@ -11,11 +11,5 @@ sequenceDiagram
     TicketRepository->>+Database: SELECT * FROM tickets WHERE owner_id = ?
     Database-->>-TicketRepository: List<Ticket>
     TicketRepository-->>-TicketService: List<Ticket>
-    
-    alt tickets found
-        TicketService-->>-TicketController: List<TicketDto>
-        TicketController-->>-Client: 200 OK<br/>List<TicketDto>
-    else no tickets found
-        TicketService-->>TicketController: List<TicketDto> (empty)
-        TicketController-->>Client: 200 OK<br/>[]
-    end
+    TicketService-->>-TicketController: List<TicketDto>
+    TicketController-->>-Client: 200 OK<br/>List<TicketDto>

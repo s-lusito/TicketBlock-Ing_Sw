@@ -11,11 +11,5 @@ sequenceDiagram
     TicketRepository->>+Database: SELECT * FROM tickets WHERE event_id = ? AND (? IS NULL OR status = ?)
     Database-->>-TicketRepository: List<Ticket>
     TicketRepository-->>-TicketService: List<Ticket>
-    
-    alt tickets found
-        TicketService-->>-PublicEventController: List<TicketDto>
-        PublicEventController-->>-Client: 200 OK<br/>List<TicketDto>
-    else no tickets found
-        TicketService-->>PublicEventController: List<TicketDto> (empty)
-        PublicEventController-->>Client: 200 OK<br/>[]
-    end
+    TicketService-->>-PublicEventController: List<TicketDto>
+    PublicEventController-->>-Client: 200 OK<br/>List<TicketDto>
