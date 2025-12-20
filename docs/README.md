@@ -46,8 +46,10 @@ docs/
     ├── get-mine-tickets-sequence.mmd    # Visualizza biglietti utente
     ├── create-event-sequence.mmd        # Creazione evento
     ├── delete-event-sequence.mmd        # Eliminazione evento
-    ├── get-user-sequence.mmd           # Recupero informazioni utente
-    └── get-venue-sequence.mmd          # Recupero informazioni venue
+    ├── get-all-events-sequence.mmd      # Lista tutti gli eventi
+    ├── get-event-tickets-sequence.mmd   # Biglietti di un evento
+    ├── get-user-sequence.mmd            # Recupero informazioni utente
+    └── get-venue-sequence.mmd           # Recupero informazioni venue
 ```
 
 ## Come Visualizzare i Diagrammi
