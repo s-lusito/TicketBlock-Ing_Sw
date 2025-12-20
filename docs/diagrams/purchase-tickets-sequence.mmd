@@ -1,0 +1,35 @@
+sequenceDiagram
+    participant Client
+    participant TicketController
+    participant TicketService
+    participant TicketRepository
+    participant Database
+
+    Client->>+TicketController: POST /api/v1/tickets/purchase<br/>PurchaseTicketRequest
+    TicketController->>+TicketService: purchaseTickets(purchaseTicketRequest)
+    TicketService->>+TicketRepository: findAllByIdIn(ticketIds)
+    TicketRepository->>+Database: SELECT * FROM tickets WHERE id IN (?)
+    Database-->>-TicketRepository: List<Ticket>
+    TicketRepository-->>-TicketService: List<Ticket>
+    
+    alt tickets found and available
+        TicketService->>+TicketRepository: countAllByOwnerAndEvent(user, event)
+        TicketRepository->>+Database: SELECT COUNT(*) FROM tickets WHERE owner_id = ? AND event_id = ?
+        Database-->>-TicketRepository: count
+        TicketRepository-->>-TicketService: count
+        
+        alt tickets within limit
+            TicketService->>+TicketRepository: saveAll(tickets)
+            TicketRepository->>+Database: UPDATE tickets SET status = 'SOLD', owner_id = ?
+            Database-->>-TicketRepository: saved tickets
+            TicketRepository-->>-TicketService: List<Ticket>
+            TicketService-->>-TicketController: PurchaseTicketResponse(success, totalPrice)
+            TicketController-->>-Client: 200 OK<br/>PurchaseTicketResponse
+        else limit exceeded
+            TicketService-->>TicketController: ForbiddenActionException
+            TicketController-->>Client: 403 Forbidden<br/>Error message
+        end
+    else tickets not found or unavailable
+        TicketService-->>TicketController: ResourceNotFoundException/UnavailableTicketException
+        TicketController-->>Client: 404 Not Found / 409 Conflict<br/>Error message
+    end

@@ -1,0 +1,29 @@
+sequenceDiagram
+    participant Client
+    participant OrganizerEventController
+    participant EventService
+    participant VenueRepository
+    participant EventRepository
+    participant Database
+
+    Client->>+OrganizerEventController: POST /api/v1/organizer/events<br/>EventCreationRequest
+    OrganizerEventController->>+EventService: createEvent(eventCreationRequest)
+    EventService->>+VenueRepository: findById(venueId)
+    VenueRepository->>+Database: SELECT * FROM venues WHERE id = ?
+    Database-->>-VenueRepository: Optional<Venue>
+    VenueRepository-->>-EventService: Optional<Venue>
+    
+    alt venue found and available
+        EventService->>+EventRepository: save(event)
+        EventRepository->>+Database: INSERT INTO events VALUES (?)
+        Database-->>-EventRepository: Event
+        EventRepository-->>-EventService: Event
+        EventService-->>-OrganizerEventController: EventDto
+        OrganizerEventController-->>-Client: 200 OK<br/>EventDto
+    else venue not found
+        EventService-->>OrganizerEventController: ResourceNotFoundException
+        OrganizerEventController-->>Client: 404 Not Found<br/>Error message
+    else venue not available
+        EventService-->>OrganizerEventController: VenueNotAvailableException
+        OrganizerEventController-->>Client: 409 Conflict<br/>Error message
+    end

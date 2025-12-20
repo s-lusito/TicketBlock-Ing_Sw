@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant VenueController
+    participant VenueService
+    participant VenueRepository
+    participant Database
+
+    Client->>+VenueController: GET /api/v1/venues/{id}
+    VenueController->>+VenueService: getVenueByVenueId(id)
+    VenueService->>+VenueRepository: findById(id)
+    VenueRepository->>+Database: SELECT * FROM venues WHERE id = ?
+    Database-->>-VenueRepository: Optional<Venue>
+    VenueRepository-->>-VenueService: Optional<Venue>
+    
+    alt venue found
+        VenueService-->>-VenueController: VenueDto
+        VenueController-->>-Client: 200 OK<br/>VenueDto
+    else venue not found
+        VenueService-->>VenueController: ResourceNotFoundException
+        VenueController-->>Client: 404 Not Found<br/>Error message
+    end

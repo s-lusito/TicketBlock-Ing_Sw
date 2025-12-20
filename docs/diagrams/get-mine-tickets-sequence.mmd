@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant TicketController
+    participant TicketService
+    participant TicketRepository
+    participant Database
+
+    Client->>+TicketController: GET /api/v1/tickets/mine
+    TicketController->>+TicketService: getLoggedUserTickets()
+    TicketService->>+TicketRepository: findAllByOwner(loggedUser)
+    TicketRepository->>+Database: SELECT * FROM tickets WHERE owner_id = ?
+    Database-->>-TicketRepository: List<Ticket>
+    TicketRepository-->>-TicketService: List<Ticket>
+    
+    alt tickets found
+        TicketService-->>-TicketController: List<TicketDto>
+        TicketController-->>-Client: 200 OK<br/>List<TicketDto>
+    else no tickets found
+        TicketService-->>TicketController: List<TicketDto> (empty)
+        TicketController-->>Client: 200 OK<br/>[]
+    end

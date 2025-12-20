@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant Client
+    participant TicketController
+    participant TicketService
+    participant TicketRepository
+    participant Database
+
+    Client->>+TicketController: POST /api/v1/tickets/{id}/resell
+    TicketController->>+TicketService: resellTicket(id)
+    TicketService->>+TicketRepository: findById(ticketId)
+    TicketRepository->>+Database: SELECT * FROM tickets WHERE id = ?
+    Database-->>-TicketRepository: Optional<Ticket>
+    TicketRepository-->>-TicketService: Optional<Ticket>
+    
+    alt ticket found and resellable
+        alt ticket belongs to user
+            TicketService->>+TicketRepository: save(ticket)
+            TicketRepository->>+Database: UPDATE tickets SET status = 'AVAILABLE', owner_id = NULL
+            Database-->>-TicketRepository: Ticket
+            TicketRepository-->>-TicketService: Ticket
+            TicketService-->>-TicketController: void
+            TicketController-->>-Client: 200 OK
+        else ticket does not belong to user
+            TicketService-->>TicketController: ForbiddenActionException
+            TicketController-->>Client: 403 Forbidden<br/>Error message
+        end
+    else ticket not found or not resellable
+        TicketService-->>TicketController: ResourceNotFoundException/NonResellableTicketException
+        TicketController-->>Client: 404 Not Found / 409 Conflict<br/>Error message
+    end

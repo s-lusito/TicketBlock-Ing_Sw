@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant Client
+    participant OrganizerEventController
+    participant EventService
+    participant EventRepository
+    participant TicketRepository
+    participant Database
+
+    Client->>+OrganizerEventController: DELETE /api/v1/organizer/events/{id}
+    OrganizerEventController->>+EventService: removeEventById(id)
+    EventService->>+EventRepository: findById(eventId)
+    EventRepository->>+Database: SELECT * FROM events WHERE id = ?
+    Database-->>-EventRepository: Optional<Event>
+    EventRepository-->>-EventService: Optional<Event>
+    
+    alt event found and user is organizer
+        EventService->>+TicketRepository: countSoldTicketsByEvent(event)
+        TicketRepository->>+Database: SELECT COUNT(*) FROM tickets WHERE event_id = ? AND owner_id IS NOT NULL
+        Database-->>-TicketRepository: count
+        TicketRepository-->>-EventService: count
+        
+        alt no tickets sold
+            EventService->>+EventRepository: delete(event)
+            EventRepository->>+Database: DELETE FROM events WHERE id = ?
+            Database-->>-EventRepository: void
+            EventRepository-->>-EventService: void
+            EventService-->>-OrganizerEventController: EventDto
+            OrganizerEventController-->>-Client: 204 No Content
+        else tickets already sold
+            EventService-->>OrganizerEventController: NonRemovableEventException
+            OrganizerEventController-->>Client: 409 Conflict<br/>Error message
+        end
+    else event not found
+        EventService-->>OrganizerEventController: ResourceNotFoundException
+        OrganizerEventController-->>Client: 404 Not Found<br/>Error message
+    else user not authorized
+        EventService-->>OrganizerEventController: ForbiddenActionException
+        OrganizerEventController-->>Client: 403 Forbidden<br/>Error message
+    end

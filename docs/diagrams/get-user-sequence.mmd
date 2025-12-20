@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant UserController
+    participant UserService
+    participant UserRepository
+    participant Database
+
+    Client->>+UserController: GET /api/v1/user/{id}
+    UserController->>+UserService: getUserById(id)
+    UserService->>+UserRepository: findById(id)
+    UserRepository->>+Database: SELECT * FROM users WHERE id = ?
+    Database-->>-UserRepository: Optional<User>
+    UserRepository-->>-UserService: Optional<User>
+    
+    alt user found
+        UserService-->>-UserController: UserDto
+        UserController-->>-Client: 200 OK<br/>UserDto
+    else user not found
+        UserService-->>UserController: ResourceNotFoundException
+        UserController-->>Client: 404 Not Found<br/>Error message
+    end
