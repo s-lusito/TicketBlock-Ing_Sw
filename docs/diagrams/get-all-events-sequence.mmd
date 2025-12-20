@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant Client
+    participant PublicEventController
+    participant EventService
+    participant EventRepository
+    participant Database
+
+    Client->>+PublicEventController: GET /api/v1/events?saleStatus=ONGOING
+    PublicEventController->>+EventService: getAllEvents(saleStatusList)
+    
+    alt with status filter
+        EventService->>+EventRepository: findAllBySaleStatusIn(saleStatusList)
+        EventRepository->>+Database: SELECT * FROM events WHERE sale_status IN (?)
+        Database-->>-EventRepository: List<Event>
+        EventRepository-->>-EventService: List<Event>
+    else without status filter
+        EventService->>+EventRepository: findAll()
+        EventRepository->>+Database: SELECT * FROM events
+        Database-->>-EventRepository: List<Event>
+        EventRepository-->>-EventService: List<Event>
+    end
+    
+    EventService-->>-PublicEventController: List<EventDto>
+    PublicEventController-->>-Client: 200 OK<br/>List<EventDto>

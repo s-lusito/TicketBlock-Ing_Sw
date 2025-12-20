@@ -46,6 +46,8 @@ Only relevant actors are included in each diagram:
 ### Event Management
 - **create-event-sequence.mmd**: Create a new event (organizer only)
 - **delete-event-sequence.mmd**: Delete an event (organizer only, with validations)
+- **get-all-events-sequence.mmd**: Retrieve all events with optional status filter
+- **get-event-tickets-sequence.mmd**: Retrieve tickets for a specific event
 
 ### User & Venue
 - **get-user-sequence.mmd**: Retrieve user information by ID
