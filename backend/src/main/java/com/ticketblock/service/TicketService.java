@@ -87,22 +87,11 @@ public class TicketService {
             }
             ticket.setTicketStatus(TicketStatus.SOLD); // imposto lo stato a SOLD
             if(ticket.getOwner()==null){ // prima volta che viene acquistato
-                try {
-                    ticketContract.mintTicket(
-                            loggedUser.getWallet().getAddress(),
-                            (MoneyHelper.priceInCents(ticket.getPrice())) ,
-                            ticket.getResellable(),
-                            ticket.getEvent().getName()
-                            ).send();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+
             }
 
-            ticket.setOwner(loggedUser); // imposto il proprietario
         }
 
-        ticketRepository.saveAll(tickets); // salvo i ticket aggiornati
 
         // Gestione del pagamento (simulata)
         if (managePayment(ticketsRequested.getCreditCardNumber(),
@@ -111,6 +100,36 @@ public class TicketService {
                 ticketsRequested.getCardHolderName(),
                 totalPrice))
         {
+            for (Ticket ticket : tickets) {
+                if( ticket.getOwner() ==  null){ // se è la prima volta che viene venduto viene mintato
+                    try {
+                        BigInteger blockchainTicketId = ticketContract.mintTicket(
+                                loggedUser.getWallet().getAddress(),
+                                (MoneyHelper.priceInCents(ticket.getPrice())) ,
+                                ticket.getResellable(),
+                                ticket.getEvent().getName()
+                        ).send();
+                        ticket.setBlockchainId(blockchainTicketId.intValueExact());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } else  {
+                    try {
+                        ticketContract.transferTicket(
+                                loggedUser.getWallet().getAddress(),
+                                BigInteger.valueOf(ticket.getBlockchainId())
+                        ).send();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                ticket.setOwner(loggedUser); // imposto il proprietario
+
+            }
+
+
+            ticketRepository.saveAll(tickets); // salvo i ticket aggiornati
+
             // Pubblica l'evento di acquisto del biglietto
             applicationEventPublisher.publishEvent(new TicketPurchasedEvent(this, event));
 
