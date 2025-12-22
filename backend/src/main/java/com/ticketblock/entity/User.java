@@ -48,6 +48,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "organizer")
     private Set<Event> events;
 
+    private String walletAddress;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
