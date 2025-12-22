@@ -24,7 +24,7 @@ public class Web3Config {
     public Credentials credentials() {
         // Chiave privata di Ganache (SOLO ambiente locale)
         return Credentials.create(
-            "0x3d3bde3e9e5872c23896435c8c41d24a82bf5ec131797eae75ec99b354ca2383"
+            "0xa9ac1f437974fe0cee54c9a1e4997af2c5c145b1d674b73bb797475b3b44a3ba"
         );
     }
 
@@ -44,7 +44,7 @@ public class Web3Config {
             ContractGasProvider gasProvider
     ) {
         return TicketContract.load(
-                "0x5d6218E3cf14677e123Ad600439220790Ad0095d", // indirizzo del contratto deployato su Ganache
+                "0xafc3F7f8Cb85f5F2b3c2e13940147b8AEE22c31E", // indirizzo del contratto deployato su Ganache
                 web3j,
                 credentials,
                 gasProvider.getGasPrice(),
