@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -31,7 +32,14 @@ public class VenueService {
     }
 
     public VenueAvailableSlotsResponse getVenueAvailableSlots(Integer venueId, LocalDate date) {
-        return  new VenueAvailableSlotsResponse(getAvailableSlots(venueId,date));
+        HashMap<Integer, Boolean> availableSlotsMap = new HashMap<>();
+        Boolean[] availableSlotsArray = getAvailableSlots(venueId, date);
+        for (int i =32 ; i<=92; i++){
+            availableSlotsMap.put(i, availableSlotsArray[i]);
+        }
+        return new VenueAvailableSlotsResponse(availableSlotsMap);
+
+
     }
 
 

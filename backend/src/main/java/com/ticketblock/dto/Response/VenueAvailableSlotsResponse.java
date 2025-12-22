@@ -1,5 +1,6 @@
 package com.ticketblock.dto.Response;
 
+import com.ticketblock.entity.Ticket;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,5 +14,5 @@ import java.util.HashMap;
 @Setter
 @AllArgsConstructor
 public class VenueAvailableSlotsResponse {
-    private Boolean[] availableSlots;
+    private HashMap<Integer, Boolean> slot;
 }
