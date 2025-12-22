@@ -21,6 +21,8 @@ public class Ticket {
     @EqualsAndHashCode.Include
     private Integer id;
 
+    private Integer blockchainId;
+
     @ManyToOne()
     @JoinColumn(name = "event_id")
     private Event event;
