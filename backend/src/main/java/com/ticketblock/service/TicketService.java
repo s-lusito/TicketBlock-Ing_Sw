@@ -190,7 +190,13 @@ public class TicketService {
     }
 
     public void invalidateTicket(Integer ticketId){
+        User user = securityService.getLoggedInUser();
+
        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
+
+       if (ticket.getOwner() == null || !ticket.getOwner().equals(user))
+            throw new ForbiddenActionException("Ticket is not in your account");
+
        ticket.setTicketStatus(TicketStatus.INVALIDATED);
        ticketRepository.save(ticket);
 
