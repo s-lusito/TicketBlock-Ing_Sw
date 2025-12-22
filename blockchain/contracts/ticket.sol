@@ -7,12 +7,12 @@ pragma solidity ^0.8.13;
 
 contract EventTicket {
     //string public baseURI; // es. "http://metadata/" => tokenURI(1) = "http://metadata/1"
-    event TicketMinted(uint256 indexed ticketID, address indexed proprietario, bool indexed vendibile);
+    event TicketMinted(uint256 indexed ticketID, address indexed owner, bool indexed resellable);
 
     struct Ticket {
-        uint256 prezzo;      // in centesimi
-        address proprietario;
-        bool vendibile;
+        uint256 priceInCents;      // in centesimi
+        address owner;
+        bool resellable;
         string info;
     }
 
@@ -28,37 +28,38 @@ contract EventTicket {
 
 
     // Creazione di un nuovo ticket (solo owner)
-    function mintTicket(address _proprietario,uint256 _prezzo,bool _vendibile,string memory _info) external {
+    function mintTicket(address _owner,uint256 _priceInCents,bool _resellable,string memory _info) external returns(uint256){
         uint256 ticketID = nextTicketID;
 
         tickets[ticketID] = Ticket({
-            prezzo: _prezzo,
-            proprietario: _proprietario,
-            vendibile: _vendibile,
+            priceInCents: _priceInCents,
+            owner: _owner,
+            resellable: _resellable,
             info: _info
         });
 
-        // _safeMint(_proprietario, ticketID);
+        // _safeMint(_owner, ticketID);
         nextTicketID++;
-        emit TicketMinted(ticketID, _proprietario,  _vendibile);
+        emit TicketMinted(ticketID, _owner,  _resellable);
 
+        return ticketID;
     }
 
-    // Controlla se il biglietto è vendibile
+    // Controlla se il biglietto è resellable
     function isSalable(uint256 ticketID) internal view returns (bool) {
         require(ticketExists(ticketID), "Biglietto non esistente");
-        return tickets[ticketID].vendibile;
+        return tickets[ticketID].resellable;
     }
 
     function ticketPrice(uint256 ticketID) internal view returns (uint256) {
         require(ticketExists(ticketID), "Biglietto non esistente");
-        return tickets[ticketID].prezzo;
+        return tickets[ticketID].priceInCents;
     }
 
-    // Ritorna il proprietario del biglietto
+    // Ritorna il owner del biglietto
     function ticketOwner(uint256 ticketID) internal view returns (address) {
         require(ticketExists(ticketID), "Biglietto non esistente");
-        return tickets[ticketID].proprietario;
+        return tickets[ticketID].owner;
     }
 
     // Ritorna le informazioni del biglietto
@@ -81,22 +82,22 @@ contract EventTicket {
         return count;
     }
 
-    // Trasferisce il biglietto da un proprietario a un altro
+    // Trasferisce il biglietto da un owner a un altro
     function transferTicket(address to,uint256 ticketID) external {
         address owner = ticketOwner(ticketID);
-        require(owner != to, "Il destinatario e' l'attuale proprietario del ticket");
-        require(isSalable(ticketID), "Biglietto non vendibile");
+        require(owner != to, "Il destinatario e' l'attuale owner del ticket");
+        require(isSalable(ticketID), "Biglietto non resellable");
 
-        // require(msg.sender == owner, "Non sei il proprietario");
+        // require(msg.sender == owner, "Non sei il owner");
 
-        tickets[ticketID].proprietario = to;
+        tickets[ticketID].owner = to;
         // _safeTransfer(owner, to, ticketID, "");
     }
 
-    // Brucia un biglietto (solo proprietario)
+    // Brucia un biglietto (solo owner)
     function burnTicket(uint256 ticketID) external {
         //address owner = ticketOwner(ticketID);
-        //require(msg.sender == owner, "Non sei il proprietario");
+        //require(msg.sender == owner, "Non sei il owner");
 
         delete tickets[ticketID]; //la chiave esiste ancora ma viene inizializzato tutto a 0
         // _burn(ticketID);
@@ -104,7 +105,7 @@ contract EventTicket {
 
     // Funzione di supporto per controllare se un biglietto esiste
     function ticketExists(uint256 ticketID) internal view returns (bool) {
-        return tickets[ticketID].proprietario != address(0);
+        return tickets[ticketID].owner != address(0);
     }
 
     // Override baseURI di ERC721
