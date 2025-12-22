@@ -39,12 +39,7 @@ public class AuthenticationService {
         }
 
         Role  role = Role.valueOf(request.getRole());
-        Wallet wallet = null;
-        if(role.equals(Role.USER)){
-            wallet = walletRepository.findFirstByFreeTrue();
-            wallet.setFree(false);
-            walletRepository.save(wallet);
-        }
+
 
 
 
@@ -54,9 +49,16 @@ public class AuthenticationService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .role(role)
-                .wallet(wallet)
                 .build();
         userRepository.save(user);
+
+        if(role.equals(Role.USER)){
+            Wallet wallet = walletRepository.findFirstByFreeTrue();
+            wallet.setFree(false);
+            wallet.setUser(user);
+            walletRepository.save(wallet);
+        }
+
         var jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(jwt).build();
     }
