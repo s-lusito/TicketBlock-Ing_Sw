@@ -109,7 +109,7 @@ public class TicketService {
                                 ticket.getResellable(),
                                 ticket.getEvent().getName()
                         ).send();
-                        ticket.setBlockchainId(blockchainTicketId.intValueExact());
+                        ticket.setBlockchainId(blockchainTicketId);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -117,7 +117,7 @@ public class TicketService {
                     try {
                         ticketContract.transferTicket(
                                 loggedUser.getWallet().getAddress(),
-                                BigInteger.valueOf(ticket.getBlockchainId())
+                                ticket.getBlockchainId()
                         ).send();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -187,5 +187,15 @@ public class TicketService {
     private static boolean managePayment(String creditCardNumber, String expirationDate, String cvv, String cardHolderName, BigDecimal amount) {
         // Simula la gestione del pagamento
         return true; // Supponiamo che il pagamento sia sempre riuscito
+    }
+
+    public void invalidateTicket(Integer ticketId){
+       Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
+       ticket.setTicketStatus(TicketStatus.INVALIDATED);
+       ticketRepository.save(ticket);
+
+        //lo brucio dalla bc
+        ticketContract.burnTicket(ticket.getBlockchainId());
+
     }
 }

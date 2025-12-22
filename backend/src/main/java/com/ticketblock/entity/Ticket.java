@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Data
 @AllArgsConstructor
@@ -21,7 +22,7 @@ public class Ticket {
     @EqualsAndHashCode.Include
     private Integer id;
 
-    private Integer blockchainId;
+    private BigInteger blockchainId;
 
     @ManyToOne()
     @JoinColumn(name = "event_id")
