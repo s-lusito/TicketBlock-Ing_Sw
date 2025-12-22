@@ -14,12 +14,14 @@ import com.ticketblock.exception.*;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.utils.MoneyHelper;
+import com.ticketblock.utils.TicketContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ public class TicketService {
 
     private final int MAX_TICKETS_PER_EVENT = 4;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final TicketContract ticketContract;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
@@ -83,6 +86,19 @@ public class TicketService {
                 ticket.setResellable(false);
             }
             ticket.setTicketStatus(TicketStatus.SOLD); // imposto lo stato a SOLD
+            if(ticket.getOwner()==null){ // prima volta che viene acquistato
+                try {
+                    ticketContract.mintTicket(
+                            loggedUser.getWallet().getAddress(),
+                            (MoneyHelper.priceInCents(ticket.getPrice())) ,
+                            ticket.getResellable(),
+                            ticket.getEvent().getName()
+                            ).send();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             ticket.setOwner(loggedUser); // imposto il proprietario
         }
 
@@ -110,10 +126,8 @@ public class TicketService {
         }
 
 
-
-
-
     }
+
 
     private void verifyTicketOwnershipLimit(User loggedUser, Event event, List<Ticket> tickets) {
         int eventTickedAlreadyOwned =ticketRepository.countAllByOwnerAndEvent(loggedUser, event);
