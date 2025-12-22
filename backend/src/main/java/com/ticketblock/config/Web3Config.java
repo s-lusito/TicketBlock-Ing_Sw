@@ -44,7 +44,7 @@ public class Web3Config {
             ContractGasProvider gasProvider
     ) {
         return TicketContract.load(
-                "0xafc3F7f8Cb85f5F2b3c2e13940147b8AEE22c31E", // indirizzo del contratto deployato su Ganache
+                "0xa9eABE4DC87076770e197FBE569E7b2aF6fC9e43", // indirizzo del contratto deployato su Ganache
                 web3j,
                 credentials,
                 gasProvider.getGasPrice(),
