@@ -4,8 +4,10 @@ import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
 import com.ticketblock.entity.User;
+import com.ticketblock.entity.Wallet;
 import com.ticketblock.entity.enumeration.Role;
 import com.ticketblock.repository.UserRepository;
+import com.ticketblock.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +22,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final WalletRepository walletRepository;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())); //autentico
@@ -35,15 +38,30 @@ public class AuthenticationService {
             throw new IllegalArgumentException("User is already registered");
         }
 
+        Role  role = Role.valueOf(request.getRole());
+        Wallet wallet = null;
+        if(role.equals(Role.USER)){
+            wallet = walletRepository.findFirstByFreeTrue();
+            wallet.setFree(false);
+            walletRepository.save(wallet);
+        }
+
+
+
         var user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .role(Role.valueOf(request.getRole()))
+                .role(role)
+                .wallet(wallet)
                 .build();
         userRepository.save(user);
         var jwt = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(jwt).build();
     }
 }
+
+
+
+
