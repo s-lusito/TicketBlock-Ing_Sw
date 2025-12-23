@@ -1,7 +1,9 @@
 package com.ticketblock.config;
 
 import com.ticketblock.entity.Venue;
+import com.ticketblock.entity.Wallet;
 import com.ticketblock.repository.VenueRepository;
+import com.ticketblock.repository.WalletRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,10 +11,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
+import org.web3j.protocol.Web3j;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -23,6 +28,8 @@ public class DataInitializer implements CommandLineRunner {  //CommandLineRunner
     private final VenueRepository venueRepository;
     private final ResourceLoader resourceLoader;
     private final ObjectMapper objectMapper;
+    private final Web3j web3j;
+    private final WalletRepository walletRepository;
 
 
     @Override
@@ -37,6 +44,28 @@ public class DataInitializer implements CommandLineRunner {  //CommandLineRunner
         } else {
             log.debug("Venues already exist. Loading from Json skipped");
         }
+
+
+        try {
+            List<String> accounts = web3j.ethAccounts().send().getAccounts();
+            List<Wallet> walletList = new ArrayList<>();
+
+            for (String account : accounts){
+                walletList.add(
+                        Wallet.builder()
+                                .address(account)
+                                .free(true)
+                                .build()
+                );
+            }
+            walletRepository.saveAll(walletList);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+
     }
 
     private List<Venue> loadVenues() {
@@ -66,4 +95,7 @@ public class DataInitializer implements CommandLineRunner {  //CommandLineRunner
         }
             return null;
     }
+
+
+
 }

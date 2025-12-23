@@ -22,13 +22,16 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "users")
 public class User implements UserDetails {
+
+    public static final int MAX_EMAIL_LENGTH = 50;
+    public static final int MAX_NAME_LENGTH = 50;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @EqualsAndHashCode.Include
     private Integer userId;
 
-    public static final int MAX_EMAIL_LENGTH = 50;
-    public static final int MAX_NAME_LENGTH = 50;
+
 
     @Column(unique = true, nullable = false, length = MAX_EMAIL_LENGTH)
     private String email;
@@ -47,6 +50,9 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "organizer")
     private Set<Event> events;
+
+    @OneToOne(mappedBy = "user")
+    private Wallet wallet;
 
 
     @Override

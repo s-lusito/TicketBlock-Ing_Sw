@@ -14,12 +14,14 @@ import com.ticketblock.exception.*;
 import com.ticketblock.mapper.TicketMapper;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.utils.MoneyHelper;
+import com.ticketblock.utils.TicketContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ public class TicketService {
 
     private final int MAX_TICKETS_PER_EVENT = 4;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final TicketContract ticketContract;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
@@ -83,10 +86,12 @@ public class TicketService {
                 ticket.setResellable(false);
             }
             ticket.setTicketStatus(TicketStatus.SOLD); // imposto lo stato a SOLD
-            ticket.setOwner(loggedUser); // imposto il proprietario
+            if(ticket.getOwner()==null){ // prima volta che viene acquistato
+
+            }
+
         }
 
-        ticketRepository.saveAll(tickets); // salvo i ticket aggiornati
 
         // Gestione del pagamento (simulata)
         if (managePayment(ticketsRequested.getCreditCardNumber(),
@@ -95,6 +100,36 @@ public class TicketService {
                 ticketsRequested.getCardHolderName(),
                 totalPrice))
         {
+            for (Ticket ticket : tickets) {
+                if( ticket.getOwner() ==  null){ // se è la prima volta che viene venduto viene mintato
+                    try {
+                        BigInteger blockchainTicketId = ticketContract.mintTicket(
+                                loggedUser.getWallet().getAddress(),
+                                (MoneyHelper.priceInCents(ticket.getPrice())) ,
+                                ticket.getResellable(),
+                                ticket.getEvent().getName()
+                        ).send();
+                        ticket.setBlockchainId(blockchainTicketId);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                } else  {
+                    try {
+                        ticketContract.transferTicket(
+                                loggedUser.getWallet().getAddress(),
+                                ticket.getBlockchainId()
+                        ).send();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                ticket.setOwner(loggedUser); // imposto il proprietario
+
+            }
+
+
+            ticketRepository.saveAll(tickets); // salvo i ticket aggiornati
+
             // Pubblica l'evento di acquisto del biglietto
             applicationEventPublisher.publishEvent(new TicketPurchasedEvent(this, event));
 
@@ -110,10 +145,8 @@ public class TicketService {
         }
 
 
-
-
-
     }
+
 
     private void verifyTicketOwnershipLimit(User loggedUser, Event event, List<Ticket> tickets) {
         int eventTickedAlreadyOwned =ticketRepository.countAllByOwnerAndEvent(loggedUser, event);
@@ -154,5 +187,21 @@ public class TicketService {
     private static boolean managePayment(String creditCardNumber, String expirationDate, String cvv, String cardHolderName, BigDecimal amount) {
         // Simula la gestione del pagamento
         return true; // Supponiamo che il pagamento sia sempre riuscito
+    }
+
+    public void invalidateTicket(Integer ticketId){
+        User user = securityService.getLoggedInUser();
+
+       Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
+
+       if (ticket.getOwner() == null || !ticket.getOwner().equals(user))
+            throw new ForbiddenActionException("Ticket is not in your account");
+
+       ticket.setTicketStatus(TicketStatus.INVALIDATED);
+       ticketRepository.save(ticket);
+
+        //lo brucio dalla bc
+        ticketContract.burnTicket(ticket.getBlockchainId());
+
     }
 }
