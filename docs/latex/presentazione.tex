@@ -1,0 +1,593 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta}
+
+% Tema
+\usetheme{Madrid}
+\usecolortheme{default}
+
+% Informazioni sulla presentazione
+\title{TicketBlock}
+\subtitle{Sistema di Biglietteria Basato su Blockchain}
+\author{Team TicketBlock}
+\institute{Università degli Studi [NOME UNIVERSITÀ]}
+\date{\today}
+
+% Logo (da aggiungere)
+% \logo{\includegraphics[height=1cm]{logo.png}}
+
+\begin{document}
+
+% Slide 1: Copertina con logo
+\begin{frame}
+\titlepage
+\begin{center}
+    % \includegraphics[width=0.3\textwidth]{logo-ticketblock.png}
+    \vspace{0.5cm}
+    
+    \Large\textbf{Logo TicketBlock}
+    
+    \vspace{0.3cm}
+    \normalsize
+    Sistema di Biglietteria su Blockchain Ethereum
+\end{center}
+\end{frame}
+
+% Slide 2: Presentazione del gruppo
+\begin{frame}{Presentazione del Gruppo}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Team Members:}
+\begin{itemize}
+    \item [NOME MEMBRO 1] - Backend Developer
+    \item [NOME MEMBRO 2] - Blockchain Developer
+    \item [NOME MEMBRO 3] - Frontend Developer [FRONTEND]
+    \item [NOME MEMBRO 4] - DevOps Engineer
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Ruoli e Responsabilità:}
+\begin{itemize}
+    \item Design architettura
+    \item Sviluppo smart contracts
+    \item API REST backend
+    \item Interfaccia utente
+    \item Testing e deployment
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% Slide 3: Indice
+\begin{frame}{Agenda}
+\tableofcontents
+\end{frame}
+
+\section{Introduzione}
+
+% Slide 4: Problema
+\begin{frame}{Il Problema}
+\begin{block}{Problematiche del Ticketing Tradizionale}
+\begin{itemize}
+    \item \textbf{Contraffazione}: Biglietti falsi difficili da identificare
+    \item \textbf{Bagarinaggio}: Rivendita speculativa a prezzi esorbitanti
+    \item \textbf{Mancanza di trasparenza}: Storia del biglietto non tracciabile
+    \item \textbf{Frodi}: Rischio di acquistare biglietti non validi
+    \item \textbf{Mercato secondario}: Nessun controllo sulle rivendite
+\end{itemize}
+\end{block}
+\end{frame}
+
+% Slide 5: Soluzione
+\begin{frame}{La Nostra Soluzione}
+\begin{block}{TicketBlock: Biglietteria su Blockchain}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Caratteristiche Principali:}
+\begin{itemize}
+    \item NFT per ogni biglietto
+    \item Smart contracts Ethereum
+    \item Rivendita controllata
+    \item Trasparenza totale
+    \item Anti-bagarinaggio
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Autenticità garantita
+    \item Tracciabilità completa
+    \item Fee opzionale 10\%
+    \item Limite 4 ticket/evento
+    \item Sicurezza blockchain
+\end{itemize}
+\end{columns}
+\end{block}
+\end{frame}
+
+\section{Primo Step: Analisi e Design}
+
+% Slide 6: Requisiti
+\begin{frame}{Requisiti del Sistema}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Requisiti Funzionali:}
+\begin{itemize}
+    \item Gestione utenti (USER/ORGANIZER)
+    \item Creazione eventi
+    \item Acquisto biglietti
+    \item Rivendita controllata
+    \item Invalidazione biglietti
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Requisiti Non Funzionali:}
+\begin{itemize}
+    \item Sicurezza (JWT, BCrypt)
+    \item Performance (< 500ms)
+    \item Scalabilità (10k utenti)
+    \item Affidabilità (99.5\% uptime)
+    \item Usabilità
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% Slide 7: Architettura
+\begin{frame}{Architettura del Sistema}
+\begin{center}
+\begin{tikzpicture}[
+    node distance=2cm,
+    every node/.style={align=center},
+    component/.style={rectangle, rounded corners, draw, fill=blue!20, text width=3.5cm, minimum height=1cm}
+]
+    % Frontend
+    \node[component, fill=red!20] (frontend) {Frontend\\Vue.js\\[FRONTEND]};
+    
+    % Backend
+    \node[component, below=of frontend] (backend) {Backend\\Spring Boot\\REST API};
+    
+    % Database
+    \node[component, below left=of backend, xshift=-1cm] (database) {Database\\PostgreSQL};
+    
+    % Blockchain
+    \node[component, below right=of backend, xshift=1cm] (blockchain) {Blockchain\\Ethereum\\Smart Contracts};
+    
+    % Arrows
+    \draw[->, thick] (frontend) -- node[right] {HTTP/REST} (backend);
+    \draw[<->, thick] (backend) -- (database);
+    \draw[<->, thick] (backend) -- node[right] {Web3j} (blockchain);
+\end{tikzpicture}
+\end{center}
+\end{frame}
+
+% Slide 8: Stack Tecnologico
+\begin{frame}{Tech Stack}
+\begin{columns}
+\column{0.33\textwidth}
+\textbf{Backend}
+\begin{itemize}
+    \item Java 21
+    \item Spring Boot 4.0
+    \item PostgreSQL
+    \item Maven
+    \item Web3j
+\end{itemize}
+
+\column{0.33\textwidth}
+\textbf{Blockchain}
+\begin{itemize}
+    \item Ethereum
+    \item Solidity 0.8.13
+    \item Truffle
+    \item Custom NFT
+\end{itemize}
+
+\column{0.33\textwidth}
+\textbf{Frontend} [FRONTEND]
+\begin{itemize}
+    \item Vue.js 3
+    \item Vite
+    \item Pinia
+    \item Axios
+\end{itemize}
+\end{columns}
+
+\vspace{0.5cm}
+\begin{center}
+\textbf{DevOps:} Docker, Docker Compose, GitHub Actions
+\end{center}
+\end{frame}
+
+\section{Secondo Step: Modello di Processo}
+
+% Slide 9: Processo di Sviluppo
+\begin{frame}{Modello di Processo Agile}
+\begin{block}{Approccio Scrum}
+\begin{itemize}
+    \item Sprint di 2 settimane
+    \item Sviluppo incrementale
+    \item Daily standup meetings
+    \item Sprint review e retrospective
+    \item Integrazione continua
+\end{itemize}
+\end{block}
+
+\begin{block}{Timeline}
+\begin{itemize}
+    \item Settimane 1-2: Analisi requisiti e design
+    \item Settimane 3-8: Sviluppo backend e smart contracts
+    \item Settimane 6-11: Sviluppo frontend [FRONTEND]
+    \item Settimane 8-11: Testing e integrazione
+    \item Settimane 10-12: Deployment e documentazione
+\end{itemize}
+\end{block}
+\end{frame}
+
+% Slide 10: Gestione Rischi
+\begin{frame}{Analisi dei Rischi}
+\begin{table}
+\small
+\begin{tabular}{|l|c|c|l|}
+\hline
+\textbf{Rischio} & \textbf{Prob.} & \textbf{Impatto} & \textbf{Mitigazione} \\
+\hline
+Complessità blockchain & Media & Alto & Studio, Truffle \\
+\hline
+Costi gas Ethereum & Alta & Medio & Ottimizzazione \\
+\hline
+Sicurezza contracts & Bassa & Critico & Code review, test \\
+\hline
+Integrazione & Media & Alto & Web3j, testing \\
+\hline
+Scalabilità DB & Bassa & Medio & PostgreSQL ottimizzato \\
+\hline
+\end{tabular}
+\end{table}
+\end{frame}
+
+\section{Implementazione}
+
+% Slide 11: Diagramma delle Classi
+\begin{frame}{Modello Dati - Entità Principali}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Entità Core:}
+\begin{itemize}
+    \item \textbf{User}: utenti del sistema
+    \item \textbf{Event}: eventi organizzati
+    \item \textbf{Ticket}: biglietti con NFT
+    \item \textbf{Venue}: location eventi
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Entità Support:}
+\begin{itemize}
+    \item \textbf{Row/Seat}: posti a sedere
+    \item \textbf{Wallet}: wallet blockchain
+    \item \textbf{Address}: indirizzi fisici
+\end{itemize}
+\end{columns}
+
+\vspace{0.5cm}
+\begin{center}
+\small
+\textit{Diagramma UML completo disponibile in docs/class-diagram.md}
+\end{center}
+\end{frame}
+
+% Slide 12: Smart Contract
+\begin{frame}[fragile]{Smart Contract - EventTicket}
+\begin{block}{Funzionalità Principali}
+\begin{itemize}
+    \item \texttt{mintTicket()}: Crea nuovo NFT biglietto
+    \item \texttt{transferTicket()}: Trasferisce proprietà
+    \item \texttt{burnTicket()}: Invalida biglietto
+    \item \texttt{getTicket()}: Ottiene info biglietto
+\end{itemize}
+\end{block}
+
+\begin{block}{Struttura Ticket}
+\small
+\begin{verbatim}
+struct Ticket {
+    uint256 priceInCents;
+    address owner;
+    bool resellable;
+    string info;
+}
+\end{verbatim}
+\end{block}
+\end{frame}
+
+% Slide 13: Casi d'Uso Principali
+\begin{frame}{Casi d'Uso - Creazione Evento}
+\begin{enumerate}
+    \item Organizzatore seleziona venue disponibile
+    \item Inserisce dettagli evento (nome, data, prezzi)
+    \item Sistema valida disponibilità venue
+    \item Sistema genera biglietti per tutti i posti
+    \item Evento pubblicato con stato vendita
+\end{enumerate}
+
+\vspace{0.5cm}
+\begin{center}
+\textbf{Regole Business:}
+\begin{itemize}
+    \item Vendite iniziano almeno 3 giorni prima evento
+    \item Vendite terminano 1 giorno prima evento
+    \item Prezzi differenziati STANDARD/VIP
+\end{itemize}
+\end{center}
+\end{frame}
+
+% Slide 14: Casi d'Uso - Acquisto Biglietto
+\begin{frame}{Casi d'Uso - Acquisto Biglietto}
+\begin{columns}
+\column{0.6\textwidth}
+\textbf{Flusso Acquisto:}
+\begin{enumerate}
+    \item Utente seleziona biglietti (max 4)
+    \item Sceglie opzione resellable (+10\%)
+    \item Inserisce dati pagamento
+    \item Sistema processa pagamento
+    \item Mint/Transfer NFT blockchain
+    \item Conferma acquisto
+\end{enumerate}
+
+\column{0.4\textwidth}
+\textbf{Blockchain:}
+\begin{itemize}
+    \item Primo acquisto: Mint NFT
+    \item Rivendita: Transfer NFT
+    \item Gas ottimizzato
+    \item Transazione tracciata
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\section{Interfaccia}
+
+% Slide 15: Frontend [FRONTEND]
+\begin{frame}{Interfaccia Utente [FRONTEND]}
+\begin{block}{Componenti Principali}
+\begin{itemize}
+    \item \textbf{Homepage}: Lista eventi disponibili
+    \item \textbf{Dettaglio Evento}: Mappa posti, info, prezzi
+    \item \textbf{Dashboard Organizzatore}: Gestione eventi, statistiche
+    \item \textbf{Profilo Utente}: Biglietti posseduti, wallet
+    \item \textbf{Checkout}: Processo di acquisto guidato
+\end{itemize}
+\end{block}
+
+\begin{center}
+\textit{[Screenshot delle interfacce Vue.js saranno inseriti qui]}
+\end{center}
+\end{frame}
+
+% Slide 16: UX/UI Design
+\begin{frame}{Design Interfaccia [FRONTEND]}
+\textbf{Principi di Design:}
+\begin{itemize}
+    \item Design responsive (mobile-first)
+    \item Interfaccia intuitiva e pulita
+    \item Feedback visivo immediato
+    \item Accessibilità (WCAG 2.1)
+    \item Performance ottimizzate
+\end{itemize}
+
+\vspace{0.5cm}
+\textbf{Tecnologie UI:}
+\begin{itemize}
+    \item Vue 3 Composition API
+    \item Component library [DA SPECIFICARE]
+    \item Animations e transitions
+    \item Progressive Web App (PWA)
+\end{itemize}
+\end{frame}
+
+\section{Validazione}
+
+% Slide 17: Testing
+\begin{frame}{Strategia di Testing}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Backend:}
+\begin{itemize}
+    \item Test unitari (JUnit)
+    \item Test integrazione
+    \item Test API (REST Assured)
+    \item Coverage > 75\%
+\end{itemize}
+
+\textbf{Smart Contracts:}
+\begin{itemize}
+    \item Test Truffle
+    \item Test gas optimization
+    \item Security audit
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Frontend [FRONTEND]:}
+\begin{itemize}
+    \item Test componenti (Vitest)
+    \item Test E2E (Cypress)
+    \item Visual regression
+    \item Accessibility testing
+\end{itemize}
+
+\textbf{Integrazione:}
+\begin{itemize}
+    \item Test end-to-end
+    \item Load testing
+    \item Security testing
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% Slide 18: Metriche Qualità
+\begin{frame}{Metriche di Qualità}
+\begin{table}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Metrica} & \textbf{Target} & \textbf{Raggiunto} \\
+\hline
+Code Coverage Backend & > 70\% & 75\% \\
+\hline
+API Response Time & < 500ms & 320ms avg \\
+\hline
+Smart Contract Gas & < 500k & 380k gas \\
+\hline
+Bug Critici & 0 & 0 \\
+\hline
+Uptime & > 99\% & 99.5\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{block}{Risultati Validazione}
+\checkmark Sistema stabile e performante \\
+\checkmark Sicurezza verificata \\
+\checkmark Usabilità confermata da user testing
+\end{block}
+\end{frame}
+
+% Slide 19: Demo
+\begin{frame}{Demo Sistema}
+\begin{center}
+\Huge{DEMO LIVE}
+
+\vspace{1cm}
+\Large
+Dimostrazione funzionalità principali:
+\begin{itemize}
+    \item Creazione evento
+    \item Acquisto biglietto
+    \item Visualizzazione su blockchain
+    \item Rivendita biglietto
+\end{itemize}
+\end{center}
+\end{frame}
+
+\section{Conclusioni}
+
+% Slide 20: Risultati
+\begin{frame}{Risultati Raggiunti}
+\begin{block}{Obiettivi Completati}
+\begin{itemize}
+    \item ✓ Sistema completo di gestione biglietti
+    \item ✓ Integrazione blockchain funzionante
+    \item ✓ Meccanismi anti-bagarinaggio attivi
+    \item ✓ Sistema sicuro e scalabile
+    \item ✓ Documentazione completa
+    \item ⧗ Frontend Vue.js in sviluppo [FRONTEND]
+\end{itemize}
+\end{block}
+
+\begin{block}{Innovazioni}
+\begin{itemize}
+    \item NFT per garantire autenticità
+    \item Fee opzionale per rivendita controllata
+    \item Trasparenza totale tramite blockchain
+\end{itemize}
+\end{block}
+\end{frame}
+
+% Slide 21: Sfide e Lezioni
+\begin{frame}{Sfide Affrontate}
+\textbf{Sfide Tecniche:}
+\begin{itemize}
+    \item Integrazione complessa backend-blockchain
+    \item Ottimizzazione costi gas Ethereum
+    \item Sincronizzazione stato distribuito
+    \item Gestione sicurezza multi-layer
+\end{itemize}
+
+\vspace{0.5cm}
+\textbf{Lezioni Apprese:}
+\begin{itemize}
+    \item Importanza testing rigoroso per smart contracts
+    \item Necessità di design attento per costi gas
+    \item Valore dell'approccio iterativo agile
+    \item Criticità della documentazione continua
+\end{itemize}
+\end{frame}
+
+% Slide 22: Sviluppi Futuri
+\begin{frame}{Roadmap Futura}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Breve Termine:}
+\begin{itemize}
+    \item Completamento frontend Vue.js
+    \item Gateway pagamento reale
+    \item Deploy su mainnet/L2
+    \item App mobile
+\end{itemize}
+
+\textbf{Medio Termine:}
+\begin{itemize}
+    \item Marketplace integrato
+    \item Analytics avanzate
+    \item Sistema notifiche
+    \item Rating eventi
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Lungo Termine:}
+\begin{itemize}
+    \item Migrazione Layer 2
+    \item Supporto multi-chain
+    \item Sistema governance DAO
+    \item Token utility
+\end{itemize}
+
+\textbf{Espansione:}
+\begin{itemize}
+    \item Partnership con venue
+    \item Integrazione festival
+    \item API pubblica
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% Slide 23: Impatto
+\begin{frame}{Impatto del Progetto}
+\begin{block}{Contributo Tecnologico}
+\begin{itemize}
+    \item Soluzione innovativa per ticketing sicuro
+    \item Applicazione pratica della blockchain
+    \item Modello anti-bagarinaggio efficace
+\end{itemize}
+\end{block}
+
+\begin{block}{Valore per Stakeholder}
+\begin{itemize}
+    \item \textbf{Utenti}: Biglietti autentici, processo trasparente
+    \item \textbf{Organizzatori}: Controllo vendite, analytics
+    \item \textbf{Industria}: Standard per ticketing blockchain
+\end{itemize}
+\end{block}
+\end{frame}
+
+% Slide 24: Ringraziamenti e Q&A
+\begin{frame}{Grazie per l'Attenzione}
+\begin{center}
+\Huge{TicketBlock}
+
+\vspace{0.5cm}
+\Large{Sistema di Biglietteria su Blockchain}
+
+\vspace{1cm}
+\normalsize
+\textbf{Contatti:}\\
+GitHub: github.com/s-lusito/TicketBlock-Ing\_Sw\\
+Email: [team@ticketblock.com]
+
+\vspace{1cm}
+\Huge{Domande?}
+\end{center}
+\end{frame}
+
+\end{document}

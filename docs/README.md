@@ -1,8 +1,38 @@
-# TicketBlock System - UML Documentation
+# TicketBlock System - Documentazione Completa
 
-This directory contains UML diagrams created with Mermaid for the TicketBlock ticketing system.
+Questa directory contiene tutta la documentazione del progetto TicketBlock, inclusi diagrammi UML e documentazione LaTeX completa.
 
-## Contents
+## Contenuti
+
+### Documentazione LaTeX (Italiano)
+
+La directory `latex/` contiene la documentazione completa richiesta per il corso:
+
+1. **[Relazione Tecnica](./latex/relazione-tecnica.tex)** - Documento completo che include:
+   - Introduzione con ambito applicativo, obiettivo, problema e soluzione
+   - Stato dell'arte e lavori correlati
+   - Modello di processo Agile con Gantt, rischi e costi
+   - Requisiti funzionali e non funzionali
+   - Architettura e tech stack completo
+   - Descrizione del prototipo
+   - Validazione e verifica con test documentati
+   - Discussione delle sfide tecniche
+   - Conclusioni e sviluppi futuri
+   - Bibliografia
+
+2. **[Presentazione](./latex/presentazione.tex)** - Presentazione Beamer che include:
+   - Copertina con logo applicazione
+   - Presentazione del gruppo
+   - Presentazione incrementale dei primi due step di consegna
+   - Implementazione e interfaccia
+   - Validazione e metriche
+   - Conclusioni e roadmap futura
+
+**Nota:** La documentazione include placeholder `[FRONTEND]` per le parti relative al frontend Vue.js non ancora completato.
+
+Per compilare i documenti LaTeX, consultare il [README nella directory latex](./latex/README.md).
+
+### Diagrammi UML (Mermaid)
 
 ### 1. [Class Diagram](./class-diagram.md)
 Shows the main domain entities and their relationships:

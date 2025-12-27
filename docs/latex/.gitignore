@@ -1,0 +1,29 @@
+# LaTeX temporary files
+*.aux
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.vrb
+*.bbl
+*.blg
+*.lot
+*.lof
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex.gz(busy)
+*.bcf
+*.run.xml
+
+# PDF output (uncomment if you don't want to track PDFs)
+# *.pdf
+
+# LaTeX backup files
+*.bak
+*~
+
+# Build directories
+build/
+output/
