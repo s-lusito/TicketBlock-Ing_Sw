@@ -18,6 +18,7 @@ graph TB
         UC11[Create Venue]
         UC12[Register User]
         UC13[Login]
+        UC14[Update Event Sale Status]
     end
     
     User((User))
@@ -91,7 +92,7 @@ Automated system process that:
 ## Business Rules
 
 - Users can purchase maximum 4 tickets per event
-- Tickets can be purchased with 10% fee to make them resellable
+- Tickets can be purchased with an optional fee (configurable, currently 10%) to make them resellable
 - Events must have sales start at least 3 days before event date
 - Sales close automatically 1 day before event
 - Organizers cannot delete events with sold tickets

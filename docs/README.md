@@ -10,7 +10,7 @@ Shows the main domain entities and their relationships:
 - Enumerations: EventSaleStatus, TicketStatus, Role, RowSector
 - Relationships between entities
 
-### 2. [Sequence Diagrams](./sequence-diagrams.md)
+### 2. Sequence Diagrams
 Detailed sequence diagrams for the main use cases:
 
 #### [Event Creation](./sequence-event-creation.md)

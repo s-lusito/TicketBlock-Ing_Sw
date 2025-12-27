@@ -41,7 +41,7 @@ sequenceDiagram
     
     loop For each ticket
         Service->>Service: Calculate price with optional fee
-        Note over Service: If user accepts fee (10%):<br/>- Add fee to price<br/>- Set ticket as resellable<br/>Otherwise:<br/>- Keep original price<br/>- Set ticket as non-resellable
+        Note over Service: If user accepts fee (feePercentage = 10%):<br/>- Add fee to price<br/>- Set ticket as resellable<br/>Otherwise:<br/>- Keep original price<br/>- Set ticket as non-resellable
         Service->>Service: Set ticketStatus = SOLD
     end
     
