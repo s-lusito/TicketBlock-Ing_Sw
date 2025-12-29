@@ -37,6 +37,9 @@ public class AuthenticationService {
         if(userRepository.findByEmail(request.getEmail()).isPresent()){ //se la mail è già presente
             throw new IllegalArgumentException("User is already registered");
         }
+        if (walletRepository.countWalletsByFreeTrue() == 0){
+            throw new RuntimeException("No wallet available");
+        }
 
         Role  role = Role.valueOf(request.getRole());
 
