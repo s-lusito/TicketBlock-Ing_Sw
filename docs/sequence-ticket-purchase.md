@@ -61,6 +61,17 @@ sequenceDiagram
             deactivate TicketContract
             Service->>Service: Set ticket.blockchainId
         else Resale
+            Service->>TicketContract: verifyTicketOwnership(blockchainId, ownerAddress)
+            activate TicketContract
+            Note over TicketContract: Verifies current owner<br/>matches blockchain record
+            TicketContract-->>Service: boolean (isValid)
+            deactivate TicketContract
+            
+            alt Ownership verification failed
+                Service-->>Controller: throw UnavailableTicketException
+                Controller-->>User: 409 Conflict
+            end
+            
             Service->>TicketContract: transferTicket(walletAddress, blockchainId)
             activate TicketContract
             TicketContract-->>Service: success

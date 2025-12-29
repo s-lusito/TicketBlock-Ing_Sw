@@ -38,10 +38,17 @@ Per compilare i documenti LaTeX, consultare il [README nella directory latex](./
 Shows the main domain entities and their relationships:
 - User, Event, Ticket, Venue, Row, Seat, Wallet, Address
 - Enumerations: EventSaleStatus, TicketStatus, Role, RowSector
+- Service layer and blockchain integration classes
 - Relationships between entities
 
 ### 2. Sequence Diagrams
 Detailed sequence diagrams for the main use cases:
+
+#### [User Registration](./sequence-user-registration.md)
+- User registers with email and password
+- System checks wallet availability
+- Allocates blockchain wallet to user
+- Creates JWT tokens for authentication
 
 #### [Event Creation](./sequence-event-creation.md)
 - Organizer creates a new event
@@ -51,17 +58,20 @@ Detailed sequence diagrams for the main use cases:
 #### [Ticket Purchase](./sequence-ticket-purchase.md)
 - User purchases one or more tickets
 - System processes payment
+- Verifies blockchain ownership for resold tickets
 - Mints or transfers NFT on blockchain
 - Updates ticket ownership
 
 #### [Ticket Resale](./sequence-ticket-resale.md)
 - User puts a previously purchased ticket back on sale
-- System validates ownership and resellability
+- System validates ownership on blockchain
+- System verifies resellability on blockchain
 - Makes ticket available again
 
 #### [Ticket Invalidation](./sequence-ticket-invalidation.md)
 - User invalidates a ticket (e.g., when entering event)
-- System marks ticket as invalidated
+- System verifies ownership on blockchain
+- Marks ticket as invalidated
 - Burns the NFT on blockchain
 
 ### 3. [Use Case Diagram](./use-case-diagram.md)

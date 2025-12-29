@@ -2,6 +2,8 @@
 
 This diagram shows the main classes and their relationships in the TicketBlock ticketing system.
 
+## Domain Entities
+
 ```mermaid
 classDiagram
     class User {
@@ -109,3 +111,61 @@ classDiagram
     User -- Role : has
     Row -- RowSector : has
 ```
+
+## Service Layer and Blockchain Integration
+
+```mermaid
+classDiagram
+    class TicketService {
+        -BigDecimal feePercentage
+        -int MAX_TICKETS_PER_EVENT
+        +getTicketsFromEvent(eventId, status) List~TicketDto~
+        +purchaseTickets(request) PurchaseTicketResponse
+        +resellTicket(ticketId) void
+        +invalidateTicket(ticketId) void
+        +getLoggedUserTickets() List~TicketDto~
+        -verifyTicketOwnershipLimit(user, event, tickets) void
+        -managePayment(cardNumber, date, cvv, holder, amount) boolean
+    }
+
+    class TicketContract {
+        -String contractAddress
+        -Web3j web3j
+        +mintTicket(owner, price, resellable, info) BigInteger
+        +transferTicket(to, ticketId) void
+        +burnTicket(ticketId) void
+        +getTicket(ticketId) List~Type~
+        +isTicketResellable(ticketId) boolean
+        +verifyTicketOwnership(ticketId, ownerAddress) boolean
+    }
+
+    class AuthenticationService {
+        +register(request) AuthenticationResponse
+        +login(request) AuthenticationResponse
+        +refreshToken(refreshToken) AuthenticationResponse
+        -allocateWallet(user) void
+    }
+
+    class WalletRepository {
+        <<interface>>
+        +findFirstByFreeTrue() Wallet
+        +countWalletsByFreeTrue() double
+    }
+
+    class EventService {
+        +createEvent(request) EventDto
+        +getAllEvents(statusList) List~EventDto~
+        +getEventById(id) EventDto
+        +removeEventById(id) EventDto
+        +updateEventsSaleStatus() void
+        +updateStatusIfSoldOut(event) void
+        -verifyDateAndTime(event) void
+        -createTickets(venue, event) void
+    }
+
+    TicketService --> TicketContract : uses
+    TicketService --> TicketRepository : uses
+    AuthenticationService --> WalletRepository : uses
+    EventService --> VenueService : uses
+```
+

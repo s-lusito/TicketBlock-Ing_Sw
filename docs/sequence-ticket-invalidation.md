@@ -40,6 +40,17 @@ sequenceDiagram
         Controller-->>User: 403 Forbidden
     end
     
+    Service->>TicketContract: verifyTicketOwnership(blockchainId, ownerAddress)
+    activate TicketContract
+    Note over TicketContract: Verifies ownership<br/>on blockchain before invalidation
+    TicketContract-->>Service: boolean (isOwner)
+    deactivate TicketContract
+    
+    alt Ownership verification failed
+        Service-->>Controller: throw ForbiddenActionException
+        Controller-->>User: 403 Forbidden
+    end
+    
     Service->>Service: Set ticket.ticketStatus = INVALIDATED
     
     Service->>TicketRepo: save(ticket)

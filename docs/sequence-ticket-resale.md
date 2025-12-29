@@ -9,7 +9,7 @@ sequenceDiagram
     participant Service as TicketService
     participant SecurityService
     participant TicketRepo as TicketRepository
-    participant EventPublisher as ApplicationEventPublisher
+    participant TicketContract as BlockchainContract
     participant DB as Database
 
     User->>Controller: POST /api/tickets/{ticketId}/resell
@@ -38,6 +38,28 @@ sequenceDiagram
     alt User is not ticket owner
         Service-->>Controller: throw ForbiddenActionException
         Controller-->>User: 403 Forbidden
+    end
+    
+    Service->>TicketContract: verifyTicketOwnership(blockchainId, ownerAddress)
+    activate TicketContract
+    Note over TicketContract: Verifies ownership<br/>on blockchain
+    TicketContract-->>Service: boolean (isOwner)
+    deactivate TicketContract
+    
+    alt Ownership verification failed
+        Service-->>Controller: throw ForbiddenActionException
+        Controller-->>User: 403 Forbidden
+    end
+    
+    Service->>TicketContract: isTicketResellable(blockchainId)
+    activate TicketContract
+    Note over TicketContract: Checks resellability<br/>status on blockchain
+    TicketContract-->>Service: boolean (isResellable)
+    deactivate TicketContract
+    
+    alt Ticket not resellable on blockchain
+        Service-->>Controller: throw NonResellableTicketException
+        Controller-->>User: 400 Bad Request
     end
     
     alt Ticket is not resellable
