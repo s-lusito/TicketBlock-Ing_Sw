@@ -114,6 +114,14 @@ public class TicketService {
                         throw new RuntimeException(e);
                     }
                 } else  {
+                    boolean isOwnershipValid = ticketContract.verifyTicketOwnership(
+                            ticket.getBlockchainId(),
+                            ticket.getOwner().getWallet().getAddress()
+                    );
+                    if (!isOwnershipValid) {
+                        throw new UnavailableTicketException("Ownership verification failed for ticket on blockchain");
+                    }
+
                     try {
                         ticketContract.transferTicket(
                                 loggedUser.getWallet().getAddress(),
@@ -164,6 +172,25 @@ public class TicketService {
         if (ticket.getOwner() == null || !ticket.getOwner().equals(user))
             throw new ForbiddenActionException("Ticket is not in your account");
 
+        // Verifica ownership sulla blockchain
+        if (ticket.getBlockchainId() != null) {
+            boolean isOwnerOnBlockchain = ticketContract.verifyTicketOwnership(
+                    ticket.getBlockchainId(),
+                    user.getWallet().getAddress()
+            );
+            if (!isOwnerOnBlockchain) {
+                throw new ForbiddenActionException("Ownership verification failed on blockchain");
+            }
+        }
+
+        // Verifica resellable sulla blockchain
+        if (ticket.getBlockchainId() != null) {
+            boolean isResellableOnBlockchain = ticketContract.isTicketResellable(ticket.getBlockchainId());
+            if (!isResellableOnBlockchain) {
+                throw new NonResellableTicketException("This ticket is not resellable according to blockchain");
+            }
+        }
+
         if(!ticket.getResellable())
             throw new NonResellableTicketException("This ticket is not resellable");
 
@@ -196,6 +223,17 @@ public class TicketService {
 
        if (ticket.getOwner() == null || !ticket.getOwner().equals(user))
             throw new ForbiddenActionException("Ticket is not in your account");
+
+       // Verifica ownership sulla blockchain prima di invalidare
+       if (ticket.getBlockchainId() != null) {
+           boolean isOwnerOnBlockchain = ticketContract.verifyTicketOwnership(
+                   ticket.getBlockchainId(),
+                   user.getWallet().getAddress()
+           );
+           if (!isOwnerOnBlockchain) {
+               throw new ForbiddenActionException("Ownership verification failed on blockchain");
+           }
+       }
 
        ticket.setTicketStatus(TicketStatus.INVALIDATED);
        ticketRepository.save(ticket);

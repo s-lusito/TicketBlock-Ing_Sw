@@ -98,6 +98,38 @@ public class TicketContract extends Contract {
         return executeRemoteCallMultipleValueReturn(function);
     }
 
+    /**
+     * Verifica se un biglietto è resellable sulla blockchain
+     * @param ticketId ID del biglietto sulla blockchain
+     * @return true se il biglietto è resellable, false altrimenti
+     */
+    public boolean isTicketResellable(BigInteger ticketId) {
+        try {
+            List<Type> result = getTicket(ticketId).send();
+            // Il terzo elemento (indice 2) è resellable (bool)
+            return (Boolean) result.get(2).getValue();
+        } catch (Exception e) {
+            throw new RuntimeException("Errore nel recupero dello stato resellable del biglietto dalla blockchain", e);
+        }
+    }
+
+    /**
+     * Verifica l'ownership di un biglietto sulla blockchain
+     * @param ticketId ID del biglietto sulla blockchain
+     * @param ownerAddress Indirizzo del wallet del proprietario atteso
+     * @return true se il proprietario corrisponde, false altrimenti
+     */
+    public boolean verifyTicketOwnership(BigInteger ticketId, String ownerAddress) {
+        try {
+            List<Type> result = getTicket(ticketId).send();
+            // Il primo elemento (indice 0) è l'owner (address)
+            String blockchainOwner = (String) result.get(0).getValue();
+            return blockchainOwner.equalsIgnoreCase(ownerAddress);
+        } catch (Exception e) {
+            throw new RuntimeException("Errore nella verifica dell'ownership del biglietto sulla blockchain", e);
+        }
+    }
+
 
     //serve per deployare il contratto se vuoi farlo da qua, lo devi fare dopo aver fatto truffle compile che genera il json del contratto
     //ma non serve tanto basta fare truffle migrate o truffle migrate -reset
