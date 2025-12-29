@@ -1,6 +1,6 @@
-# UML Sequence Diagram - Event Creation
+# Diagramma di Sequenza UML - Creazione Evento
 
-This diagram shows the sequence of interactions for creating a new event in the TicketBlock system.
+Questo diagramma mostra la sequenza di interazioni per la creazione di un nuovo evento nel sistema TicketBlock.
 
 ```mermaid
 sequenceDiagram
@@ -20,40 +20,40 @@ sequenceDiagram
     activate Service
     
     Service->>Service: verifyDateAndTime(event)
-    Note over Service: Check event date is not in past<br/>Check sale start date validity<br/>Check 3-day minimum between sale and event
+    Note over Service: Verifica che la data evento non sia nel passato<br/>Verifica validità data inizio vendita<br/>Verifica minimo 3 giorni tra vendita ed evento
     
     Service->>VenueRepo: findById(venueId)
     activate VenueRepo
     VenueRepo->>DB: SELECT venue
-    DB-->>VenueRepo: venue data
+    DB-->>VenueRepo: dati venue
     VenueRepo-->>Service: Venue
     deactivate VenueRepo
     
     Service->>VenueService: isVenueAvailable(venueId, date, timeSlot, duration)
     activate VenueService
-    VenueService-->>Service: boolean (available)
+    VenueService-->>Service: boolean (disponibile)
     deactivate VenueService
     
-    alt Venue not available
+    alt Venue non disponibile
         Service-->>Controller: throw VenueNotAvailableException
         Controller-->>Organizer: 409 Conflict
     end
     
     Service->>SecurityService: getLoggedInUser()
     activate SecurityService
-    SecurityService-->>Service: User (organizer)
+    SecurityService-->>Service: User (organizzatore)
     deactivate SecurityService
     
     Service->>Service: createTickets(venue, event)
-    Note over Service: For each seat in venue:<br/>Create ticket with price based on sector<br/>Set status to AVAILABLE
+    Note over Service: Per ogni posto nel venue:<br/>Crea biglietto con prezzo basato sul settore<br/>Imposta stato ad AVAILABLE
     
     Service->>Service: setSaleStatus(event)
-    Note over Service: Set to NOT_STARTED if sale date is future<br/>Set to ONGOING if sale starts today
+    Note over Service: Imposta a NOT_STARTED se data vendita è futura<br/>Imposta a ONGOING se vendita inizia oggi
     
     Service->>EventRepo: save(event)
     activate EventRepo
-    EventRepo->>DB: INSERT event and tickets
-    DB-->>EventRepo: saved entity
+    EventRepo->>DB: INSERT event e biglietti
+    DB-->>EventRepo: entità salvata
     EventRepo-->>Service: Event
     deactivate EventRepo
     

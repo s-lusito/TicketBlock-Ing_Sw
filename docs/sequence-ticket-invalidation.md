@@ -1,6 +1,6 @@
-# UML Sequence Diagram - Ticket Invalidation
+# Diagramma di Sequenza UML - Invalidazione Biglietto
 
-This diagram shows the sequence of interactions for invalidating a ticket in the TicketBlock system.
+Questo diagramma mostra la sequenza di interazioni per l'invalidazione di un biglietto nel sistema TicketBlock.
 
 ```mermaid
 sequenceDiagram
@@ -30,23 +30,23 @@ sequenceDiagram
     TicketRepo-->>Service: Ticket
     deactivate TicketRepo
     
-    alt Ticket not found
+    alt Biglietto non trovato
         Service-->>Controller: throw ResourceNotFoundException
         Controller-->>User: 404 Not Found
     end
     
-    alt User is not ticket owner
+    alt L'utente non è proprietario del biglietto
         Service-->>Controller: throw ForbiddenActionException
         Controller-->>User: 403 Forbidden
     end
     
     Service->>TicketContract: verifyTicketOwnership(blockchainId, ownerAddress)
     activate TicketContract
-    Note over TicketContract: Verifies ownership<br/>on blockchain before invalidation
+    Note over TicketContract: Verifica la proprietà sulla blockchain<br/>prima dell'invalidazione
     TicketContract-->>Service: boolean (isOwner)
     deactivate TicketContract
     
-    alt Ownership verification failed
+    alt Verifica proprietà fallita
         Service-->>Controller: throw ForbiddenActionException
         Controller-->>User: 403 Forbidden
     end
@@ -62,13 +62,13 @@ sequenceDiagram
     
     Service->>TicketContract: burnTicket(blockchainId)
     activate TicketContract
-    Note over TicketContract: Burns the ticket NFT<br/>from the blockchain,<br/>making it permanently invalid
+    Note over TicketContract: Brucia l'NFT del biglietto<br/>dalla blockchain,<br/>rendendolo permanentemente invalido
     TicketContract-->>Service: success
     deactivate TicketContract
     
     Service-->>Controller: success
     deactivate Service
     
-    Controller-->>User: 200 OK (Ticket invalidated)
+    Controller-->>User: 200 OK (Biglietto invalidato)
     deactivate Controller
 ```

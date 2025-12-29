@@ -1,6 +1,6 @@
-# UML Sequence Diagram - Ticket Resale
+# Diagramma di Sequenza UML - Rivendita Biglietto
 
-This diagram shows the sequence of interactions for reselling a ticket in the TicketBlock system.
+Questo diagramma mostra la sequenza di interazioni per la rivendita di un biglietto nel sistema TicketBlock.
 
 ```mermaid
 sequenceDiagram
@@ -30,39 +30,39 @@ sequenceDiagram
     TicketRepo-->>Service: Ticket
     deactivate TicketRepo
     
-    alt Ticket not found
+    alt Biglietto non trovato
         Service-->>Controller: throw ResourceNotFoundException
         Controller-->>User: 404 Not Found
     end
     
-    alt User is not ticket owner
+    alt L'utente non è proprietario del biglietto
         Service-->>Controller: throw ForbiddenActionException
         Controller-->>User: 403 Forbidden
     end
     
     Service->>TicketContract: verifyTicketOwnership(blockchainId, ownerAddress)
     activate TicketContract
-    Note over TicketContract: Verifies ownership<br/>on blockchain
+    Note over TicketContract: Verifica la proprietà<br/>sulla blockchain
     TicketContract-->>Service: boolean (isOwner)
     deactivate TicketContract
     
-    alt Ownership verification failed
+    alt Verifica proprietà fallita
         Service-->>Controller: throw ForbiddenActionException
         Controller-->>User: 403 Forbidden
     end
     
     Service->>TicketContract: isTicketResellable(blockchainId)
     activate TicketContract
-    Note over TicketContract: Checks resellability<br/>status on blockchain
+    Note over TicketContract: Verifica lo stato di rivendibilità<br/>sulla blockchain
     TicketContract-->>Service: boolean (isResellable)
     deactivate TicketContract
     
-    alt Ticket not resellable on blockchain
+    alt Biglietto non rivendibile sulla blockchain
         Service-->>Controller: throw NonResellableTicketException
         Controller-->>User: 400 Bad Request
     end
     
-    alt Ticket is not resellable
+    alt Biglietto non rivendibile
         Service-->>Controller: throw NonResellableTicketException
         Controller-->>User: 400 Bad Request
     end
@@ -80,13 +80,13 @@ sequenceDiagram
     
     Service->>EventPublisher: publishEvent(TicketResoldEvent)
     activate EventPublisher
-    Note over EventPublisher: Event is published to trigger<br/>event status update (check if still sold out)
-    EventPublisher-->>Service: event published
+    Note over EventPublisher: L'evento viene pubblicato per aggiornare<br/>lo stato dell'evento (verifica se ancora sold out)
+    EventPublisher-->>Service: evento pubblicato
     deactivate EventPublisher
     
     Service-->>Controller: success
     deactivate Service
     
-    Controller-->>User: 200 OK (Ticket put back on sale)
+    Controller-->>User: 200 OK (Biglietto rimesso in vendita)
     deactivate Controller
 ```

@@ -1,6 +1,6 @@
-# UML Sequence Diagram - User Registration
+# Diagramma di Sequenza UML - Registrazione Utente
 
-This diagram shows the sequence of interactions for user registration with blockchain wallet allocation in the TicketBlock system.
+Questo diagramma mostra la sequenza di interazioni per la registrazione utente con allocazione del wallet blockchain nel sistema TicketBlock.
 
 ```mermaid
 sequenceDiagram
@@ -24,22 +24,22 @@ sequenceDiagram
     UserRepo-->>Service: Optional<User>
     deactivate UserRepo
     
-    alt User already exists
+    alt Utente già esistente
         Service-->>Controller: throw IllegalArgumentException
-        Controller-->>User: 400 Bad Request (User already registered)
+        Controller-->>User: 400 Bad Request (Utente già registrato)
     end
     
     Service->>WalletRepo: countWalletsByFreeTrue()
     activate WalletRepo
-    Note over WalletRepo: Checks availability of<br/>free blockchain wallets
+    Note over WalletRepo: Verifica disponibilità<br/>wallet blockchain liberi
     WalletRepo->>DB: COUNT wallets WHERE free=true
     DB-->>WalletRepo: count
     WalletRepo-->>Service: long (count)
     deactivate WalletRepo
     
-    alt No wallets available
+    alt Nessun wallet disponibile
         Service-->>Controller: throw RuntimeException
-        Controller-->>User: 500 Internal Server Error (No wallet available)
+        Controller-->>User: 500 Internal Server Error (Nessun wallet disponibile)
     end
     
     Service->>WalletRepo: findFirstByFreeTrue()
@@ -50,7 +50,7 @@ sequenceDiagram
     deactivate WalletRepo
     
     Service->>Service: Create User with hashed password
-    Note over Service: Password hashed with BCrypt
+    Note over Service: Password hashata con BCrypt
     Service->>Service: Set user.wallet = allocatedWallet
     Service->>Service: Set wallet.free = false
     Service->>Service: Set wallet.user = user
@@ -58,16 +58,16 @@ sequenceDiagram
     Service->>UserRepo: save(user)
     activate UserRepo
     UserRepo->>DB: INSERT user
-    DB-->>UserRepo: saved user
+    DB-->>UserRepo: utente salvato
     UserRepo-->>Service: User
     deactivate UserRepo
     
     Service->>Service: generateJwtToken(user)
-    Note over Service: Creates JWT access token<br/>and refresh token
+    Note over Service: Crea JWT access token<br/>e refresh token
     
     Service-->>Controller: AuthenticationResponse(tokens)
     deactivate Service
     
-    Controller-->>User: 200 OK (tokens, user info)
+    Controller-->>User: 200 OK (tokens, informazioni utente)
     deactivate Controller
 ```

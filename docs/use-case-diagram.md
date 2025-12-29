@@ -1,6 +1,6 @@
-# UML Use Case Diagram - TicketBlock System
+# Diagramma dei Casi d'Uso UML - Sistema TicketBlock
 
-This diagram shows the main use cases and actors in the TicketBlock ticketing system.
+Questo diagramma mostra i principali casi d'uso e attori nel sistema di biglietteria TicketBlock.
 
 ```mermaid
 graph TB
@@ -56,44 +56,44 @@ graph TB
     style UC11 fill:#e1f5ff
 ```
 
-## Actor Descriptions
+## Descrizione Attori
 
-### User
-A registered user who can:
-- View available events
-- Purchase tickets (with or without resale option)
-- View their owned tickets
-- Resell purchased tickets (if resellable)
-- Invalidate their tickets (e.g., when entering an event)
+### User (Utente)
+Un utente registrato che può:
+- Visualizzare gli eventi disponibili
+- Acquistare biglietti (con o senza opzione di rivendita)
+- Visualizzare i propri biglietti posseduti
+- Rivendere biglietti acquistati (se rivendibili)
+- Invalidare i propri biglietti (es. quando entra all'evento)
 
-### Organizer
-A special type of user (with ORGANIZER role) who can:
-- Create new events
-- Remove events (if no tickets sold)
-- Create venues
-- View their organized events
-- View sales details for their events
+### Organizer (Organizzatore)
+Un tipo speciale di utente (con ruolo ORGANIZER) che può:
+- Creare nuovi eventi
+- Rimuovere eventi (se non sono stati venduti biglietti)
+- Creare venue
+- Visualizzare i propri eventi organizzati
+- Visualizzare i dettagli delle vendite dei propri eventi
 
-### System Scheduler
-Automated system process that:
-- Updates event sale statuses based on dates
-- Opens sales when sale start date arrives
-- Closes sales one day before event
-- Runs daily at midnight
+### System Scheduler (Schedulatore di Sistema)
+Processo automatico di sistema che:
+- Aggiorna gli stati di vendita degli eventi in base alle date
+- Apre le vendite quando arriva la data di inizio vendita
+- Chiude le vendite un giorno prima dell'evento
+- Viene eseguito quotidianamente a mezzanotte
 
-## Main Use Cases
+## Casi d'Uso Principali
 
-1. **Create Event**: Organizer creates a new event with venue, dates, and pricing
-2. **Purchase Ticket**: User buys one or more tickets for an event
-3. **Resell Ticket**: User puts a previously purchased ticket back on sale
-4. **Invalidate Ticket**: User marks a ticket as used/invalid (burns NFT on blockchain)
-5. **View Event Sales Details**: Organizer views statistics about ticket sales for their events
+1. **Create Event**: L'organizzatore crea un nuovo evento con venue, date e prezzi
+2. **Purchase Ticket**: L'utente acquista uno o più biglietti per un evento
+3. **Resell Ticket**: L'utente rimette in vendita un biglietto acquistato in precedenza
+4. **Invalidate Ticket**: L'utente segna un biglietto come usato/invalido (brucia l'NFT sulla blockchain)
+5. **View Event Sales Details**: L'organizzatore visualizza le statistiche sulle vendite dei biglietti dei propri eventi
 
-## Business Rules
+## Regole di Business
 
-- Users can purchase maximum 4 tickets per event
-- Tickets can be purchased with an optional fee (configurable, currently 10%) to make them resellable
-- Events must have sales start at least 3 days before event date
-- Sales close automatically 1 day before event
-- Organizers cannot delete events with sold tickets
-- Each ticket is represented as an NFT on the blockchain
+- Gli utenti possono acquistare massimo 4 biglietti per evento
+- I biglietti possono essere acquistati con una fee opzionale (configurabile, attualmente 10%) per renderli rivendibili
+- Gli eventi devono avere inizio vendita almeno 3 giorni prima della data dell'evento
+- Le vendite si chiudono automaticamente 1 giorno prima dell'evento
+- Gli organizzatori non possono eliminare eventi con biglietti venduti
+- Ogni biglietto è rappresentato come un NFT sulla blockchain

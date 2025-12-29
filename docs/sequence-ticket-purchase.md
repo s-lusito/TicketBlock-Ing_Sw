@@ -1,6 +1,6 @@
-# UML Sequence Diagram - Ticket Purchase
+# Diagramma di Sequenza UML - Acquisto Biglietto
 
-This diagram shows the sequence of interactions for purchasing tickets in the TicketBlock system.
+Questo diagramma mostra la sequenza di interazioni per l'acquisto di biglietti nel sistema TicketBlock.
 
 ```mermaid
 sequenceDiagram
@@ -32,42 +32,42 @@ sequenceDiagram
     deactivate TicketRepo
     
     Service->>Service: verifyTicketOwnershipLimit(user, event, tickets)
-    Note over Service: Check user doesn't exceed<br/>MAX_TICKETS_PER_EVENT (4) limit
+    Note over Service: Verifica che l'utente non superi<br/>il limite MAX_TICKETS_PER_EVENT (4)
     
-    alt Tickets not available or different events
+    alt Biglietti non disponibili o eventi diversi
         Service-->>Controller: throw UnavailableTicketException
         Controller-->>User: 409 Conflict
     end
     
-    loop For each ticket
+    loop Per ogni biglietto
         Service->>Service: Calculate price with optional fee
-        Note over Service: If user accepts fee (feePercentage = 10%):<br/>- Add fee to price<br/>- Set ticket as resellable<br/>Otherwise:<br/>- Keep original price<br/>- Set ticket as non-resellable
+        Note over Service: Se l'utente accetta la fee (feePercentage = 10%):<br/>- Aggiunge la fee al prezzo<br/>- Imposta il biglietto come rivendibile<br/>Altrimenti:<br/>- Mantiene il prezzo originale<br/>- Imposta il biglietto come non rivendibile
         Service->>Service: Set ticketStatus = SOLD
     end
     
     Service->>Service: managePayment(creditCard, totalPrice)
-    Note over Service: Simulated payment processing
+    Note over Service: Elaborazione pagamento simulata
     
-    alt Payment failed
+    alt Pagamento fallito
         Service-->>Controller: throw FailedPaymentException
         Controller-->>User: 402 Payment Required
     end
     
-    loop For each ticket
-        alt First time purchase
+    loop Per ogni biglietto
+        alt Primo acquisto
             Service->>TicketContract: mintTicket(walletAddress, price, resellable, eventName)
             activate TicketContract
             TicketContract-->>Service: blockchainTicketId
             deactivate TicketContract
             Service->>Service: Set ticket.blockchainId
-        else Resale
+        else Rivendita
             Service->>TicketContract: verifyTicketOwnership(blockchainId, ownerAddress)
             activate TicketContract
-            Note over TicketContract: Verifies current owner<br/>matches blockchain record
+            Note over TicketContract: Verifica che il proprietario corrente<br/>corrisponda al record blockchain
             TicketContract-->>Service: boolean (isValid)
             deactivate TicketContract
             
-            alt Ownership verification failed
+            alt Verifica proprietà fallita
                 Service-->>Controller: throw UnavailableTicketException
                 Controller-->>User: 409 Conflict
             end
@@ -89,12 +89,12 @@ sequenceDiagram
     
     Service->>EventPublisher: publishEvent(TicketPurchasedEvent)
     activate EventPublisher
-    EventPublisher-->>Service: event published
+    EventPublisher-->>Service: evento pubblicato
     deactivate EventPublisher
     
     Service-->>Controller: PurchaseTicketResponse
     deactivate Service
     
-    Controller-->>User: 200 OK (Purchase successful)
+    Controller-->>User: 200 OK (Acquisto completato)
     deactivate Controller
 ```

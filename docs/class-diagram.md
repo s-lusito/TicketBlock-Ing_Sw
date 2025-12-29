@@ -1,8 +1,8 @@
-# UML Class Diagram - TicketBlock System
+# Diagramma delle Classi UML - Sistema TicketBlock
 
-This diagram shows the main classes and their relationships in the TicketBlock ticketing system.
+Questo diagramma mostra le classi principali e le loro relazioni nel sistema di biglietteria TicketBlock.
 
-## Domain Entities
+## Entità di Dominio
 
 ```mermaid
 classDiagram
@@ -112,7 +112,7 @@ classDiagram
     Row -- RowSector : has
 ```
 
-## Service Layer and Blockchain Integration
+## Livello Servizi e Integrazione Blockchain
 
 ```mermaid
 classDiagram
