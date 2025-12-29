@@ -149,7 +149,7 @@ classDiagram
     class WalletRepository {
         <<interface>>
         +findFirstByFreeTrue() Wallet
-        +countWalletsByFreeTrue() double
+        +countWalletsByFreeTrue() long
     }
 
     class EventService {

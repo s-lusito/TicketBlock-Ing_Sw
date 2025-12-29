@@ -34,7 +34,7 @@ sequenceDiagram
     Note over WalletRepo: Checks availability of<br/>free blockchain wallets
     WalletRepo->>DB: COUNT wallets WHERE free=true
     DB-->>WalletRepo: count
-    WalletRepo-->>Service: double (count)
+    WalletRepo-->>Service: long (count)
     deactivate WalletRepo
     
     alt No wallets available
