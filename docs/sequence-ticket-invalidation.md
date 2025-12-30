@@ -5,70 +5,37 @@ Questo diagramma mostra la sequenza di interazioni per l'invalidazione di un big
 ```mermaid
 sequenceDiagram
     actor User
-    participant Controller as TicketController
-    participant Service as TicketService
-    participant SecurityService
-    participant TicketRepo as TicketRepository
-    participant TicketContract as BlockchainContract
-    participant DB as Database
+    participant TicketController
+    participant TicketService
+    participant BlockchainContract
+    participant TicketRepository
 
-    User->>Controller: POST /api/tickets/{ticketId}/invalidate
-    activate Controller
+    User->>TicketController: Richiesta invalidazione biglietto
+    TicketController->>TicketService: Elabora invalidazione
     
-    Controller->>Service: invalidateTicket(ticketId)
-    activate Service
-    
-    Service->>SecurityService: getLoggedInUser()
-    activate SecurityService
-    SecurityService-->>Service: User
-    deactivate SecurityService
-    
-    Service->>TicketRepo: findById(ticketId)
-    activate TicketRepo
-    TicketRepo->>DB: SELECT ticket
-    DB-->>TicketRepo: ticket data
-    TicketRepo-->>Service: Ticket
-    deactivate TicketRepo
+    TicketService->>TicketRepository: Recupera biglietto
     
     alt Biglietto non trovato
-        Service-->>Controller: throw ResourceNotFoundException
-        Controller-->>User: 404 Not Found
+        TicketService-->>User: Errore: biglietto non trovato
     end
     
-    alt L'utente non è proprietario del biglietto
-        Service-->>Controller: throw ForbiddenActionException
-        Controller-->>User: 403 Forbidden
+    alt Utente non è proprietario
+        TicketService-->>User: Errore: accesso negato
     end
     
-    Service->>TicketContract: verifyTicketOwnership(blockchainId, ownerAddress)
-    activate TicketContract
-    Note over TicketContract: Verifica la proprietà sulla blockchain<br/>prima dell'invalidazione
-    TicketContract-->>Service: boolean (isOwner)
-    deactivate TicketContract
+    TicketService->>BlockchainContract: Verifica proprietà su blockchain
+    Note over BlockchainContract: Conferma proprietà prima dell'invalidazione
     
     alt Verifica proprietà fallita
-        Service-->>Controller: throw ForbiddenActionException
-        Controller-->>User: 403 Forbidden
+        TicketService-->>User: Errore: proprietà non verificata
     end
     
-    Service->>Service: Set ticket.ticketStatus = INVALIDATED
+    TicketService->>TicketService: Imposta stato INVALIDATED
+    TicketService->>TicketRepository: Salva modifiche
     
-    Service->>TicketRepo: save(ticket)
-    activate TicketRepo
-    TicketRepo->>DB: UPDATE ticket
-    DB-->>TicketRepo: updated ticket
-    TicketRepo-->>Service: Ticket
-    deactivate TicketRepo
+    TicketService->>BlockchainContract: Brucia NFT
+    Note over BlockchainContract: Il biglietto diventa<br/>permanentemente invalido
     
-    Service->>TicketContract: burnTicket(blockchainId)
-    activate TicketContract
-    Note over TicketContract: Brucia l'NFT del biglietto<br/>dalla blockchain,<br/>rendendolo permanentemente invalido
-    TicketContract-->>Service: success
-    deactivate TicketContract
-    
-    Service-->>Controller: success
-    deactivate Service
-    
-    Controller-->>User: 200 OK (Biglietto invalidato)
-    deactivate Controller
+    TicketService-->>TicketController: Conferma invalidazione
+    TicketController-->>User: Biglietto invalidato con successo
 ```

@@ -5,96 +5,42 @@ Questo diagramma mostra la sequenza di interazioni per l'acquisto di biglietti n
 ```mermaid
 sequenceDiagram
     actor User
-    participant Controller as TicketController
-    participant Service as TicketService
-    participant SecurityService
-    participant TicketRepo as TicketRepository
-    participant TicketContract as BlockchainContract
-    participant EventPublisher as ApplicationEventPublisher
-    participant DB as Database
+    participant TicketController
+    participant TicketService
+    participant TicketRepository
+    participant BlockchainContract
+    participant EventPublisher
 
-    User->>Controller: POST /api/tickets/purchase (PurchaseTicketRequest)
-    activate Controller
+    User->>TicketController: Richiesta acquisto biglietti
+    TicketController->>TicketService: Elabora acquisto
     
-    Controller->>Service: purchaseTickets(ticketsRequested)
-    activate Service
+    TicketService->>TicketRepository: Recupera biglietti
+    Note over TicketService: Verifica limite 4 biglietti per evento
     
-    Service->>SecurityService: getLoggedInUser()
-    activate SecurityService
-    SecurityService-->>Service: User
-    deactivate SecurityService
-    
-    Service->>TicketRepo: findAllByIdIn(ticketIds)
-    activate TicketRepo
-    TicketRepo->>DB: SELECT tickets
-    DB-->>TicketRepo: ticket list
-    TicketRepo-->>Service: List<Ticket>
-    deactivate TicketRepo
-    
-    Service->>Service: verifyTicketOwnershipLimit(user, event, tickets)
-    Note over Service: Verifica che l'utente non superi<br/>il limite MAX_TICKETS_PER_EVENT (4)
-    
-    alt Biglietti non disponibili o eventi diversi
-        Service-->>Controller: throw UnavailableTicketException
-        Controller-->>User: 409 Conflict
+    alt Biglietti non disponibili
+        TicketService-->>User: Errore: biglietti non disponibili
     end
     
-    loop Per ogni biglietto
-        Service->>Service: Calculate price with optional fee
-        Note over Service: Se l'utente accetta la fee (feePercentage = 10%):<br/>- Aggiunge la fee al prezzo<br/>- Imposta il biglietto come rivendibile<br/>Altrimenti:<br/>- Mantiene il prezzo originale<br/>- Imposta il biglietto come non rivendibile
-        Service->>Service: Set ticketStatus = SOLD
-    end
+    TicketService->>TicketService: Calcola prezzo totale con fee opzionale
+    Note over TicketService: Fee 10% per abilitare rivendita
     
-    Service->>Service: managePayment(creditCard, totalPrice)
-    Note over Service: Elaborazione pagamento simulata
+    TicketService->>TicketService: Elabora pagamento
     
     alt Pagamento fallito
-        Service-->>Controller: throw FailedPaymentException
-        Controller-->>User: 402 Payment Required
+        TicketService-->>User: Errore: pagamento fallito
     end
     
-    loop Per ogni biglietto
-        alt Primo acquisto
-            Service->>TicketContract: mintTicket(walletAddress, price, resellable, eventName)
-            activate TicketContract
-            TicketContract-->>Service: blockchainTicketId
-            deactivate TicketContract
-            Service->>Service: Set ticket.blockchainId
-        else Rivendita
-            Service->>TicketContract: verifyTicketOwnership(blockchainId, ownerAddress)
-            activate TicketContract
-            Note over TicketContract: Verifica che il proprietario corrente<br/>corrisponda al record blockchain
-            TicketContract-->>Service: boolean (isValid)
-            deactivate TicketContract
-            
-            alt Verifica proprietà fallita
-                Service-->>Controller: throw UnavailableTicketException
-                Controller-->>User: 409 Conflict
-            end
-            
-            Service->>TicketContract: transferTicket(walletAddress, blockchainId)
-            activate TicketContract
-            TicketContract-->>Service: success
-            deactivate TicketContract
-        end
-        Service->>Service: Set ticket.owner = user
+    alt Primo acquisto
+        TicketService->>BlockchainContract: Crea NFT biglietto
+        BlockchainContract-->>TicketService: ID blockchain
+    else Rivendita
+        TicketService->>BlockchainContract: Verifica proprietà
+        TicketService->>BlockchainContract: Trasferisci NFT
     end
     
-    Service->>TicketRepo: saveAll(tickets)
-    activate TicketRepo
-    TicketRepo->>DB: UPDATE tickets
-    DB-->>TicketRepo: success
-    TicketRepo-->>Service: saved tickets
-    deactivate TicketRepo
+    TicketService->>TicketRepository: Salva biglietti
+    TicketService->>EventPublisher: Pubblica evento acquisto
     
-    Service->>EventPublisher: publishEvent(TicketPurchasedEvent)
-    activate EventPublisher
-    EventPublisher-->>Service: evento pubblicato
-    deactivate EventPublisher
-    
-    Service-->>Controller: PurchaseTicketResponse
-    deactivate Service
-    
-    Controller-->>User: 200 OK (Acquisto completato)
-    deactivate Controller
+    TicketService-->>TicketController: Conferma acquisto
+    TicketController-->>User: Acquisto completato con successo
 ```

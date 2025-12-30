@@ -1,0 +1,37 @@
+@startuml Creazione Evento
+!theme plain
+title Diagramma di Sequenza - Creazione Evento
+
+actor Organizer
+participant OrganizerEventController
+participant EventService
+participant VenueService
+participant VenueRepository
+participant EventRepository
+
+Organizer -> OrganizerEventController: Richiesta creazione evento
+OrganizerEventController -> EventService: Elabora creazione
+
+EventService -> EventService: Valida date e orari
+note right of EventService: Verifica data non passata\nMinimo 3 giorni tra vendita ed evento
+
+EventService -> VenueRepository: Recupera informazioni venue
+
+EventService -> VenueService: Verifica disponibilità venue
+
+alt Venue non disponibile
+    EventService --> Organizer: Errore: venue non disponibile
+end
+
+EventService -> EventService: Crea biglietti per tutti i posti
+note right of EventService: Genera biglietti per ogni posto\nPrezzi differenziati STANDARD/VIP\nStato iniziale: AVAILABLE
+
+EventService -> EventService: Imposta stato vendita
+note right of EventService: NOT_STARTED o ONGOING\nin base alla data inizio vendita
+
+EventService -> EventRepository: Salva evento e biglietti
+
+EventService --> OrganizerEventController: Evento creato
+OrganizerEventController --> Organizer: Creazione completata con successo
+
+@enduml

@@ -5,61 +5,34 @@ Questo diagramma mostra la sequenza di interazioni per la creazione di un nuovo 
 ```mermaid
 sequenceDiagram
     actor Organizer
-    participant Controller as OrganizerEventController
-    participant Service as EventService
-    participant SecurityService
+    participant OrganizerEventController
+    participant EventService
     participant VenueService
-    participant VenueRepo as VenueRepository
-    participant EventRepo as EventRepository
-    participant DB as Database
+    participant VenueRepository
+    participant EventRepository
 
-    Organizer->>Controller: POST /api/organizer/events (EventCreationRequest)
-    activate Controller
+    Organizer->>OrganizerEventController: Richiesta creazione evento
+    OrganizerEventController->>EventService: Elabora creazione
     
-    Controller->>Service: createEvent(eventCreationRequest)
-    activate Service
+    EventService->>EventService: Valida date e orari
+    Note over EventService: Verifica data non passata<br/>Minimo 3 giorni tra vendita ed evento
     
-    Service->>Service: verifyDateAndTime(event)
-    Note over Service: Verifica che la data evento non sia nel passato<br/>Verifica validità data inizio vendita<br/>Verifica minimo 3 giorni tra vendita ed evento
+    EventService->>VenueRepository: Recupera informazioni venue
     
-    Service->>VenueRepo: findById(venueId)
-    activate VenueRepo
-    VenueRepo->>DB: SELECT venue
-    DB-->>VenueRepo: dati venue
-    VenueRepo-->>Service: Venue
-    deactivate VenueRepo
-    
-    Service->>VenueService: isVenueAvailable(venueId, date, timeSlot, duration)
-    activate VenueService
-    VenueService-->>Service: boolean (disponibile)
-    deactivate VenueService
+    EventService->>VenueService: Verifica disponibilità venue
     
     alt Venue non disponibile
-        Service-->>Controller: throw VenueNotAvailableException
-        Controller-->>Organizer: 409 Conflict
+        EventService-->>Organizer: Errore: venue non disponibile
     end
     
-    Service->>SecurityService: getLoggedInUser()
-    activate SecurityService
-    SecurityService-->>Service: User (organizzatore)
-    deactivate SecurityService
+    EventService->>EventService: Crea biglietti per tutti i posti
+    Note over EventService: Genera biglietti per ogni posto<br/>Prezzi differenziati STANDARD/VIP<br/>Stato iniziale: AVAILABLE
     
-    Service->>Service: createTickets(venue, event)
-    Note over Service: Per ogni posto nel venue:<br/>Crea biglietto con prezzo basato sul settore<br/>Imposta stato ad AVAILABLE
+    EventService->>EventService: Imposta stato vendita
+    Note over EventService: NOT_STARTED o ONGOING<br/>in base alla data inizio vendita
     
-    Service->>Service: setSaleStatus(event)
-    Note over Service: Imposta a NOT_STARTED se data vendita è futura<br/>Imposta a ONGOING se vendita inizia oggi
+    EventService->>EventRepository: Salva evento e biglietti
     
-    Service->>EventRepo: save(event)
-    activate EventRepo
-    EventRepo->>DB: INSERT event e biglietti
-    DB-->>EventRepo: entità salvata
-    EventRepo-->>Service: Event
-    deactivate EventRepo
-    
-    Service-->>Controller: EventDto
-    deactivate Service
-    
-    Controller-->>Organizer: 201 Created (EventDto)
-    deactivate Controller
+    EventService-->>OrganizerEventController: Evento creato
+    OrganizerEventController-->>Organizer: Creazione completata con successo
 ```

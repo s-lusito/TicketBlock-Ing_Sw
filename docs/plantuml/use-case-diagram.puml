@@ -1,0 +1,60 @@
+@startuml Casi d'Uso
+!theme plain
+title Diagramma dei Casi d'Uso - Sistema TicketBlock
+
+left to right direction
+
+actor "User" as User
+actor "Organizer" as Organizer
+actor "System Scheduler" as System
+
+rectangle "Sistema TicketBlock" {
+  usecase "Registrazione Utente" as UC12
+  usecase "Login" as UC13
+  usecase "Visualizza Eventi" as UC3
+  usecase "Visualizza Dettagli Evento" as UC4
+  usecase "Acquista Biglietto" as UC5
+  usecase "Rivendi Biglietto" as UC6
+  usecase "Invalida Biglietto" as UC7
+  usecase "Visualizza Miei Biglietti" as UC8
+  usecase "Crea Evento" as UC1
+  usecase "Rimuovi Evento" as UC2
+  usecase "Visualizza Miei Eventi" as UC9
+  usecase "Visualizza Dettagli Vendite" as UC10
+  usecase "Crea Venue" as UC11
+  usecase "Aggiorna Stato Vendita Eventi" as UC14
+}
+
+User --> UC12
+User --> UC13
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+User --> UC7
+User --> UC8
+
+Organizer --> UC1
+Organizer --> UC2
+Organizer --> UC9
+Organizer --> UC10
+Organizer --> UC11
+
+System --> UC14
+
+UC1 .> UC3 : <<include>>
+UC5 .> UC4 : <<include>>
+UC9 .> UC3 : <<extend>>
+UC10 .> UC4 : <<extend>>
+
+note right of UC5
+  Massimo 4 biglietti per evento
+  Fee opzionale 10% per rivendita
+end note
+
+note right of UC14
+  Eseguito quotidianamente
+  Apre/chiude vendite automaticamente
+end note
+
+@enduml

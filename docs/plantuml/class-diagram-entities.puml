@@ -1,0 +1,128 @@
+@startuml Entità di Dominio
+!theme plain
+title Diagramma delle Classi - Entità di Dominio
+
+class User {
+  -Integer userId
+  -String email
+  -String password
+  -String firstName
+  -String lastName
+  -Role role
+  -Set<Ticket> tickets
+  -Set<Event> events
+  -Wallet wallet
+  +getAuthorities()
+  +getUsername()
+  +isAccountNonExpired() : boolean
+  +isAccountNonLocked() : boolean
+  +isCredentialsNonExpired() : boolean
+  +isEnabled() : boolean
+}
+
+class Event {
+  -Integer id
+  -String name
+  -LocalDate date
+  -LocalTime startTime
+  -LocalTime endTime
+  -EventSaleStatus saleStatus
+  -LocalDate saleStartDate
+  -String imageUrl
+  -BigDecimal standardTicketPrice
+  -BigDecimal vipTicketPrice
+  -User organizer
+  -Venue venue
+  -List<Ticket> tickets
+}
+
+class Ticket {
+  -Integer id
+  -BigInteger blockchainId
+  -Boolean resellable
+  -BigDecimal price
+  -TicketStatus ticketStatus
+  -Event event
+  -Seat seat
+  -User owner
+}
+
+class Venue {
+  -Integer id
+  -String name
+  -Address address
+  -List<Row> rows
+  -List<Event> events
+  +getStandardRows() : List<Row>
+  +getVipRows() : List<Row>
+}
+
+class Row {
+  -Integer id
+  -String letter
+  -RowSector sector
+  -Venue venue
+  -List<Seat> seats
+}
+
+class Seat {
+  -Integer id
+  -Integer seatNumber
+  -Row row
+  -Set<Ticket> tickets
+}
+
+class Wallet {
+  -Integer id
+  -String address
+  -Boolean free
+  -User user
+}
+
+class Address {
+  -Integer id
+  -String street
+  -String city
+  -String state
+  -Venue venue
+}
+
+enum EventSaleStatus {
+  NOT_STARTED
+  ONGOING
+  SOLD_OUT
+  ENDED
+}
+
+enum TicketStatus {
+  AVAILABLE
+  SOLD
+  INVALIDATED
+}
+
+enum Role {
+  USER
+  ORGANIZER
+  ADMIN
+}
+
+enum RowSector {
+  STANDARD
+  VIP
+}
+
+User "1" -- "1" Wallet : possiede >
+User "1" -- "*" Ticket : proprietario >
+User "1" -- "*" Event : organizza >
+Event "*" -- "1" Venue : si tiene a >
+Event "1" -- "*" Ticket : include >
+Ticket "*" -- "1" Seat : assegnato a >
+Venue "1" -- "1" Address : situato in >
+Venue "1" -- "*" Row : contiene >
+Row "1" -- "*" Seat : contiene >
+Event -- EventSaleStatus : stato
+Ticket -- TicketStatus : stato
+User -- Role : ruolo
+Row -- RowSector : settore
+
+@enduml

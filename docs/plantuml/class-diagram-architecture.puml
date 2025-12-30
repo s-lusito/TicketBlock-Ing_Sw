@@ -1,0 +1,167 @@
+@startuml Architettura Servizi
+!theme plain
+title Diagramma delle Classi - Livello Servizi e Architettura
+
+package "Controller Layer" {
+  class AuthenticationController {
+    -AuthenticationService authenticationService
+    +register(request) : ResponseEntity
+    +login(request) : ResponseEntity
+    +refreshToken(token) : ResponseEntity
+  }
+
+  class TicketController {
+    -TicketService ticketService
+    +getTicketsFromEvent(eventId, status) : ResponseEntity
+    +purchaseTickets(request) : ResponseEntity
+    +resellTicket(ticketId) : ResponseEntity
+    +invalidateTicket(ticketId) : ResponseEntity
+    +getLoggedUserTickets() : ResponseEntity
+  }
+
+  class OrganizerEventController {
+    -EventService eventService
+    +createEvent(request) : ResponseEntity
+    +removeEvent(eventId) : ResponseEntity
+    +getOrganizerEvents() : ResponseEntity
+    +getOrganizerEventDetails(eventId) : ResponseEntity
+  }
+
+  class PublicEventController {
+    -EventService eventService
+    +getAllEvents(statusList) : ResponseEntity
+    +getEventById(eventId) : ResponseEntity
+  }
+
+  class VenueController {
+    -VenueService venueService
+    +getVenueById(venueId) : ResponseEntity
+    +getVenueAvailableSlots(venueId, date) : ResponseEntity
+  }
+
+  class UserController {
+    -UserService userService
+    +getUserById(userId) : ResponseEntity
+  }
+}
+
+package "Service Layer" {
+  class TicketService {
+    -BigDecimal feePercentage
+    -int MAX_TICKETS_PER_EVENT
+    -TicketRepository ticketRepository
+    -SecurityService securityService
+    -TicketContract ticketContract
+    +getTicketsFromEvent(eventId, status) : List<TicketDto>
+    +purchaseTickets(request) : PurchaseTicketResponse
+    +resellTicket(ticketId) : void
+    +invalidateTicket(ticketId) : void
+    +getLoggedUserTickets() : List<TicketDto>
+    -verifyTicketOwnershipLimit(user, event, tickets) : void
+    -managePayment(...) : boolean
+  }
+
+  class EventService {
+    -EventRepository eventRepository
+    -VenueService venueService
+    +createEvent(request) : EventDto
+    +getAllEvents(statusList) : List<EventDto>
+    +getEventById(id) : EventDto
+    +removeEventById(id) : EventDto
+    +updateEventsSaleStatus() : void
+    +updateStatusIfSoldOut(event) : void
+    -verifyDateAndTime(event) : void
+    -createTickets(venue, event) : void
+  }
+
+  class VenueService {
+    -VenueRepository venueRepository
+    -EventRepository eventRepository
+    +getVenueByVenueId(venueId) : VenueDto
+    +getVenueAvailableSlots(venueId, date) : VenueAvailableSlotsResponse
+    +isVenueAvailable(...) : boolean
+  }
+
+  class AuthenticationService {
+    -UserRepository userRepository
+    -WalletRepository walletRepository
+    -JwtService jwtService
+    +register(request) : AuthenticationResponse
+    +login(request) : AuthenticationResponse
+    +refreshToken(token) : AuthenticationResponse
+    -allocateWallet(user) : void
+  }
+
+  class UserService {
+    -UserRepository userRepository
+    +getUserById(userId) : UserDto
+  }
+
+  class SecurityService {
+    +getLoggedInUser() : User
+  }
+
+  class JwtService {
+    -String SECRET_KEY
+    -Integer EXPIRATION_TIME
+    +extractUsername(token) : String
+    +generateToken(userDetails) : String
+    +isTokenValid(token, userDetails) : boolean
+  }
+}
+
+package "Repository Layer" {
+  interface UserRepository
+  interface EventRepository
+  interface TicketRepository
+  interface VenueRepository
+  interface WalletRepository
+  interface RowRepository
+  interface SeatRepository
+}
+
+package "Blockchain Integration" {
+  class TicketContract {
+    -String contractAddress
+    -Web3j web3j
+    -Credentials credentials
+    +mintTicket(...) : BigInteger
+    +transferTicket(to, ticketId) : void
+    +burnTicket(ticketId) : void
+    +getTicket(ticketId) : List<Type>
+    +isTicketResellable(ticketId) : boolean
+    +verifyTicketOwnership(ticketId, ownerAddress) : boolean
+  }
+
+  class Web3Config {
+    -String nodeUrl
+    -String privateKey
+    -String contractAddress
+    +web3j() : Web3j
+    +credentials() : Credentials
+    +ticketContract() : TicketContract
+  }
+}
+
+AuthenticationController --> AuthenticationService
+TicketController --> TicketService
+OrganizerEventController --> EventService
+PublicEventController --> EventService
+VenueController --> VenueService
+UserController --> UserService
+
+TicketService --> TicketRepository
+TicketService --> TicketContract
+TicketService --> SecurityService
+EventService --> EventRepository
+EventService --> VenueService
+VenueService --> VenueRepository
+VenueService --> EventRepository
+AuthenticationService --> UserRepository
+AuthenticationService --> WalletRepository
+AuthenticationService --> JwtService
+UserService --> UserRepository
+
+Web3Config ..> TicketContract : crea
+
+@enduml

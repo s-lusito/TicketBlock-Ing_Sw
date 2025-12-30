@@ -32,7 +32,19 @@ La directory `latex/` contiene la documentazione completa richiesta per il corso
 
 Per compilare i documenti LaTeX, consultare il [README nella directory latex](./latex/README.md).
 
-### Diagrammi UML (Mermaid)
+### Diagrammi UML
+
+I diagrammi UML sono disponibili in **due formati**:
+
+#### Formato Mermaid (Visualizzazione GitHub)
+Diagrammi visualizzabili direttamente su GitHub con sintassi Mermaid. Ottimi per la consultazione online.
+
+#### Formato PlantUML (Stampa e Integrazione)
+Directory **[plantuml/](./plantuml/)** - Versione PlantUML dei diagrammi per:
+- Generazione di immagini ad alta qualità (PNG, SVG, PDF)
+- Integrazione nella relazione tecnica
+- Compatibilità con editor e IDE
+- Consultare il [README PlantUML](./plantuml/README.md) per istruzioni di utilizzo
 
 ### 1. [Class Diagram](./class-diagram.md)
 Shows the main domain entities and their relationships:
