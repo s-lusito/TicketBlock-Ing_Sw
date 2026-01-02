@@ -45,23 +45,27 @@ public class DataInitializer implements CommandLineRunner {  //CommandLineRunner
             log.debug("Venues already exist. Loading from Json skipped");
         }
 
+        if(walletRepository.count() == 0) {
+            log.debug("Adding Wallet to DB");
+            try {
+                List<String> accounts = web3j.ethAccounts().send().getAccounts();
+                List<Wallet> walletList = new ArrayList<>();
 
-        try {
-            List<String> accounts = web3j.ethAccounts().send().getAccounts();
-            List<Wallet> walletList = new ArrayList<>();
-
-            for (String account : accounts){
-                walletList.add(
-                        Wallet.builder()
-                                .address(account)
-                                .free(true)
-                                .build()
-                );
+                for (String account : accounts){
+                    walletList.add(
+                            Wallet.builder()
+                                    .address(account)
+                                    .free(true)
+                                    .build()
+                    );
+                }
+                walletRepository.saveAll(walletList);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            walletRepository.saveAll(walletList);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
+
+
 
 
 
