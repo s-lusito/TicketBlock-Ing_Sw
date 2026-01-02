@@ -25,6 +25,9 @@ public class Event {
     @Column(nullable = false)
     private String name;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @ManyToOne
     @JoinColumn(nullable = false)
     private User organizer;

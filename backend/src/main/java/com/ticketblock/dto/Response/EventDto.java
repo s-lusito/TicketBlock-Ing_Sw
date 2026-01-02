@@ -17,6 +17,7 @@ import java.time.LocalTime;
 public class EventDto {
     private Integer id;
     private String name;
+    private String description;
     private UserDto organizer;
     private LocalDate date;
     private LocalTime startTime;
