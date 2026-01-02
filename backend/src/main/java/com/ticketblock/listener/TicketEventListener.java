@@ -1,4 +1,4 @@
-package com.ticketblock.Listener;
+package com.ticketblock.listener;
 
 import com.ticketblock.ApplicationEvent.TicketSaleEvent;
 import com.ticketblock.service.EventService;

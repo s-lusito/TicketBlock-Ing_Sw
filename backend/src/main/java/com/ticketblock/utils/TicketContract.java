@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import com.ticketblock.exception.BlockchainException;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.*;
@@ -110,7 +112,7 @@ public class TicketContract extends Contract {
             // Il terzo elemento (indice 2) è resellable (bool)
             return (Boolean) result.get(2).getValue();
         } catch (Exception e) {
-            throw new RuntimeException("Errore nel recupero dello stato resellable del biglietto dalla blockchain", e);
+            throw new BlockchainException("Error retrieving ticket's resellable status from blockchain");
         }
     }
 
@@ -127,7 +129,7 @@ public class TicketContract extends Contract {
             String blockchainOwner = (String) result.get(0).getValue();
             return blockchainOwner.equalsIgnoreCase(ownerAddress);
         } catch (Exception e) {
-            throw new RuntimeException("Errore nella verifica dell'ownership del biglietto sulla blockchain", e);
+            throw new BlockchainException("Error verifying ticket ownership on the blockchain");
         }
     }
 

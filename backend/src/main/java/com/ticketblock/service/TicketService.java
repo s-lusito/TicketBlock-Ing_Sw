@@ -111,7 +111,7 @@ public class TicketService {
                         ).send();
                         ticket.setBlockchainId(blockchainTicketId);
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new BlockchainException("Error while minting ticket");
                     }
                 } else  {
                     boolean isOwnershipValid = ticketContract.verifyTicketOwnership(
@@ -128,7 +128,7 @@ public class TicketService {
                                 ticket.getBlockchainId()
                         ).send();
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new BlockchainException("Error while transfering ticket");
                     }
                 }
                 ticket.setOwner(loggedUser); // imposto il proprietario
