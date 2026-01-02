@@ -20,17 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Global exception handler for handling exceptions across the Spring Boot application.
- *
- * This class is annotated with {@code @RestControllerAdvice} which combines the functionalities
- * of {@code @ControllerAdvice} and {@code @ResponseBody}. It listens for exceptions thrown
- * from any controller and ensures that error details are serialized into a JSON response.
+ * Global exception handler for handling exceptions across the Spring Boot
+ * application.
+
  *
  */
-@RestControllerAdvice //Response body + controller advice
-// @ControllerAdvice: questa classe ascolta tutte le eccezioni lanciate da qualsiasi controller
-// @Response Body: annotazione che si mette nei metodi affinchè i valori restituiti dai metodi vengono serializzati in JSON
-@Slf4j //per i log
+@RestControllerAdvice // Response body + controller advice
+// @ControllerAdvice: questa classe ascolta tutte le eccezioni lanciate da
+// qualsiasi controller
+// @Response Body: annotazione che si mette nei metodi affinchè i valori
+// restituiti dai metodi vengono serializzati in JSON
+@Slf4j // per i log
 
 // TODO in futuro si può passare ad usare ProblemDetail di spring invece di ErrorResponse personalizzato
 public class GlobalExceptionHandler {
@@ -144,8 +144,7 @@ public class GlobalExceptionHandler {
                     ApiFieldError.builder()
                             .field(fieldError.getField())
                             .message(fieldError.getDefaultMessage())
-                            .build()
-            );
+                            .build());
         }
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .detail("Validation Failed").userMessage("Provided data are nor valid:")
@@ -187,7 +186,8 @@ public class GlobalExceptionHandler {
 
     // CONFLICT 409
 
-    @ExceptionHandler({VenueNotAvailableException.class, UnavailableTicketException.class, NonResellableTicketException.class, FailedPaymentException.class})
+    @ExceptionHandler({ VenueNotAvailableException.class, UnavailableTicketException.class,
+            NonResellableTicketException.class, FailedPaymentException.class })
     public ResponseEntity<?> handleConflictException(AppException exception) {
         if (exception instanceof FailedPaymentException) {
             log.warn("Payment failed"); // nascondo dal log i dettagli dell'eccezione di pagamento
@@ -198,6 +198,7 @@ public class GlobalExceptionHandler {
     }
 
 
+    // TODO aggiungi Blockchain Exception
     private ResponseEntity<?> buildResponseEntity(AppException exception, HttpStatus status) {
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .detail(exception.getMessage())
@@ -208,4 +209,3 @@ public class GlobalExceptionHandler {
     }
 
 }
-
