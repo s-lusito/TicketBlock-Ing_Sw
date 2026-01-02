@@ -10,6 +10,7 @@ import com.ticketblock.repository.VenueRepository;
 import com.ticketblock.utils.TimeSlot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -18,56 +19,48 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class VenueService {
     private final VenueRepository venueRepository;
     private final EventRepository eventRepository;
 
     public VenueDto getVenueByVenueId(Integer venueId) {
-         return venueRepository.findById(venueId)
-                 .map(VenueMapper::toDto)
-                 .orElseThrow(() -> new ResourceNotFoundException("Venue with id " + venueId + " not found"));
-         // poichè viene restituito un optional, attraverso l'interfaccia di optional posso richiamare
-        // un il metodo orElseThrow che accetta una funzione che crea l'eccezione da lanciare
-
+        return venueRepository.findById(venueId)
+                .map(VenueMapper::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Venue with id " + venueId + " not found"));
     }
 
     public VenueAvailableSlotsResponse getVenueAvailableSlots(Integer venueId, LocalDate date) {
         HashMap<Integer, Boolean> availableSlotsMap = new HashMap<>();
         Boolean[] availableSlotsArray = getAvailableSlots(venueId, date);
-        for (int i =32 ; i<=92; i++){
+        for (int i = 32; i <= 92; i++) {
             availableSlotsMap.put(i, availableSlotsArray[i]);
         }
         return new VenueAvailableSlotsResponse(availableSlotsMap);
-
-
     }
 
-
     public Boolean[] getAvailableSlots(Integer venueId, LocalDate date) {
-        List<Event> eventList = eventRepository.findAllByDateAndVenueId(date,venueId);
-        Boolean[] availableSlots = new Boolean[TimeSlot.getLastSlot().getIndex() +1 ];
+        List<Event> eventList = eventRepository.findAllByDateAndVenueId(date, venueId);
+        Boolean[] availableSlots = new Boolean[TimeSlot.getLastSlot().getIndex() + 1];
         Arrays.fill(availableSlots, true);
 
-        for (Event event : eventList){
+        for (Event event : eventList) {
             TimeSlot startSlot = TimeSlot.fromTime(event.getStartTime());
             TimeSlot endSlot = TimeSlot.fromTime(event.getEndTime());
             for (int i = startSlot.getIndex(); i <= endSlot.getIndex(); i++) {
-                availableSlots[i] = false; //slot occupato
+                availableSlots[i] = false; // slot occupato
             }
-
         }
         return availableSlots;
     }
 
-
     public boolean isVenueAvailable(Integer venueId, LocalDate date, TimeSlot startSlot, Integer duration) {
         Boolean[] availableSlots = getAvailableSlots(venueId, date);
         TimeSlot endSlot = startSlot.plus(duration);
-        for ( int i = startSlot.getIndex(); i <= endSlot.getIndex(); i++) {
-            if (availableSlots[i] == false) return false;
+        for (int i = startSlot.getIndex(); i <= endSlot.getIndex(); i++) {
+            if (availableSlots[i] == false)
+                return false;
         }
         return true;
     }
-
-
 }

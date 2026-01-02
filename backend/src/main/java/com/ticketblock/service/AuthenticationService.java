@@ -34,17 +34,14 @@ public class AuthenticationService {
 
     public AuthenticationResponse register(RegisterRequest request) {
 
-        if(userRepository.findByEmail(request.getEmail()).isPresent()){ //se la mail è già presente
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) { // se la mail è già presente
             throw new IllegalArgumentException("User is already registered");
         }
-        if (walletRepository.countWalletsByFreeTrue() == 0){
+        if (walletRepository.countWalletsByFreeTrue() == 0) {
             throw new RuntimeException("No wallet available");
         }
 
-        Role  role = Role.valueOf(request.getRole());
-
-
-
+        Role role = Role.valueOf(request.getRole());
 
         var user = User.builder()
                 .email(request.getEmail())
@@ -55,7 +52,7 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
 
-        if(role.equals(Role.USER)){
+        if (role.equals(Role.USER)) {
             Wallet wallet = walletRepository.findFirstByFreeTrue();
             wallet.setFree(false);
             wallet.setUser(user);
@@ -66,7 +63,3 @@ public class AuthenticationService {
         return AuthenticationResponse.builder().token(jwt).build();
     }
 }
-
-
-
-
