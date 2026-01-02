@@ -18,6 +18,7 @@ public class TicketDto {
     private UserDto owner;
     private BigDecimal price;
     private Boolean resellable;
+    private EventDto event;
     private String ticketStatus;
 
 }

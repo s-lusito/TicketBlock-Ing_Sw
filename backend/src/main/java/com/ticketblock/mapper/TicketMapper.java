@@ -11,6 +11,7 @@ public class TicketMapper {
                 .owner(ticket.getOwner() != null ? UserMapper.toDto(ticket.getOwner()) : null)
                 .resellable(ticket.getResellable())
                 .ticketStatus(ticket.getTicketStatus().name())
+                .event(EventMapper.toDto(ticket.getEvent()))
                 .price(ticket.getPrice())
                 .build();
     }

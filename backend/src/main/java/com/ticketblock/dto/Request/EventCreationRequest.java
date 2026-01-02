@@ -19,6 +19,9 @@ public class EventCreationRequest {
     @NotBlank
     @Size(max = 50, message = "Event name must not exceed 50 characters")
     private String name;
+
+    @Size(max = 2000, message = "Description must not exceed 2000 characters")
+    private String description;
     @NotNull
     private LocalDate date;
     @PositiveOrZero

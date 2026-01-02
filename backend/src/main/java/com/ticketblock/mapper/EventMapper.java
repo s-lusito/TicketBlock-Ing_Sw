@@ -15,17 +15,16 @@ public class EventMapper {
         return EventDto.builder()
                 .id(event.getId())
                 .name(event.getName())
+                .description(event.getDescription())
                 .date(event.getDate())
                 .startTime(event.getStartTime())
                 .endTime(event.getEndTime())
                 .eventSaleStatus(event.getSaleStatus())
                 .saleStartDate(event.getSaleStartDate())
                 .organizer(
-                        UserMapper.toDto(event.getOrganizer())
-                )
+                        UserMapper.toDto(event.getOrganizer()))
                 .venue(
-                        VenueMapper.toSummaryDto(event.getVenue())
-                )
+                        VenueMapper.toSummaryDto(event.getVenue()))
                 .standardTicketPrice(event.getStandardTicketPrice())
                 .vipTicketPrice(event.getVipTicketPrice())
                 .imageUrl(event.getImageUrl())
@@ -35,7 +34,7 @@ public class EventMapper {
 
     public static Event toEntity(EventCreationRequest eventCreationRequest) {
         TimeSlot startTimeSlot = TimeSlot.fromIndexOrThrow(eventCreationRequest.getStartTimeSlot());
-        if(!startTimeSlot.canAddDuration(eventCreationRequest.getDuration())) {
+        if (!startTimeSlot.canAddDuration(eventCreationRequest.getDuration())) {
             throw new InvalidDateAndTimeException("Invalid duration");
         }
 
@@ -43,12 +42,14 @@ public class EventMapper {
 
         return Event.builder()
                 .name(eventCreationRequest.getName())
+                .description(eventCreationRequest.getDescription())
                 .date(eventCreationRequest.getDate())
                 .endTime(endTimeSlot.getTime())
                 .startTime(startTimeSlot.getTime())
                 .saleStartDate(eventCreationRequest.getSaleStartDate())
                 .standardTicketPrice(MoneyHelper.normalizeAmount(eventCreationRequest.getStandardTicketPrice()))
-                .vipTicketPrice(MoneyHelper.normalizeAmount(eventCreationRequest.getVipTicketPrice())) //normalize the amount
+                .vipTicketPrice(MoneyHelper.normalizeAmount(eventCreationRequest.getVipTicketPrice())) // normalize the
+                                                                                                       // amount
                 .imageUrl(eventCreationRequest.getImageUrl())
                 .build();
     }

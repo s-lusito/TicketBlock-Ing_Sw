@@ -1,5 +1,7 @@
 package com.ticketblock.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
@@ -25,26 +27,29 @@ public class AuthenticationService {
     private final WalletRepository walletRepository;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())); //autentico
-        var user =  userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new UsernameNotFoundException("User not found")); //prelevo dal db
-        var jwt = jwtService.generateToken(user);
+        authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())); // autentico
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found")); // prelevo dal db
+
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", user.getRole());
+
+        var jwt = jwtService.generateToken(extraClaims, user);
         return AuthenticationResponse.builder().token(jwt).build();
 
     }
 
     public AuthenticationResponse register(RegisterRequest request) {
 
-        if(userRepository.findByEmail(request.getEmail()).isPresent()){ //se la mail è già presente
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) { // se la mail è già presente
             throw new IllegalArgumentException("User is already registered");
         }
-        if (walletRepository.countWalletsByFreeTrue() == 0){
+        if (walletRepository.countWalletsByFreeTrue() == 0) {
             throw new RuntimeException("No wallet available");
         }
 
-        Role  role = Role.valueOf(request.getRole());
-
-
-
+        Role role = Role.valueOf(request.getRole());
 
         var user = User.builder()
                 .email(request.getEmail())
@@ -55,18 +60,17 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
 
-        if(role.equals(Role.USER)){
+        if (role.equals(Role.USER)) {
             Wallet wallet = walletRepository.findFirstByFreeTrue();
             wallet.setFree(false);
             wallet.setUser(user);
             walletRepository.save(wallet);
         }
 
-        var jwt = jwtService.generateToken(user);
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", user.getRole());
+
+        var jwt = jwtService.generateToken(extraClaims, user);
         return AuthenticationResponse.builder().token(jwt).build();
     }
 }
-
-
-
-

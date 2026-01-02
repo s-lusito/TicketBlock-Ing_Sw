@@ -24,15 +24,14 @@ public class Web3Config {
     public Credentials credentials() {
         // Chiave privata di Ganache (SOLO ambiente locale)
         return Credentials.create(
-            "0xa9ac1f437974fe0cee54c9a1e4997af2c5c145b1d674b73bb797475b3b44a3ba"
-        );
+                "0xa61aaa0a483cc4dbdd3375935f66d5eb074d3abebf0dc9ca830651e3b44d583a");
     }
 
     @Bean
     public ContractGasProvider gasProvider() {
         return new StaticGasProvider(
                 BigInteger.valueOf(20_000_000_000L), // gasPrice
-                BigInteger.valueOf(4_300_000)        // gasLimit
+                BigInteger.valueOf(4_300_000) // gasLimit
         );
 
     }
@@ -41,14 +40,12 @@ public class Web3Config {
     public TicketContract eventTicket(
             Web3j web3j,
             Credentials credentials,
-            ContractGasProvider gasProvider
-    ) {
+            ContractGasProvider gasProvider) {
         return TicketContract.load(
-                "0xa9eABE4DC87076770e197FBE569E7b2aF6fC9e43", // indirizzo del contratto deployato su Ganache
+                "0x2D60E8c18371489d514Be8E5809A83B27ADC0636", // indirizzo del contratto deployato su Ganache
                 web3j,
                 credentials,
                 gasProvider.getGasPrice(),
-                gasProvider.getGasLimit()
-        );
+                gasProvider.getGasLimit());
     }
 }

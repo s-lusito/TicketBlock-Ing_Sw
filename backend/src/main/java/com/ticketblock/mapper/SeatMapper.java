@@ -9,10 +9,8 @@ public class SeatMapper {
         return SeatDto.builder()
                 .id(seat.getId())
                 .seatNumber(seat.getSeatNumber())
+                .sector(seat.getRow().getSector().name())
                 .build();
     }
 
-
 }
-
-
