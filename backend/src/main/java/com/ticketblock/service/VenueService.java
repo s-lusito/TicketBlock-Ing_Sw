@@ -24,6 +24,12 @@ public class VenueService {
     private final VenueRepository venueRepository;
     private final EventRepository eventRepository;
 
+    public List<VenueDto> getAllVenues() {
+        return venueRepository.findAll().stream()
+                .map(VenueMapper::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
     public VenueDto getVenueByVenueId(Integer venueId) {
         return venueRepository.findById(venueId)
                 .map(VenueMapper::toDto)

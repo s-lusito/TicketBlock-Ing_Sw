@@ -25,13 +25,15 @@ public class VenueController {
 
     }
 
-
     @GetMapping("/{id}/available-slots")
     public ResponseEntity<?> getVenueAvailableSlots(@PathVariable Integer id, @RequestParam("date") LocalDate date) {
         return ResponseEntity.ok(venueService.getVenueAvailableSlots(id, date));
 
     }
 
-
+    @GetMapping
+    public ResponseEntity<?> getAllVenues() {
+        return ResponseEntity.ok(venueService.getAllVenues());
+    }
 
 }
