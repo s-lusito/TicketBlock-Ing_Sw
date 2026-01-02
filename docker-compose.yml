@@ -5,17 +5,54 @@ services:
     environment:
       POSTGRES_USER: team
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: ticketblock
       PGDATA: /data/postgres
     volumes:
       - db:/data/postgres
     ports:
       - "5432:5432"
     networks:
-      - db
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U team -d ticketblock"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    container_name: spring-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ticketblock
+      SPRING_DATASOURCE_USERNAME: team
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  frontend:
+    container_name: vue-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
     restart: unless-stopped
 
 networks:
-    db:
+    app-network:
       driver: bridge
 
 volumes:
