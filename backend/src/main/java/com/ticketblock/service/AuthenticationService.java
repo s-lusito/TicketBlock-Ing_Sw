@@ -1,5 +1,7 @@
 package com.ticketblock.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
@@ -25,9 +27,15 @@ public class AuthenticationService {
     private final WalletRepository walletRepository;
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword())); //autentico
-        var user =  userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new UsernameNotFoundException("User not found")); //prelevo dal db
-        var jwt = jwtService.generateToken(user);
+        authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())); // autentico
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found")); // prelevo dal db
+
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", user.getRole());
+
+        var jwt = jwtService.generateToken(extraClaims, user);
         return AuthenticationResponse.builder().token(jwt).build();
 
     }
@@ -59,7 +67,10 @@ public class AuthenticationService {
             walletRepository.save(wallet);
         }
 
-        var jwt = jwtService.generateToken(user);
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", user.getRole());
+
+        var jwt = jwtService.generateToken(extraClaims, user);
         return AuthenticationResponse.builder().token(jwt).build();
     }
 }
