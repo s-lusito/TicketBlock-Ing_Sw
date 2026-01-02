@@ -121,6 +121,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(errorResponse);
     }
 
+    @ExceptionHandler(BlockchainException.class)
+    public ResponseEntity<?> handleBlockchainException(BlockchainException exception) {
+        log.error(exception.getMessage(), exception);
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .detail("Blockchain Error")
+                .userMessage("Internal Server Error")
+                .status(status.value())
+                .build();
+        return ResponseEntity.status(status).body(errorResponse);
+    }
+
     // BAD REQUEST 400
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException exception) {
