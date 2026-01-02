@@ -29,7 +29,6 @@ public class Event {
     @JoinColumn(nullable = false)
     private User organizer;
 
-
     @Column(columnDefinition = "DATE")
     private LocalDate date;
 
@@ -39,14 +38,11 @@ public class Event {
     @Column(columnDefinition = "TIME")
     private LocalTime endTime;
 
-
     @Enumerated(EnumType.STRING)
     private EventSaleStatus saleStatus;
 
     @Column(columnDefinition = "DATE")
     private LocalDate saleStartDate;
-
-
 
     private String imageUrl;
 
@@ -55,14 +51,14 @@ public class Event {
     @JoinColumn(nullable = false, updatable = false)
     private Venue venue;
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "event")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
     @Builder.Default
     private List<Ticket> tickets = new ArrayList<>();
 
-    @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
-    private BigDecimal standardTicketPrice; //big decimal è preferito a float o double essendo più preciso
+    @Column(nullable = false, updatable = false) // dopo aver scelto il prezzo non si può cambiare
+    private BigDecimal standardTicketPrice; // big decimal è preferito a float o double essendo più preciso
 
-    @Column(nullable = false, updatable = false) //dopo aver scelto il prezzo non si può cambiare
+    @Column(nullable = false, updatable = false) // dopo aver scelto il prezzo non si può cambiare
     private BigDecimal vipTicketPrice;
 
     @PostConstruct

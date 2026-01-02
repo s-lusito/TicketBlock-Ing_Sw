@@ -28,4 +28,3 @@ public class EventDto {
     private BigDecimal standardTicketPrice;
     private BigDecimal vipTicketPrice;
 }
-
