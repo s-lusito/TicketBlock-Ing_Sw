@@ -10,16 +10,19 @@ Questa directory contiene tutti i diagrammi UML del sistema TicketBlock in forma
    - Gestione fee opzionale per rivendita
    - Verifica limiti per utente
    - Integrazione blockchain (mint/transfer NFT)
+   - **Gestione errori blockchain**
 
 2. **sequence-ticket-resale.puml** - Diagramma di sequenza per la rivendita di biglietti
    - Verifica proprietà su blockchain
    - Controllo rivendibilità
    - Pubblicazione evento rivendita
+   - **Gestione errori blockchain**
 
 3. **sequence-ticket-invalidation.puml** - Diagramma di sequenza per l'invalidazione di biglietti
    - Verifica proprietà
    - Burning NFT su blockchain
    - Aggiornamento stato biglietto
+   - **Gestione errori blockchain**
 
 4. **sequence-user-registration.puml** - Diagramma di sequenza per la registrazione utente
    - Allocazione wallet blockchain
@@ -31,24 +34,33 @@ Questa directory contiene tutti i diagrammi UML del sistema TicketBlock in forma
    - Generazione automatica biglietti
    - Impostazione stato vendita
 
+**Nota**: In tutti i diagrammi di sequenza, il frontend è rappresentato come attore "Client" (Vue.js).
+
 ### Diagrammi delle Classi
 
-1. **class-diagram-entities.puml** - Entità di dominio
+1. **class-diagram-entities.puml** - Entità di dominio backend
    - 8 entità principali (User, Event, Ticket, Venue, Row, Seat, Wallet, Address)
    - 4 enumerazioni (EventSaleStatus, TicketStatus, Role, RowSector)
    - Relazioni complete con cardinalità
 
-2. **class-diagram-architecture.puml** - Architettura completa del sistema
+2. **class-diagram-architecture.puml** - Architettura completa del sistema backend
    - Controller Layer (6 controller REST)
    - Service Layer (7 servizi)
    - Repository Layer (7 repository)
    - Blockchain Integration (TicketContract, Web3Config)
    - Dipendenze tra livelli
 
+3. **class-diagram-frontend.puml** - Architettura frontend Vue.js
+   - Componenti Vue per tutte le pagine
+   - Vuex Store per gestione stato globale
+   - Servizi API per comunicazione con backend
+   - Router con navigation guards
+   - Modelli DTOs e utilities
+
 ### Diagramma dei Casi d'Uso
 
 1. **use-case-diagram.puml** - Casi d'uso del sistema
-   - 3 attori (User, Organizer, System Scheduler)
+   - 3 attori (Client/Frontend, Organizer, System Scheduler)
    - 14 casi d'uso principali
    - Relazioni include/extend
 

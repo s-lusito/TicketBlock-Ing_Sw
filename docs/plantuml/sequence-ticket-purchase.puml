@@ -2,21 +2,21 @@
 !theme plain
 title Diagramma di Sequenza - Acquisto Biglietto
 
-actor User
+actor Client
 participant TicketController
 participant TicketService
 participant TicketRepository
 participant BlockchainContract
 participant EventPublisher
 
-User -> TicketController: Richiesta acquisto biglietti
+Client -> TicketController: Richiesta acquisto biglietti
 TicketController -> TicketService: Elabora acquisto
 
 TicketService -> TicketRepository: Recupera biglietti
 note right of TicketService: Verifica limite 4 biglietti per evento
 
 alt Biglietti non disponibili
-    TicketService --> User: Errore: biglietti non disponibili
+    TicketService --> Client: Errore: biglietti non disponibili
 end
 
 TicketService -> TicketService: Calcola prezzo totale con fee opzionale
@@ -25,21 +25,35 @@ note right of TicketService: Fee 10% per abilitare rivendita
 TicketService -> TicketService: Elabora pagamento
 
 alt Pagamento fallito
-    TicketService --> User: Errore: pagamento fallito
+    TicketService --> Client: Errore: pagamento fallito
 end
 
 alt Primo acquisto
     TicketService -> BlockchainContract: Crea NFT biglietto
-    BlockchainContract --> TicketService: ID blockchain
+    alt Errore blockchain
+        BlockchainContract --> TicketService: Errore: transazione fallita
+        TicketService --> Client: Errore: impossibile creare NFT
+    else Successo
+        BlockchainContract --> TicketService: ID blockchain
+    end
 else Rivendita
     TicketService -> BlockchainContract: Verifica proprietà
-    TicketService -> BlockchainContract: Trasferisci NFT
+    alt Errore verifica
+        BlockchainContract --> TicketService: Errore: verifica fallita
+        TicketService --> Client: Errore: proprietà non verificata
+    else Proprietà verificata
+        TicketService -> BlockchainContract: Trasferisci NFT
+        alt Errore trasferimento
+            BlockchainContract --> TicketService: Errore: trasferimento fallito
+            TicketService --> Client: Errore: impossibile trasferire NFT
+        end
+    end
 end
 
 TicketService -> TicketRepository: Salva biglietti
 TicketService -> EventPublisher: Pubblica evento acquisto
 
 TicketService --> TicketController: Conferma acquisto
-TicketController --> User: Acquisto completato con successo
+TicketController --> Client: Acquisto completato con successo
 
 @enduml

@@ -46,76 +46,89 @@ Directory **[plantuml/](./plantuml/)** - Versione PlantUML dei diagrammi per:
 - Compatibilità con editor e IDE
 - Consultare il [README PlantUML](./plantuml/README.md) per istruzioni di utilizzo
 
-### 1. [Class Diagram](./class-diagram.md)
-Shows the main domain entities and their relationships:
-- User, Event, Ticket, Venue, Row, Seat, Wallet, Address
-- Enumerations: EventSaleStatus, TicketStatus, Role, RowSector
-- Service layer and blockchain integration classes
-- Relationships between entities
+### 1. Diagrammi delle Classi
 
-### 2. Sequence Diagrams
-Detailed sequence diagrams for the main use cases:
+#### [Class Diagram - Backend](./class-diagram.md)
+Mostra le entità di dominio principali e le loro relazioni nel backend:
+- 8 entità: User, Event, Ticket, Venue, Row, Seat, Wallet, Address
+- 4 enumerazioni: EventSaleStatus, TicketStatus, Role, RowSector
+- Livello servizi e integrazione blockchain
+- Architettura completa a 3 livelli (Controller → Service → Repository)
 
-#### [User Registration](./sequence-user-registration.md)
-- User registers with email and password
-- System checks wallet availability
-- Allocates blockchain wallet to user
-- Creates JWT tokens for authentication
+#### [Class Diagram - Frontend](./class-diagram-frontend.md)
+Architettura del frontend Vue.js (da implementare):
+- Componenti Vue.js per tutte le pagine
+- Vuex Store per gestione stato
+- Servizi API per comunicazione con backend
+- Router con navigation guards
+- Modelli DTOs e utilities
 
-#### [Event Creation](./sequence-event-creation.md)
-- Organizer creates a new event
-- System validates dates and venue availability
-- Creates tickets for all seats in the venue
+### 2. Diagrammi di Sequenza
+Diagrammi di sequenza dettagliati per i casi d'uso principali. **Nota**: Il frontend è rappresentato come attore "Client".
 
-#### [Ticket Purchase](./sequence-ticket-purchase.md)
-- User purchases one or more tickets
-- System processes payment
-- Verifies blockchain ownership for resold tickets
-- Mints or transfers NFT on blockchain
-- Updates ticket ownership
+#### [Registrazione Utente](./sequence-user-registration.md)
+- Client richiede registrazione con email e password
+- Sistema verifica disponibilità wallet blockchain
+- Alloca wallet all'utente
+- Crea token JWT per autenticazione
 
-#### [Ticket Resale](./sequence-ticket-resale.md)
-- User puts a previously purchased ticket back on sale
-- System validates ownership on blockchain
-- System verifies resellability on blockchain
-- Makes ticket available again
+#### [Creazione Evento](./sequence-event-creation.md)
+- Client (organizzatore) crea un nuovo evento
+- Sistema valida date e disponibilità venue
+- Crea biglietti per tutti i posti nel venue
 
-#### [Ticket Invalidation](./sequence-ticket-invalidation.md)
-- User invalidates a ticket (e.g., when entering event)
-- System verifies ownership on blockchain
-- Marks ticket as invalidated
-- Burns the NFT on blockchain
+#### [Acquisto Biglietto](./sequence-ticket-purchase.md)
+- Client acquista uno o più biglietti
+- Sistema elabora pagamento
+- Verifica proprietà blockchain per biglietti rivenduti
+- Crea o trasferisce NFT sulla blockchain
+- **Include gestione errori blockchain**
 
-### 3. [Use Case Diagram](./use-case-diagram.md)
-Shows:
-- System actors: User, Organizer, System Scheduler
-- Main use cases and their relationships
-- Business rules and constraints
+#### [Rivendita Biglietto](./sequence-ticket-resale.md)
+- Client rimette in vendita un biglietto acquistato
+- Sistema valida proprietà sulla blockchain
+- Sistema verifica rivendibilità sulla blockchain
+- **Include gestione errori blockchain**
+- Rende il biglietto nuovamente disponibile
 
-## How to View
+#### [Invalidazione Biglietto](./sequence-ticket-invalidation.md)
+- Client invalida un biglietto (es. all'ingresso evento)
+- Sistema verifica proprietà sulla blockchain
+- Marca il biglietto come invalidato
+- Brucia l'NFT sulla blockchain
+- **Include gestione errori blockchain**
 
-These diagrams use Mermaid syntax and can be viewed in:
-- GitHub (renders Mermaid automatically)
-- VS Code with Mermaid extension
-- Any Mermaid-compatible viewer
-- Online at https://mermaid.live/
+### 3. [Diagramma dei Casi d'Uso](./use-case-diagram.md)
+Mostra:
+- Attori del sistema: Client (Frontend), Organizer, System Scheduler
+- Casi d'uso principali e le loro relazioni
+- Regole di business e vincoli
 
-## System Overview
+## Come Visualizzare
 
-TicketBlock is a blockchain-based ticketing system that:
-- Uses Ethereum smart contracts for ticket NFTs
-- Supports event creation by organizers
-- Allows users to purchase tickets with optional resale capability
-- Implements automated sale status management
-- Provides secure ticket validation through blockchain
+Questi diagrammi usano sintassi Mermaid e possono essere visualizzati in:
+- GitHub (rende Mermaid automaticamente)
+- VS Code con estensione Mermaid
+- Qualsiasi visualizzatore compatibile con Mermaid
+- Online su https://mermaid.live/
 
-### Key Technologies
+## Panoramica del Sistema
+
+TicketBlock è un sistema di biglietteria basato su blockchain che:
+- Usa smart contract Ethereum per NFT dei biglietti
+- Supporta creazione eventi da parte degli organizzatori
+- Permette agli utenti di acquistare biglietti con capacità di rivendita opzionale
+- Implementa gestione automatica dello stato di vendita
+- Fornisce validazione sicura dei biglietti tramite blockchain
+
+### Tecnologie Principali
 - **Backend**: Java Spring Boot
-- **Database**: JPA/Hibernate with relational database
-- **Blockchain**: Ethereum (Truffle framework)
+- **Database**: JPA/Hibernate con database relazionale
+- **Blockchain**: Ethereum (framework Truffle)
 - **Smart Contracts**: Solidity
+- **Frontend**: Vue.js 3 (da implementare)
 
-### Main Features
+### Funzionalità Principali
 - Event management with venue booking
 - Ticket purchasing with payment processing
 - Blockchain-based ticket NFTs

@@ -1,0 +1,338 @@
+@startuml Frontend Architecture
+!theme plain
+title Diagramma delle Classi - Frontend Vue.js
+
+package "Vue Components" {
+  class App {
+    +router: Router
+    +store: Store
+    +mounted()
+    +created()
+  }
+
+  class HomePage {
+    -events: Event[]
+    +mounted()
+    +loadEvents()
+    +filterEvents(status)
+  }
+
+  class EventDetailPage {
+    -event: Event
+    -tickets: Ticket[]
+    +mounted()
+    +loadEventDetails(eventId)
+    +loadTickets()
+  }
+
+  class TicketPurchasePage {
+    -selectedTickets: Ticket[]
+    -acceptFee: boolean
+    -totalPrice: number
+    +selectTicket(ticket)
+    +calculateTotal()
+    +purchaseTickets()
+  }
+
+  class MyTicketsPage {
+    -myTickets: Ticket[]
+    +mounted()
+    +loadMyTickets()
+    +resellTicket(ticketId)
+    +invalidateTicket(ticketId)
+  }
+
+  class OrganizerDashboard {
+    -myEvents: Event[]
+    +mounted()
+    +loadMyEvents()
+    +viewEventDetails(eventId)
+  }
+
+  class CreateEventPage {
+    -eventForm: EventForm
+    -venues: Venue[]
+    +mounted()
+    +loadVenues()
+    +validateForm()
+    +createEvent()
+  }
+
+  class LoginPage {
+    -credentials: LoginCredentials
+    +login()
+    +handleLoginSuccess()
+  }
+
+  class RegisterPage {
+    -registrationData: RegistrationData
+    +register()
+    +validatePassword()
+    +handleRegisterSuccess()
+  }
+}
+
+package "Vuex Store" {
+  class Store {
+    -state: State
+    -mutations: Mutations
+    -actions: Actions
+    -getters: Getters
+  }
+
+  class State {
+    +user: User | null
+    +authToken: string | null
+    +events: Event[]
+    +tickets: Ticket[]
+    +loading: boolean
+  }
+
+  class Mutations {
+    +SET_USER(user)
+    +SET_AUTH_TOKEN(token)
+    +SET_EVENTS(events)
+    +SET_TICKETS(tickets)
+    +SET_LOADING(loading)
+    +LOGOUT()
+  }
+
+  class Actions {
+    +login(credentials)
+    +register(data)
+    +logout()
+    +fetchEvents()
+    +fetchMyTickets()
+    +purchaseTickets(request)
+  }
+
+  class Getters {
+    +isAuthenticated(): boolean
+    +currentUser(): User
+    +isOrganizer(): boolean
+    +availableEvents(): Event[]
+  }
+}
+
+package "Services/API" {
+  class ApiService {
+    -baseURL: string
+    -httpClient: AxiosInstance
+    +setAuthToken(token)
+    +get(url, config)
+    +post(url, data, config)
+    +put(url, data, config)
+    +delete(url, config)
+  }
+
+  class AuthService {
+    -apiService: ApiService
+    +login(credentials): Promise<AuthResponse>
+    +register(data): Promise<AuthResponse>
+    +refreshToken(token): Promise<AuthResponse>
+    +logout()
+  }
+
+  class EventService {
+    -apiService: ApiService
+    +getAllEvents(statusList): Promise<Event[]>
+    +getEventById(id): Promise<Event>
+    +createEvent(request): Promise<Event>
+    +removeEvent(id): Promise<void>
+    +getOrganizerEvents(): Promise<Event[]>
+  }
+
+  class TicketService {
+    -apiService: ApiService
+    +getTicketsFromEvent(eventId, status): Promise<Ticket[]>
+    +purchaseTickets(request): Promise<PurchaseResponse>
+    +resellTicket(ticketId): Promise<void>
+    +invalidateTicket(ticketId): Promise<void>
+    +getMyTickets(): Promise<Ticket[]>
+  }
+
+  class VenueService {
+    -apiService: ApiService
+    +getVenueById(id): Promise<Venue>
+    +getVenueAvailableSlots(id, date): Promise<AvailableSlots>
+  }
+}
+
+package "Models/DTOs" {
+  class User {
+    +userId: number
+    +email: string
+    +firstName: string
+    +lastName: string
+    +role: Role
+    +wallet: Wallet
+  }
+
+  class Event {
+    +id: number
+    +name: string
+    +date: string
+    +startTime: string
+    +endTime: string
+    +saleStatus: EventSaleStatus
+    +imageUrl: string
+    +standardTicketPrice: number
+    +vipTicketPrice: number
+    +venue: Venue
+  }
+
+  class Ticket {
+    +id: number
+    +blockchainId: string
+    +price: number
+    +ticketStatus: TicketStatus
+    +resellable: boolean
+    +event: Event
+    +seat: Seat
+  }
+
+  class Venue {
+    +id: number
+    +name: string
+    +address: Address
+    +rows: Row[]
+  }
+
+  class Seat {
+    +id: number
+    +seatNumber: number
+    +row: Row
+  }
+
+  class Wallet {
+    +id: number
+    +address: string
+  }
+
+  enum Role {
+    USER
+    ORGANIZER
+    ADMIN
+  }
+
+  enum EventSaleStatus {
+    NOT_STARTED
+    ONGOING
+    SOLD_OUT
+    ENDED
+  }
+
+  enum TicketStatus {
+    AVAILABLE
+    SOLD
+    INVALIDATED
+  }
+}
+
+package "Router" {
+  class VueRouter {
+    -routes: Route[]
+    +push(location)
+    +replace(location)
+    +go(n)
+    +beforeEach(guard)
+  }
+
+  class Route {
+    +path: string
+    +name: string
+    +component: Component
+    +meta: RouteMeta
+    +beforeEnter(guard)
+  }
+
+  class NavigationGuard {
+    +checkAuth()
+    +checkRole(role)
+    +redirectIfAuthenticated()
+  }
+}
+
+package "Utils" {
+  class DateFormatter {
+    +formatDate(date): string
+    +formatTime(time): string
+    +formatDateTime(dateTime): string
+  }
+
+  class PriceFormatter {
+    +formatPrice(price): string
+    +calculateTotal(tickets, fee): number
+  }
+
+  class Validator {
+    +validateEmail(email): boolean
+    +validatePassword(password): boolean
+    +validateDate(date): boolean
+  }
+
+  class ErrorHandler {
+    +handleApiError(error)
+    +showNotification(message, type)
+  }
+}
+
+' Relationships
+App --> Store
+App --> VueRouter
+
+HomePage --> EventService
+EventDetailPage --> EventService
+EventDetailPage --> TicketService
+TicketPurchasePage --> TicketService
+MyTicketsPage --> TicketService
+OrganizerDashboard --> EventService
+CreateEventPage --> EventService
+CreateEventPage --> VenueService
+LoginPage --> AuthService
+RegisterPage --> AuthService
+
+Store --> State
+Store --> Mutations
+Store --> Actions
+Store --> Getters
+
+AuthService --> ApiService
+EventService --> ApiService
+TicketService --> ApiService
+VenueService --> ApiService
+
+EventService ..> Event : uses
+TicketService ..> Ticket : uses
+AuthService ..> User : uses
+VenueService ..> Venue : uses
+
+VueRouter --> Route
+VueRouter --> NavigationGuard
+
+User -- Role
+User -- Wallet
+Event -- EventSaleStatus
+Event -- Venue
+Ticket -- TicketStatus
+Ticket -- Event
+Ticket -- Seat
+Venue -- Seat
+
+note right of App
+  Root component dell'applicazione
+  Gestisce routing e state management
+end note
+
+note right of Store
+  Vuex store per gestione
+  stato globale dell'applicazione
+end note
+
+note right of ApiService
+  Servizio base per tutte
+  le chiamate HTTP al backend
+  Spring Boot
+end note
+
+@enduml

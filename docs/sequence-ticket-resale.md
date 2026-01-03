@@ -4,36 +4,40 @@ Questo diagramma mostra la sequenza di interazioni per la rivendita di un biglie
 
 ```mermaid
 sequenceDiagram
-    actor User
+    actor Client
     participant TicketController
     participant TicketService
     participant BlockchainContract
     participant TicketRepository
     participant EventPublisher
 
-    User->>TicketController: Richiesta rivendita biglietto
+    Client->>TicketController: Richiesta rivendita biglietto
     TicketController->>TicketService: Elabora rivendita
     
     TicketService->>TicketRepository: Recupera biglietto
     
     alt Biglietto non trovato
-        TicketService-->>User: Errore: biglietto non trovato
+        TicketService-->>Client: Errore: biglietto non trovato
     end
     
     alt Utente non è proprietario
-        TicketService-->>User: Errore: accesso negato
+        TicketService-->>Client: Errore: accesso negato
     end
     
     TicketService->>BlockchainContract: Verifica proprietà su blockchain
-    
-    alt Verifica proprietà fallita
-        TicketService-->>User: Errore: proprietà non verificata
+    alt Errore blockchain
+        BlockchainContract-->>TicketService: Errore: verifica fallita
+        TicketService-->>Client: Errore: impossibile verificare proprietà
+    else Verifica proprietà fallita
+        TicketService-->>Client: Errore: proprietà non verificata
     end
     
     TicketService->>BlockchainContract: Verifica rivendibilità su blockchain
-    
-    alt Biglietto non rivendibile
-        TicketService-->>User: Errore: biglietto non rivendibile
+    alt Errore blockchain
+        BlockchainContract-->>TicketService: Errore: verifica fallita
+        TicketService-->>Client: Errore: impossibile verificare rivendibilità
+    else Biglietto non rivendibile
+        TicketService-->>Client: Errore: biglietto non rivendibile
     end
     
     TicketService->>TicketService: Rimuovi proprietario
@@ -44,5 +48,5 @@ sequenceDiagram
     Note over EventPublisher: Aggiorna stato evento se necessario
     
     TicketService-->>TicketController: Conferma rivendita
-    TicketController-->>User: Biglietto rimesso in vendita
+    TicketController-->>Client: Biglietto rimesso in vendita
 ```

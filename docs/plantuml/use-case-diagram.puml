@@ -4,8 +4,8 @@ title Diagramma dei Casi d'Uso - Sistema TicketBlock
 
 left to right direction
 
-actor "User" as User
-actor "Organizer" as Organizer
+actor "Client" as Client
+actor "Organizer" as Organizer  
 actor "System Scheduler" as System
 
 rectangle "Sistema TicketBlock" {
@@ -25,14 +25,14 @@ rectangle "Sistema TicketBlock" {
   usecase "Aggiorna Stato Vendita Eventi" as UC14
 }
 
-User --> UC12
-User --> UC13
-User --> UC3
-User --> UC4
-User --> UC5
-User --> UC6
-User --> UC7
-User --> UC8
+Client --> UC12
+Client --> UC13
+Client --> UC3
+Client --> UC4
+Client --> UC5
+Client --> UC6
+Client --> UC7
+Client --> UC8
 
 Organizer --> UC1
 Organizer --> UC2
@@ -55,6 +55,11 @@ end note
 note right of UC14
   Eseguito quotidianamente
   Apre/chiude vendite automaticamente
+end note
+
+note right of Client
+  Rappresenta il Frontend
+  (Vue.js)
 end note
 
 @enduml

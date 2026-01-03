@@ -4,14 +4,14 @@ Questo diagramma mostra la sequenza di interazioni per la creazione di un nuovo 
 
 ```mermaid
 sequenceDiagram
-    actor Organizer
+    actor Client
     participant OrganizerEventController
     participant EventService
     participant VenueService
     participant VenueRepository
     participant EventRepository
 
-    Organizer->>OrganizerEventController: Richiesta creazione evento
+    Client->>OrganizerEventController: Richiesta creazione evento
     OrganizerEventController->>EventService: Elabora creazione
     
     EventService->>EventService: Valida date e orari
@@ -22,7 +22,7 @@ sequenceDiagram
     EventService->>VenueService: Verifica disponibilità venue
     
     alt Venue non disponibile
-        EventService-->>Organizer: Errore: venue non disponibile
+        EventService-->>Client: Errore: venue non disponibile
     end
     
     EventService->>EventService: Crea biglietti per tutti i posti
@@ -34,5 +34,5 @@ sequenceDiagram
     EventService->>EventRepository: Salva evento e biglietti
     
     EventService-->>OrganizerEventController: Evento creato
-    OrganizerEventController-->>Organizer: Creazione completata con successo
+    OrganizerEventController-->>Client: Creazione completata con successo
 ```

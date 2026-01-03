@@ -2,14 +2,14 @@
 !theme plain
 title Diagramma di Sequenza - Creazione Evento
 
-actor Organizer
+actor Client
 participant OrganizerEventController
 participant EventService
 participant VenueService
 participant VenueRepository
 participant EventRepository
 
-Organizer -> OrganizerEventController: Richiesta creazione evento
+Client -> OrganizerEventController: Richiesta creazione evento
 OrganizerEventController -> EventService: Elabora creazione
 
 EventService -> EventService: Valida date e orari
@@ -20,7 +20,7 @@ EventService -> VenueRepository: Recupera informazioni venue
 EventService -> VenueService: Verifica disponibilità venue
 
 alt Venue non disponibile
-    EventService --> Organizer: Errore: venue non disponibile
+    EventService --> Client: Errore: venue non disponibile
 end
 
 EventService -> EventService: Crea biglietti per tutti i posti
@@ -32,6 +32,6 @@ note right of EventService: NOT_STARTED o ONGOING\nin base alla data inizio vend
 EventService -> EventRepository: Salva evento e biglietti
 
 EventService --> OrganizerEventController: Evento creato
-OrganizerEventController --> Organizer: Creazione completata con successo
+OrganizerEventController --> Client: Creazione completata con successo
 
 @enduml

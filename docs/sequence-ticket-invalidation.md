@@ -4,30 +4,32 @@ Questo diagramma mostra la sequenza di interazioni per l'invalidazione di un big
 
 ```mermaid
 sequenceDiagram
-    actor User
+    actor Client
     participant TicketController
     participant TicketService
     participant BlockchainContract
     participant TicketRepository
 
-    User->>TicketController: Richiesta invalidazione biglietto
+    Client->>TicketController: Richiesta invalidazione biglietto
     TicketController->>TicketService: Elabora invalidazione
     
     TicketService->>TicketRepository: Recupera biglietto
     
     alt Biglietto non trovato
-        TicketService-->>User: Errore: biglietto non trovato
+        TicketService-->>Client: Errore: biglietto non trovato
     end
     
     alt Utente non è proprietario
-        TicketService-->>User: Errore: accesso negato
+        TicketService-->>Client: Errore: accesso negato
     end
     
     TicketService->>BlockchainContract: Verifica proprietà su blockchain
     Note over BlockchainContract: Conferma proprietà prima dell'invalidazione
-    
-    alt Verifica proprietà fallita
-        TicketService-->>User: Errore: proprietà non verificata
+    alt Errore blockchain
+        BlockchainContract-->>TicketService: Errore: verifica fallita
+        TicketService-->>Client: Errore: impossibile verificare proprietà
+    else Verifica proprietà fallita
+        TicketService-->>Client: Errore: proprietà non verificata
     end
     
     TicketService->>TicketService: Imposta stato INVALIDATED
@@ -35,7 +37,11 @@ sequenceDiagram
     
     TicketService->>BlockchainContract: Brucia NFT
     Note over BlockchainContract: Il biglietto diventa<br/>permanentemente invalido
+    alt Errore blockchain
+        BlockchainContract-->>TicketService: Errore: burn fallito
+        TicketService-->>Client: Errore: impossibile invalidare NFT
+    end
     
     TicketService-->>TicketController: Conferma invalidazione
-    TicketController-->>User: Biglietto invalidato con successo
+    TicketController-->>Client: Biglietto invalidato con successo
 ```
