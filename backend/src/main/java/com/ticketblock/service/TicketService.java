@@ -16,9 +16,11 @@ import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.utils.MoneyHelper;
 import com.ticketblock.utils.TicketContract;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -28,6 +30,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TicketService {
     private final BigDecimal feePercentage = new BigDecimal("1.10");
     private final TicketRepository ticketRepository;
@@ -103,13 +106,19 @@ public class TicketService {
             for (Ticket ticket : tickets) {
                 if( ticket.getOwner() ==  null){ // se è la prima volta che viene venduto viene mintato
                     try {
-                        BigInteger blockchainTicketId = ticketContract.mintTicket(
+
+                        TransactionReceipt receipt = ticketContract.mintTicket(
                                 loggedUser.getWallet().getAddress(),
                                 (MoneyHelper.priceInCents(ticket.getPrice())) ,
                                 ticket.getResellable(),
                                 ticket.getEvent().getName()
                         ).send();
-                        ticket.setBlockchainId(blockchainTicketId);
+                        if(receipt.isStatusOK()){
+                            BigInteger blockchainTicketId = ticketContract.getTicketIdFromReceipt(receipt);
+                            log.info("Mint ticket with id:" + blockchainTicketId );
+
+                            ticket.setBlockchainId(blockchainTicketId);
+                        }
                     } catch (Exception e) {
                         throw new BlockchainException("Error while minting ticket");
                     }
@@ -127,6 +136,7 @@ public class TicketService {
                                 loggedUser.getWallet().getAddress(),
                                 ticket.getBlockchainId()
                         ).send();
+                        log.info("Tranfer ticket");
                     } catch (Exception e) {
                         throw new BlockchainException("Error while transfering ticket");
                     }
