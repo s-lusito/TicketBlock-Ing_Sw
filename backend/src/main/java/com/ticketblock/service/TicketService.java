@@ -105,7 +105,6 @@ public class TicketService {
         {
             for (Ticket ticket : tickets) {
                 if( ticket.getBlockchainId() ==  null){ // se è la prima volta che viene venduto viene mintato
-                    log.info("Ciaoooo");
                     try {
 
                         TransactionReceipt receipt = ticketContract.mintTicket(

@@ -43,7 +43,6 @@ public class TicketContract extends Contract {
                 ),
                 Arrays.<TypeReference<?>>asList(new TypeReference<Uint8>() {})
         );
-        System.out.println("HA MINTATOOO");
 
         return executeRemoteCallTransaction(function);
     }
