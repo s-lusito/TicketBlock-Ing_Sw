@@ -1,6 +1,7 @@
 package com.ticketblock.config;
 
 import com.ticketblock.utils.TicketContract;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.web3j.crypto.Credentials;
@@ -21,10 +22,9 @@ public class Web3Config {
     }
 
     @Bean
-    public Credentials credentials() {
+    public Credentials credentials(@Value("${blockchain.private-key}") String privateKey) {
         // Chiave privata di Ganache (SOLO ambiente locale)
-        return Credentials.create(
-                "0xd32ebc7a6e22aa7e30445a7a2eed61fc54604e0446fde4401456b57256a2dfb0");
+        return Credentials.create(privateKey);
     }
 
     @Bean
@@ -38,11 +38,12 @@ public class Web3Config {
 
     @Bean
     public TicketContract eventTicket(
+            @Value("${blockchain.contract-address}") String contractAddress,
             Web3j web3j,
             Credentials credentials,
             ContractGasProvider gasProvider) {
         return TicketContract.load(
-                "0xD9559326D171ed0E9aDf9cA13e799fcC712abB1d", // indirizzo del contratto deployato su Ganache
+                contractAddress, // indirizzo del contratto deployato su Ganache
                 web3j,
                 credentials,
                 gasProvider.getGasPrice(),
