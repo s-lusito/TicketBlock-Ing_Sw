@@ -47,6 +47,12 @@ public class OrganizerEventController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/invalidate-ticket/{id}")
+    public ResponseEntity<?> invalidateTicket(@PathVariable Integer id) {
+        eventService.invalidateTicket(id);
+        return ResponseEntity.ok().build();
+    }
+
 
 
 }

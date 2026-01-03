@@ -46,22 +46,13 @@
         <div class="sidebar">
           <div class="ticket-card card">
             <h3>Acquista Biglietti</h3>
-            <div class="ticket-option">
-              <div class="ticket-info">
-                <span class="ticket-name">Standard</span>
-                <span class="ticket-price">{{ Number(event.standardTicketPrice).toFixed(2) }}€</span>
-              </div>
-              <button v-if="!isOrganizer" class="buy-btn primary" @click="openPurchaseModal('STANDARD')">Acquista Standard</button>
-              <button v-else class="buy-btn" style="background-color: #333; color: #fff; cursor: not-allowed; opacity: 0.7;" disabled>Acquisto non disponibile</button>
-            </div>
-            <div class="ticket-option">
-              <div class="ticket-info">
-                <span class="ticket-name">VIP</span>
-                <span class="ticket-price">{{ Number(event.vipTicketPrice).toFixed(2) }}€</span>
-              </div>
-              <button v-if="!isOrganizer" class="buy-btn primary" @click="openPurchaseModal('VIP')">Acquista VIP</button>
-              <button v-else class="buy-btn" style="background-color: #333; color: #fff; cursor: not-allowed; opacity: 0.7;" disabled>Acquisto non disponibile</button>
-            </div>
+            <p class="card-subtitle">Scegli fino a 4 biglietti da acquistare</p>
+            <button v-if="!isOrganizer" class="buy-btn primary large-btn" @click="openPurchaseModal">
+              Seleziona Biglietti
+            </button>
+            <button v-else class="buy-btn" style="background-color: #333; color: #fff; cursor: not-allowed; opacity: 0.7;" disabled>
+              Acquisto non disponibile
+            </button>
           </div>
 
           <div v-if="isOrganizer" class="admin-actions card">
@@ -75,38 +66,128 @@
     <!-- Purchase Modal -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal-content card">
-        <h3>Completa Acquisto</h3>
-        <p>Stai acquistando un biglietto <strong>{{ selectedTicketType }}</strong></p>
-        
-        <form @submit.prevent="handlePurchase">
-          <div class="form-group">
-            <label>Numero Carta</label>
-            <input type="text" v-model="payment.cardNumber" placeholder="1234 5678 1234 5678" required />
-          </div>
-          <div class="row">
-            <div class="form-group">
-              <label>Scadenza</label>
-              <input type="text" v-model="payment.expiration" placeholder="MM/YY" required />
-            </div>
-            <div class="form-group">
-              <label>CVV</label>
-              <input type="text" v-model="payment.cvv" placeholder="123" required />
+        <button class="close-modal-btn" @click="closeModal">✕</button>
+        <h3>Seleziona Biglietti</h3>
+        <p class="modal-subtitle">Scegli fino a {{ remainingTicketsAllowed }} biglietti da acquistare ({{ userOwnedTicketsCount }} già posseduti)</p>
+
+        <!-- Selected Tickets Summary -->
+        <div v-if="selectedTicketIds.length > 0" class="selected-summary">
+          <h4>Biglietti Selezionati ({{ selectedTicketIds.length }})</h4>
+          <div class="selected-list">
+            <div v-for="ticketId in selectedTicketIds" :key="ticketId" class="selected-ticket">
+              <span>{{ getTicketInfo(ticketId) }}</span>
+              <button type="button" class="remove-btn" @click="removeTicket(ticketId)">✕</button>
             </div>
           </div>
-          <div class="form-group">
-            <label>Intestatario</label>
-            <input type="text" v-model="payment.holderName" placeholder="Mario Rossi" required />
+        </div>
+
+        <!-- Available Tickets -->
+        <div class="tickets-list-container">
+          <h4>Biglietti Disponibili</h4>
+          <div v-if="remainingTicketsAllowed > 0 && filteredAvailableTickets.length > 0" class="tickets-table">
+            <div class="tickets-header">
+              <div class="col-type">Tipo</div>
+              <div class="col-row">Fila</div>
+              <div class="col-seat">Posto</div>
+              <div class="col-price">Prezzo</div>
+              <div class="col-action">Seleziona</div>
+            </div>
+            <div v-for="ticket in filteredAvailableTickets" :key="ticket.id" class="ticket-row">
+              <div class="col-type">
+                <span class="badge" :class="ticket.seat.sector.toLowerCase()">{{ ticket.seat.sector }}</span>
+              </div>
+              <div class="col-row">{{ ticket.seat.row }}</div>
+              <div class="col-seat">{{ ticket.seat.seatNumber }}</div>
+              <div class="col-price">€{{ Number(ticket.price).toFixed(2) }}</div>
+              <div class="col-action">
+                <button
+                  type="button"
+                  class="select-ticket-btn"
+                  :disabled="selectedTicketIds.includes(ticket.id) || selectedTicketIds.length >= remainingTicketsAllowed"
+                  @click="selectTicket(ticket.id)"
+                >
+                  {{ selectedTicketIds.includes(ticket.id) ? '✓ Selezionato' : 'Seleziona' }}
+                </button>
+              </div>
+            </div>
           </div>
-          
-          <div class="checkbox-container">
-            <label class="checkbox-label">
-              <input type="checkbox" v-model="payment.resellable" />
-              <span>Abilita rivendita (+10% fee)</span>
-            </label>
+          <div v-else-if="remainingTicketsAllowed <= 0" class="no-tickets">
+            <p>⚠️ Hai già raggiunto il limite massimo di 4 biglietti per questo evento.</p>
+          </div>
+          <div v-else class="no-tickets">
+            <p>Nessun biglietto disponibile</p>
+          </div>
+        </div>
+
+        <!-- Payment Form -->
+        <form @submit.prevent="handlePurchase" v-if="selectedTicketIds.length > 0">
+          <div class="payment-section">
+            <h4>Dettagli Pagamento</h4>
+            <div class="form-group">
+              <label>Numero Carta</label>
+              <input
+                type="text"
+                v-model="payment.cardNumber"
+                placeholder="1234 5678 1234 5678"
+                :required="!payment.skipPayment"
+                :disabled="payment.skipPayment"
+              />
+            </div>
+            <div class="row">
+              <div class="form-group">
+                <label>Scadenza</label>
+                <input
+                  type="text"
+                  v-model="payment.expiration"
+                  placeholder="MM/YY"
+                  :required="!payment.skipPayment"
+                  :disabled="payment.skipPayment"
+                />
+              </div>
+              <div class="form-group">
+                <label>CVV</label>
+                <input
+                  type="text"
+                  v-model="payment.cvv"
+                  placeholder="123"
+                  :required="!payment.skipPayment"
+                  :disabled="payment.skipPayment"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Intestatario</label>
+              <input
+                type="text"
+                v-model="payment.holderName"
+                placeholder="Mario Rossi"
+                :required="!payment.skipPayment"
+                :disabled="payment.skipPayment"
+              />
+            </div>
+
+            <div class="checkbox-container">
+              <label class="checkbox-label">
+                <input type="checkbox" v-model="payment.resellable" />
+                <span>Abilita rivendita (+10% fee)</span>
+              </label>
+            </div>
+
+            <!-- Debug: skip payment -->
+            <div class="checkbox-container">
+              <label class="checkbox-label">
+                <input type="checkbox" v-model="payment.skipPayment" />
+                <span>Salta inserimento dati pagamento (debug — invia dati mock validi)</span>
+              </label>
+            </div>
+
+            <p v-if="payment.skipPayment" class="debug-note" style="font-size:0.9rem; color:#555; margin-top:8px;">
+              Modalità debug attiva: verranno inviati dati di pagamento mock (non inserire dati reali).
+            </p>
           </div>
 
           <div class="total-section">
-            <span class="total-label">Totale da pagare:</span>
+            <span class="total-label">Totale da pagare ({{ selectedTicketIds.length }} {{ selectedTicketIds.length === 1 ? 'biglietto' : 'biglietti' }}):</span>
             <span class="total-amount">{{ Number(totalPrice).toFixed(2) }}€</span>
           </div>
 
@@ -118,6 +199,10 @@
           </div>
           <p v-if="purchaseError" class="error-msg">{{ purchaseError }}</p>
         </form>
+
+        <div v-else class="no-selection-msg">
+          <p>Seleziona almeno un biglietto per continuare</p>
+        </div>
       </div>
     </div>
   </div>
@@ -153,10 +238,12 @@ const handleDelete = async () => {
 
 // Modal & Purchase State
 const showModal = ref(false);
-const selectedTicketType = ref('');
 const processing = ref(false);
 const purchaseError = ref('');
 const availableTickets = ref([]);
+const selectedTicketIds = ref([]);
+const userOwnedTicketsCount = ref(0);
+const maxTicketsAllowed = 4;
 
 const payment = ref({
   cardNumber: '',
@@ -166,12 +253,61 @@ const payment = ref({
   resellable: false
 });
 
-// Calcola il prezzo totale (con maggiorazione per l'opzione rivendibilità)
-const totalPrice = computed(() => {
-  if (!event.value || !selectedTicketType.value) return 0;
-  const basePrice = selectedTicketType.value === 'STANDARD' ? event.value.standardTicketPrice : event.value.vipTicketPrice;
-  return payment.value.resellable ? basePrice * 1.1 : basePrice;
+// Add debug flag to skip real payment entry
+payment.value.skipPayment = false;
+
+// Computed properties
+const filteredAvailableTickets = computed(() => {
+  return availableTickets.value
+    .filter(t => t.ticketStatus === 'AVAILABLE')
+    .sort((a, b) => {
+      // Ordina per fila, poi per numero posto
+      if (a.seat.row !== b.seat.row) {
+        return a.seat.row.localeCompare(b.seat.row);
+      }
+      return a.seat.seatNumber - b.seat.seatNumber;
+    });
 });
+
+// Calcola i biglietti ancora acquistabili
+const remainingTicketsAllowed = computed(() => {
+  return maxTicketsAllowed - userOwnedTicketsCount.value;
+});
+
+// Calcola il prezzo totale basato sui biglietti selezionati
+const totalPrice = computed(() => {
+  let totalBasePrice = 0;
+
+  selectedTicketIds.value.forEach(id => {
+    const ticket = availableTickets.value.find(t => t.id === id);
+    if (ticket) {
+      totalBasePrice += Number(ticket.price);
+    }
+  });
+
+  return payment.value.resellable ? totalBasePrice * 1.1 : totalBasePrice;
+});
+
+// Funzioni per gestire la selezione
+const selectTicket = (ticketId) => {
+  const canSelect = !selectedTicketIds.value.includes(ticketId) &&
+                   selectedTicketIds.value.length < remainingTicketsAllowed.value;
+  if (canSelect) {
+    selectedTicketIds.value.push(ticketId);
+  }
+};
+
+const removeTicket = (ticketId) => {
+  selectedTicketIds.value = selectedTicketIds.value.filter(id => id !== ticketId);
+};
+
+const getTicketInfo = (ticketId) => {
+  const ticket = availableTickets.value.find(t => t.id === ticketId);
+  if (ticket) {
+    return `${ticket.seat.sector} - Fila ${ticket.seat.row} Posto ${ticket.seat.seatNumber} (€${Number(ticket.price).toFixed(2)})`;
+  }
+  return 'Biglietto non trovato';
+};
 
 onMounted(async () => {
   try {
@@ -191,18 +327,27 @@ onMounted(async () => {
   }
 });
 
-// Apre il modale di acquisto e aggiorna la disponibilità dei biglietti
-const openPurchaseModal = async (type) => {
-  selectedTicketType.value = type;
+// Apre il modale di acquisto e carica i biglietti disponibili
+const openPurchaseModal = async () => {
   purchaseError.value = '';
-  // Refetch tickets to ensure availability is up to date
+  selectedTicketIds.value = [];
   processing.value = true;
   try {
+     // Carica i biglietti disponibili
      const res = await ticketService.getEventTickets(route.params.id, 'AVAILABLE');
      availableTickets.value = res.data;
-     console.log('Tickets refreshed:', availableTickets.value);
+
+     // Carica i biglietti dell'utente per questo evento
+     const userTickets = await ticketService.getMyTickets();
+     const eventId = parseInt(route.params.id);
+     userOwnedTicketsCount.value = userTickets.data.filter(t => t.event.id === eventId).length;
+
+     console.log('Biglietti disponibili:', availableTickets.value);
+     console.log('Biglietti già posseduti per questo evento:', userOwnedTicketsCount.value);
+     console.log('Biglietti ancora acquistabili:', remainingTicketsAllowed.value);
   } catch(e) {
-     console.error('Failed to refresh tickets', e);
+     purchaseError.value = 'Errore nel caricamento dei biglietti disponibili.';
+     console.error('Errore caricamento biglietti', e);
   } finally {
      processing.value = false;
      showModal.value = true;
@@ -211,51 +356,61 @@ const openPurchaseModal = async (type) => {
 
 const closeModal = () => {
   showModal.value = false;
-  payment.value = { cardNumber: '', expiration: '', cvv: '', holderName: '', resellable: false };
+  payment.value = { cardNumber: '', expiration: '', cvv: '', holderName: '', resellable: false, skipPayment: false };
+  selectedTicketIds.value = [];
 };
 
-// Gestisce l'acquisto effettivo del biglietto
+// Gestisce l'acquisto effettivo dei biglietti
 const handlePurchase = async () => {
   processing.value = true;
   purchaseError.value = '';
 
-  // Trova un biglietto del settore selezionato tra quelli disponibili
-  // Nota: L'API backend restituisce i biglietti con 'seat' che ha 'sector'. 
-  // Dobbiamo filtrare i biglietti disponibili in base al settore che corrisponde al tipo selezionato.
-  
-  console.log('Searching for ticket type:', selectedTicketType.value);
-  console.log('Available tickets:', availableTickets.value);
-
-  const ticketToBuy = availableTickets.value.find(t => 
-    t.seat && 
-    t.seat.sector && 
-    t.seat.sector.toUpperCase() === selectedTicketType.value.toUpperCase()
-  );
-
-  if (!ticketToBuy) {
-    console.warn(`No ticket found for sector ${selectedTicketType.value}. Available sectors:`, availableTickets.value.map(t => t.seat?.sector));
-    purchaseError.value = `Nessun biglietto ${selectedTicketType.value} disponibile.`;
+  // Verifica che siano stati selezionati biglietti
+  if (selectedTicketIds.value.length === 0) {
+    purchaseError.value = 'Seleziona almeno un biglietto.';
     processing.value = false;
     return;
   }
 
+  // Verifica che i biglietti siano ancora disponibili
+  const selectedTickets = availableTickets.value.filter(t => selectedTicketIds.value.includes(t.id));
+  if (selectedTickets.length !== selectedTicketIds.value.length) {
+    purchaseError.value = 'Uno o più biglietti non sono più disponibili.';
+    processing.value = false;
+    return;
+  }
+
+  // Costruisci la mappa di ticket ID → flag di rivendibilità
+  const ticketFeeMap = {};
+  selectedTicketIds.value.forEach(id => {
+    ticketFeeMap[id] = payment.value.resellable;
+  });
+
+  // Build payload and override with mock payment if skipPayment is active
   const payload = {
-    ticketFeeMap: { [ticketToBuy.id]: payment.value.resellable },
+    ticketFeeMap: ticketFeeMap,
     creditCardNumber: payment.value.cardNumber.replace(/\s/g, ''),
     expirationDate: payment.value.expiration,
     cvv: payment.value.cvv,
     cardHolderName: payment.value.holderName
   };
 
+  if (payment.value.skipPayment) {
+    // Mock valid payment data for debug purposes
+    payload.creditCardNumber = '4242424242424242';
+    payload.expirationDate = '12/34';
+    payload.cvv = '123';
+    payload.cardHolderName = 'Debug User';
+  }
+
   try {
     await ticketService.purchaseTickets(payload);
-    alert('Acquisto completato con successo!');
+    alert(`Acquisto di ${selectedTicketIds.value.length} ${selectedTicketIds.value.length === 1 ? 'biglietto' : 'biglietti'} completato con successo!`);
     closeModal();
-    router.push('/my-tickets'); // Redirect to My Tickets (to be implemented)
+    router.push('/my-tickets');
   } catch (err) {
     console.error(err);
     if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
-      // Backend validation errors
       purchaseError.value = err.response.data.errors.map(e => e.message).join('\n');
     } else {
       purchaseError.value = err.response?.data?.userMessage || err.response?.data?.detail || 'Errore durante l\'acquisto.';
@@ -429,17 +584,322 @@ const handlePurchase = async () => {
 
 .modal-content {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   padding: 30px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+.close-modal-btn:hover {
+  color: var(--text-primary);
 }
 
 .modal-content h3 {
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   text-align: center;
+}
+
+.modal-subtitle {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.card-subtitle {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.large-btn {
+  padding: 12px 20px !important;
+  font-size: 1.05rem !important;
+}
+
+/* Selected Tickets Summary */
+.selected-summary {
+  background: #e8f4f8;
+  border: 2px solid #0071E3;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.selected-summary h4 {
+  margin-bottom: 10px;
+  color: #0071E3;
+}
+
+.selected-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selected-ticket {
+  background: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-btn:hover {
+  background: #ffebee;
+  border-radius: 4px;
+}
+
+/* Tickets List */
+.tickets-list-container {
+  margin-bottom: 20px;
+}
+
+.tickets-list-container h4 {
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.tickets-table {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.tickets-header {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr 0.8fr 1fr 1.2fr;
+  gap: 12px;
+  background: #f5f5f5;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #333;
+  border-bottom: 2px solid #ddd;
+  position: sticky;
+  top: 0;
+}
+
+.ticket-row {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr 0.8fr 1fr 1.2fr;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.ticket-row:last-child {
+  border-bottom: none;
+}
+
+.ticket-row:hover {
+  background: #f9f9f9;
+}
+
+.col-type, .col-row, .col-seat, .col-price, .col-action {
+  display: flex;
+  align-items: center;
+}
+
+.col-type {
+  justify-content: flex-start;
+}
+
+.col-row, .col-seat {
+  justify-content: center;
+  font-weight: 500;
+}
+
+.col-price {
+  justify-content: center;
+  font-weight: 600;
+  color: #0071E3;
+}
+
+.col-action {
+  justify-content: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge.standard {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge.vip {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.select-ticket-btn {
+  padding: 6px 12px;
+  border: 2px solid #0071E3;
+  background: white;
+  color: #0071E3;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.select-ticket-btn:hover:not(:disabled) {
+  background: #0071E3;
+  color: white;
+}
+
+.select-ticket-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #ccc;
+  color: #ccc;
+}
+
+.no-tickets {
+  padding: 30px;
+  text-align: center;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.no-selection-msg {
+  padding: 20px;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 6px;
+  color: #856404;
+  text-align: center;
+}
+
+/* Quantity Selector - NOT USED ANYMORE */
+.quantity-selector {
+  display: none;
+}
+
+.qty-btn {
+  display: none;
+}
+
+.qty-input {
+  display: none;
+}
+
+/* Tickets Selection - NOT USED ANYMORE */
+.tickets-selection {
+  display: none;
+}
+
+.ticket-selection-item {
+  display: none;
+}
+
+.ticket-selection-item h4 {
+  display: none;
+}
+
+.seat-select {
+  display: none;
+}
+
+/* Form Styles in Modal */
+.modal-content .form-group {
+  margin-bottom: 16px;
+}
+
+.modal-content label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #333;
+  background: white;
+  transition: all 0.2s;
+}
+
+.modal-content input[type="text"]:focus,
+.modal-content input[type="number"]:focus {
+  outline: none;
+  border-color: #0071E3;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.modal-content .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Payment Section */
+.payment-section {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #eee;
+}
+
+.payment-section h4 {
+  margin-bottom: 15px;
+  color: #333;
+  font-weight: 600;
 }
 
 .checkbox-container {
   margin-bottom: 20px;
+  margin-top: 15px;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 6px;
 }
 
 .checkbox-label {
@@ -447,12 +907,15 @@ const handlePurchase = async () => {
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  color: #333;
+  font-weight: 500;
 }
 
 .checkbox-label input[type="checkbox"] {
   width: 18px;
   height: 18px;
   margin: 0;
+  cursor: pointer;
 }
 
 .total-section {
@@ -460,21 +923,74 @@ const handlePurchase = async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(0,0,0,0.1);
+  padding: 16px;
+  background: #f0f7ff;
+  border: 2px solid #0071E3;
+  border-radius: 8px;
   font-size: 1.1rem;
+}
+
+.total-label {
+  color: #333;
+  font-weight: 500;
 }
 
 .total-amount {
   font-weight: 700;
-  color: var(--accent-color);
-  font-size: 1.3rem;
+  color: #0071E3;
+  font-size: 1.4rem;
 }
 
 .modal-actions {
   display: flex;
-  justify-content: space-between;
+  gap: 12px;
   margin-top: 20px;
+}
+
+.cancel-btn, .submit-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.cancel-btn {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e0;
+}
+
+.submit-btn {
+  background: #0071E3;
+  color: white;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-msg {
+  color: #d32f2f;
+  margin-top: 12px;
+  padding: 10px;
+  background: #ffebee;
+  border-radius: 6px;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 768px) {

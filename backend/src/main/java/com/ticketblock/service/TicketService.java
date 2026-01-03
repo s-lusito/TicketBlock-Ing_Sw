@@ -12,13 +12,16 @@ import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.*;
 import com.ticketblock.mapper.TicketMapper;
+import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.utils.MoneyHelper;
 import com.ticketblock.utils.TicketContract;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -28,6 +31,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TicketService {
     private final BigDecimal feePercentage = new BigDecimal("1.10");
     private final TicketRepository ticketRepository;
@@ -36,6 +40,7 @@ public class TicketService {
     private final int MAX_TICKETS_PER_EVENT = 4;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final TicketContract ticketContract;
+    private final EventRepository eventRepository;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
@@ -101,35 +106,43 @@ public class TicketService {
                 totalPrice))
         {
             for (Ticket ticket : tickets) {
-                if( ticket.getOwner() ==  null){ // se è la prima volta che viene venduto viene mintato
+                if( ticket.getBlockchainId() ==  null){ // se è la prima volta che viene venduto viene mintato
                     try {
-                        BigInteger blockchainTicketId = ticketContract.mintTicket(
+
+                        TransactionReceipt receipt = ticketContract.mintTicket(
                                 loggedUser.getWallet().getAddress(),
                                 (MoneyHelper.priceInCents(ticket.getPrice())) ,
                                 ticket.getResellable(),
                                 ticket.getEvent().getName()
                         ).send();
-                        ticket.setBlockchainId(blockchainTicketId);
+                        if(receipt.isStatusOK()){
+                            BigInteger blockchainTicketId = ticketContract.getTicketIdFromReceipt(receipt);
+                            log.info("Mint ticket with id:" + blockchainTicketId );
+
+                            ticket.setBlockchainId(blockchainTicketId);
+                        }
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new BlockchainException("Error while minting ticket");
                     }
                 } else  {
-                    boolean isOwnershipValid = ticketContract.verifyTicketOwnership(
+                    boolean isAlreadyOwnedInBlockchain = ticketContract.verifyTicketOwnership( // verifica il
+                            //  caso in cui l'user tenti di riacquistare un biglietto che ha rimesso lui in vendita
+                            // (che quindi risulta ancora suo sulla BC)
                             ticket.getBlockchainId(),
-                            ticket.getOwner().getWallet().getAddress()
+                            loggedUser.getWallet().getAddress()
                     );
-                    if (!isOwnershipValid) {
-                        throw new UnavailableTicketException("Ownership verification failed for ticket on blockchain");
+                    if (!isAlreadyOwnedInBlockchain) {
+                        try {
+                            ticketContract.transferTicket(
+                                    loggedUser.getWallet().getAddress(),
+                                    ticket.getBlockchainId()
+                            ).send();
+                            log.info("Tranfer ticket");
+                        } catch (Exception e) {
+                            throw new BlockchainException("Error while transfering ticket");
+                        }
                     }
 
-                    try {
-                        ticketContract.transferTicket(
-                                loggedUser.getWallet().getAddress(),
-                                ticket.getBlockchainId()
-                        ).send();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
                 }
                 ticket.setOwner(loggedUser); // imposto il proprietario
 
@@ -216,30 +229,5 @@ public class TicketService {
         return true; // Supponiamo che il pagamento sia sempre riuscito
     }
 
-    public void invalidateTicket(Integer ticketId){
-        User user = securityService.getLoggedInUser();
 
-       Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
-
-       if (ticket.getOwner() == null || !ticket.getOwner().equals(user))
-            throw new ForbiddenActionException("Ticket is not in your account");
-
-       // Verifica ownership sulla blockchain prima di invalidare
-       if (ticket.getBlockchainId() != null) {
-           boolean isOwnerOnBlockchain = ticketContract.verifyTicketOwnership(
-                   ticket.getBlockchainId(),
-                   user.getWallet().getAddress()
-           );
-           if (!isOwnerOnBlockchain) {
-               throw new ForbiddenActionException("Ownership verification failed on blockchain");
-           }
-       }
-
-       ticket.setTicketStatus(TicketStatus.INVALIDATED);
-       ticketRepository.save(ticket);
-
-        //lo brucio dalla bc
-        ticketContract.burnTicket(ticket.getBlockchainId());
-
-    }
 }

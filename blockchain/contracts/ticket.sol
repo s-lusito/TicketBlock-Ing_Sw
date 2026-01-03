@@ -28,7 +28,7 @@ contract EventTicket {
 
 
     // Creazione di un nuovo ticket (solo owner)
-    function mintTicket(address _owner,uint256 _priceInCents,bool _resellable,string memory _info) external returns(uint256){
+    function mintTicket(address _owner,uint256 _priceInCents,bool _resellable,string memory _info) external{
         uint256 ticketID = nextTicketID;
 
         tickets[ticketID] = Ticket({
@@ -42,7 +42,6 @@ contract EventTicket {
         nextTicketID++;
         emit TicketMinted(ticketID, _owner,  _resellable);
 
-        return ticketID;
     }
 
     // Controlla se il biglietto è resellable

@@ -11,8 +11,10 @@ import com.ticketblock.exception.*;
 import com.ticketblock.mapper.EventMapper;
 import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.TicketRepository;
+import com.ticketblock.repository.UserRepository;
 import com.ticketblock.repository.VenueRepository;
 import com.ticketblock.utils.MoneyHelper;
+import com.ticketblock.utils.TicketContract;
 import com.ticketblock.utils.TimeSlot;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,8 @@ public class EventService {
     private final SecurityService securityService;
     private final TicketRepository ticketRepository;
     private final VenueService venueService;
+    private final TicketContract ticketContract;
+    private final UserRepository userRepository;
 
     public List<EventDto> getAllEvents(List<EventSaleStatus> saleStatusList) {
         if( saleStatusList == null || saleStatusList.isEmpty() ) {
@@ -235,5 +239,27 @@ public class EventService {
                 e.getStandardTicketPrice().multiply(BigDecimal.valueOf(standardTicketsSold))
                         .add(
                                 e.getVipTicketPrice().multiply(BigDecimal.valueOf(vipTicketsSold))));
+    }
+
+    public void invalidateTicket(Integer ticketId){
+        User user = userRepository.findByUserId(securityService.getLoggedInUser().getUserId());
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
+
+        // verifico che il ticket è di un evento dell'organizzatore
+        Event event = ticket.getEvent();
+        if(!user.getEvents().contains(event)){
+            throw new ForbiddenActionException("Event is not organized by logged user","You are not allowed");
+        }
+        if (ticket.getOwner() == null )
+            throw new ForbiddenActionException("Ticket has not owner yet");
+
+        ticket.setTicketStatus(TicketStatus.INVALIDATED);
+        ticketRepository.save(ticket);
+
+        //lo brucio dalla bc
+        if(ticket.getBlockchainId() != null) {
+            ticketContract.burnTicket(ticket.getBlockchainId());
+        }
+
     }
 }
