@@ -22,13 +22,16 @@
       <div v-for="ticket in tickets" :key="ticket.id" class="card ticket-card">
         <div class="ticket-header">
           <span class="ticket-id">{{ ticket.event?.name || '#'+ticket.id }}</span>
-          <span :class="['status-badge', ticket.ticketStatus.toLowerCase()]">{{ ticket.ticketStatus }}</span>
+          <span :class="['status-badge', ticket.ticketStatus.toLowerCase()]">{{ ticket.seat.sector }}</span>
         </div>
         
         <div class="ticket-body">
           <div class="info-row" v-if="ticket.event">
              <span class="label">Luogo</span>
-             <span class="value">{{ ticket.event.venue.address.city }} - {{ ticket.event.venue.name }}</span>
+             <div class="venue-info">
+               <span class="venue-name">{{ ticket.event.venue.name }}</span>
+               <span class="venue-address">{{ ticket.event.venue.address.street }}, {{ ticket.event.venue.address.city }}</span>
+             </div>
           </div>
           <div class="info-row" v-if="ticket.event">
              <span class="label">Data</span>
@@ -36,7 +39,7 @@
           </div>
           <div class="info-row">
             <span class="label">Posto</span>
-            <span class="value">{{ ticket.seat.seatNumber }} ({{ ticket.seat.sector }})</span>
+            <span class="value">Fila {{ ticket.seat.row }} - Posto {{ ticket.seat.seatNumber }}</span>
           </div>
           <div class="info-row">
             <span class="label">Prezzo</span>
@@ -165,6 +168,25 @@ const handleResell = async (ticketId) => {
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
+  align-items: baseline;
+}
+
+.venue-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.venue-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.venue-address {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
 }
 
 .info-row .label {
@@ -183,7 +205,7 @@ const handleResell = async (ticketId) => {
 
 .resell-btn {
   width: 100%;
-  background-color: var(--error-color);
+  background-color: #c0392b;
   color: white;
   border: none;
   padding: 10px;

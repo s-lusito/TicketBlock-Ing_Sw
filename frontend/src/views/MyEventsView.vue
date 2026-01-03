@@ -6,11 +6,11 @@
     </div>
 
     <div v-if="loading" class="loading-state">
-      <p>Caricamento eventi...</p>
+      <div class="spinner"></div>
     </div>
 
     <div v-else-if="error" class="error-state">
-      <p>Non hai ancora creato nessun evento.</p>
+      <p>{{ error }}</p>
       <router-link to="/create-event" class="cta-button">+ Crea un Evento</router-link>
     </div>
 
@@ -19,21 +19,42 @@
       <router-link to="/create-event" class="cta-button">Crea il tuo primo evento</router-link>
     </div>
 
-    <div v-else class="events-grid">
+    <div v-else class="event-grid">
       <div v-for="item in events" :key="item.event.id" class="card event-card">
+        <div class="card-image-wrapper">
+           <img v-if="item.event.imageUrl" :src="getImageUrl(item.event.imageUrl)" :alt="item.event.name" class="card-image" />
+           <div v-else class="card-image-placeholder"></div>
+        </div>
         <div class="card-content">
-          <div class="event-date">{{ new Date(item.event.date).toLocaleDateString('it-IT') }}</div>
+          <div class="event-date">{{ new Date(item.event.date).toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) }}</div>
           <h3 class="event-title">{{ item.event.name }}</h3>
-          <div class="stats">
-            <div class="stat">
-              <span class="label">Venduti</span>
-              <span class="value">{{ (item.standardTicketsSold || 0) + (item.vipTicketsSold || 0) }}</span>
-            </div>
-            <div class="stat">
-              <span class="label">Incasso</span>
-              <span class="value">{{ Number(item.totalSales || 0).toFixed(2) }}€</span>
-            </div>
+          <p class="event-location" v-if="item.event.venue">
+             {{ item.event.venue.name }} - {{ item.event.venue.address?.city || item.event.venue.city || '' }}
+          </p>
+
+          <div class="stats-container">
+             <div class="stat-row">
+                 <span class="stat-label">Venduti Totali</span>
+                 <span class="stat-value">{{ (item.standardTicketsSold || 0) + (item.vipTicketsSold || 0) }}</span>
+             </div>
+             
+             <div class="revenue-breakdown">
+                <div class="stat-item">
+                    <span class="sub-label">Standard</span>
+                    <span class="sub-value">{{ currency( (item.standardTicketsSold || 0) * (item.event.standardTicketPrice || 0) ) }}</span>
+                </div>
+                <div class="stat-item">
+                     <span class="sub-label">VIP</span>
+                     <span class="sub-value">{{ currency( (item.vipTicketsSold || 0) * (item.event.vipTicketPrice || 0) ) }}</span>
+                 </div>
+             </div>
+
+             <div class="total-revenue">
+                <span>Totale Incasso</span>
+                <span class="total-value">{{ currency(item.totalSales || 0) }}</span>
+             </div>
           </div>
+
           <div class="card-footer">
             <button class="action-btn" @click="$router.push(`/events/${item.event.id}`)">Dettagli</button>
           </div>
@@ -66,6 +87,16 @@ const fetchEvents = async () => {
     }
 };
 
+const getImageUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith('http')) return path;
+  return `http://localhost:8080${path}`;
+};
+
+const currency = (val) => {
+    return Number(val).toFixed(2) + '€';
+}
+
 onMounted(fetchEvents);
 </script>
 
@@ -76,84 +107,167 @@ onMounted(fetchEvents);
 }
 
 .header {
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   text-align: center;
 }
 
-.events-grid {
+.event-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
 }
 
 .event-card {
-  padding: 20px;
-}
-
-.stats {
+  padding: 0;
+  overflow: hidden;
   display: flex;
-  gap: 20px;
-  margin: 15px 0;
-  padding: 10px 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.stat {
+.event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.card-image-wrapper {
+  height: 180px;
+  width: 100%;
+  overflow: hidden;
+  background: #f5f5f7;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-image-placeholder {
+  height: 100%;
+  background: linear-gradient(135deg, #f5f5f7 0%, #e1e1e6 100%);
+}
+
+.card-content {
+  padding: 20px;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
-.stat .label {
+.event-date {
   font-size: 0.8rem;
-  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-color);
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 
-.stat .value {
-  font-weight: 600;
-  font-size: 1.1rem;
+.event-title {
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.event-location {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+.stats-container {
+    background: #f9f9fb;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.revenue-breakdown {
+    display: flex;
+    justify-content: flex-start;
+    gap: 40px;
+    padding: 8px 0;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 0.85rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.total-revenue {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    color: var(--accent-color);
+    font-size: 1rem;
 }
 
 .card-footer {
-  display: flex;
-  justify-content: flex-end;
+  margin-top: auto;
+  text-align: right;
 }
 
 .action-btn {
-  background-color: #666;
+  background-color: #333;
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s;
 }
 
 .action-btn:hover {
-  background-color: #555;
+  background-color: #000;
 }
 
-.error-state, .empty-state {
+.loading-state, .error-state, .empty-state {
   text-align: center;
-  padding: 40px;
+  padding: 60px;
+  color: var(--text-secondary);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 15px;
+}
+
+.spinner {
+  border: 3px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  border-top: 3px solid var(--accent-color);
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
 }
 
 .cta-button {
-  background-color: rgb(4, 131, 132); /* Using the specific teal color requested previously */
+  background-color: var(--accent-color);
   color: white;
   padding: 10px 24px;
   border-radius: 50px;
   text-decoration: none;
   font-weight: 600;
-  transition: opacity 0.2s;
 }
 
-.cta-button:hover {
-  opacity: 0.9;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
