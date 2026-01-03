@@ -1,10 +1,10 @@
 [
   {
-    "name": "Arena Grande Spettacoli",
+    "name": "Aula Magna Attilio Alto - Politecnico di Bari",
     "address": {
-      "street": "Piazza degli Eventi 50",
-      "city": "Milan",
-      "state": "Lombardy"
+      "street": "Via Edoardo Orabona 4",
+      "city": "Bari",
+      "state": "Puglia"
     },
     "rows": [
       {
@@ -63,11 +63,11 @@
     ]
   },
   {
-    "name": "Olympic Theatre",
+    "name": "Sala Conferenze Camera di Commercio",
     "address": {
-      "street": "Piazza Gentile da Fabriano 17",
-      "city": "Rome",
-      "state": "Lazio"
+      "street": "Corso Vittorio Emanuele II 11",
+      "city": "Bari",
+      "state": "Puglia"
     },
     "rows": [
       {
@@ -96,11 +96,11 @@
     ]
   },
   {
-    "name": "Mini Teatro Test",
+    "name": "Aula Oplà",
     "address": {
-      "street": "Via del Test 1",
-      "city": "Test City",
-      "state": "Testing"
+      "street": "Via S. Francesco d'Assisi 55",
+      "city": "Bari",
+      "state": "Puglia"
     },
     "rows": [
       {

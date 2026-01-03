@@ -22,6 +22,9 @@ logging:
     com:
       ticketblock: DEBUG
 
+blockchain:
+  contract-address: 8EFD67Dd0f3fD11462fc6046A890D891AeaD99A4
+  private-key: 0x088ad3a6f8f972cfb1f4a393581b5a8758044274cda8db913d079a5f48142b6a
 
 
 
