@@ -33,6 +33,7 @@
         <div class="card-content">
           <div class="event-date">{{ new Date(event.date).toLocaleDateString('it-IT', { month: 'short', day: 'numeric' }) }}</div>
           <h3 class="event-title clickable-title" @click="goToDetails(event.id)">{{ event.name }}</h3>
+          <p class="event-location">{{event.venue.name}} - {{event.venue.address.city}}</p>
           <p class="event-desc">{{ event.description }}</p>
           <div class="card-footer">
             <div class="price-container">
@@ -239,6 +240,12 @@ const goToDetails = (eventId) => {
   font-size: 1.4rem;
   margin-bottom: 8px;
   line-height: 1.2;
+}
+
+.event-location {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
 }
 
 .clickable-title {
