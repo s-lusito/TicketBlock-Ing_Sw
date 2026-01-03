@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SeatDto {
     private Integer id;
+    private String row;
     private Integer seatNumber;
     private String sector;
 
