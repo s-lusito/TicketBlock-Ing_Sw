@@ -38,11 +38,7 @@ public class TicketController {
 
     }
 
-    @PostMapping("/{id}/invalidate")
-    public ResponseEntity<?> invalidateTicket(@PathVariable Integer id) {
-        ticketService.invalidateTicket(id);
-        return ResponseEntity.ok().build();
-    }
+
 
 
 

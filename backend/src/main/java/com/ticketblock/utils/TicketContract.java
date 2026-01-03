@@ -61,6 +61,7 @@ public class TicketContract extends Contract {
     }
 
     public RemoteCall<TransactionReceipt> burnTicket(BigInteger ticket) {
+        System.out.println("bruciaaaa");
         // Costruisci la funzione come nel contratto Solidity
         final Function function = new Function(
                 "burnTicket", // nome della funzione Solidity

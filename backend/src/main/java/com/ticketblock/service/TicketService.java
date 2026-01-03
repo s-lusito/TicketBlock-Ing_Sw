@@ -12,6 +12,7 @@ import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.exception.*;
 import com.ticketblock.mapper.TicketMapper;
+import com.ticketblock.repository.EventRepository;
 import com.ticketblock.repository.TicketRepository;
 import com.ticketblock.utils.MoneyHelper;
 import com.ticketblock.utils.TicketContract;
@@ -39,6 +40,7 @@ public class TicketService {
     private final int MAX_TICKETS_PER_EVENT = 4;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final TicketContract ticketContract;
+    private final EventRepository eventRepository;
 
     public List<TicketDto> getTicketsFromEvent(Integer eventId, TicketStatus ticketStatus) {
         return ticketRepository.findByEventIdAndOptionalTicketStatus(eventId, ticketStatus).stream().map(TicketMapper::toDto).toList();
@@ -227,30 +229,5 @@ public class TicketService {
         return true; // Supponiamo che il pagamento sia sempre riuscito
     }
 
-    public void invalidateTicket(Integer ticketId){
-        User user = securityService.getLoggedInUser();
 
-       Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException(String.format("Ticket with id %d not found", ticketId), "Ticket not found"));
-
-       if (ticket.getOwner() == null || !ticket.getOwner().equals(user))
-            throw new ForbiddenActionException("Ticket is not in your account");
-
-       // Verifica ownership sulla blockchain prima di invalidare
-       if (ticket.getBlockchainId() != null) {
-           boolean isOwnerOnBlockchain = ticketContract.verifyTicketOwnership(
-                   ticket.getBlockchainId(),
-                   user.getWallet().getAddress()
-           );
-           if (!isOwnerOnBlockchain) {
-               throw new ForbiddenActionException("Ownership verification failed on blockchain");
-           }
-       }
-
-       ticket.setTicketStatus(TicketStatus.INVALIDATED);
-       ticketRepository.save(ticket);
-
-        //lo brucio dalla bc
-        ticketContract.burnTicket(ticket.getBlockchainId());
-
-    }
 }
