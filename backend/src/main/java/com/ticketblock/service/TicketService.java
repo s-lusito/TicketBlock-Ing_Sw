@@ -104,7 +104,8 @@ public class TicketService {
                 totalPrice))
         {
             for (Ticket ticket : tickets) {
-                if( ticket.getOwner() ==  null){ // se è la prima volta che viene venduto viene mintato
+                if( ticket.getBlockchainId() ==  null){ // se è la prima volta che viene venduto viene mintato
+                    log.info("Ciaoooo");
                     try {
 
                         TransactionReceipt receipt = ticketContract.mintTicket(
@@ -123,23 +124,24 @@ public class TicketService {
                         throw new BlockchainException("Error while minting ticket");
                     }
                 } else  {
-                    boolean isOwnershipValid = ticketContract.verifyTicketOwnership(
+                    boolean isAlreadyOwnedInBlockchain = ticketContract.verifyTicketOwnership( // verifica il
+                            //  caso in cui l'user tenti di riacquistare un biglietto che ha rimesso lui in vendita
+                            // (che quindi risulta ancora suo sulla BC)
                             ticket.getBlockchainId(),
-                            ticket.getOwner().getWallet().getAddress()
+                            loggedUser.getWallet().getAddress()
                     );
-                    if (!isOwnershipValid) {
-                        throw new UnavailableTicketException("Ownership verification failed for ticket on blockchain");
+                    if (!isAlreadyOwnedInBlockchain) {
+                        try {
+                            ticketContract.transferTicket(
+                                    loggedUser.getWallet().getAddress(),
+                                    ticket.getBlockchainId()
+                            ).send();
+                            log.info("Tranfer ticket");
+                        } catch (Exception e) {
+                            throw new BlockchainException("Error while transfering ticket");
+                        }
                     }
 
-                    try {
-                        ticketContract.transferTicket(
-                                loggedUser.getWallet().getAddress(),
-                                ticket.getBlockchainId()
-                        ).send();
-                        log.info("Tranfer ticket");
-                    } catch (Exception e) {
-                        throw new BlockchainException("Error while transfering ticket");
-                    }
                 }
                 ticket.setOwner(loggedUser); // imposto il proprietario
 
