@@ -6,7 +6,8 @@ services:
       POSTGRES_DB: ticketdb
       POSTGRES_USER: ticketuser
       POSTGRES_PASSWORD: ticketpass
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ticketdb
+      # Aggiunto Timezone per allineare il database
+      TZ: Europe/Rome
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -24,13 +25,17 @@ services:
       SPRING_DATASOURCE_USERNAME: ticketuser
       SPRING_DATASOURCE_PASSWORD: ticketpass
       GANACHE_URL: http://host.docker.internal:7545
+      # 1. Imposta il fuso orario a livello OS del container
+      TZ: Europe/Rome
+      # 2. Forza Java a usare l'orario italiano (fondamentale per i filtri data)
+      JAVA_TOOL_OPTIONS: "-Duser.timezone=Europe/Rome"
     ports:
       - "8080:8080"
     restart: unless-stopped
 
   frontend:
     build: ./frontend
-    container_name: ticketbloc-frontend
+    container_name: ticketblock-frontend
     depends_on:
       - backend
     ports:

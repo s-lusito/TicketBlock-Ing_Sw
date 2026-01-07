@@ -17,7 +17,7 @@ public class Web3Config {
     @Bean
     public Web3j web3j(@Value("${blockchain.ganache-url}") String ganacheUrl) {
         return Web3j.build(
-                new HttpService("http://host.docker.internal:7545") // Ganache
+                new HttpService(ganacheUrl) // Ganache
         );
     }
 
