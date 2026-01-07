@@ -23,5 +23,16 @@ export default {
         } catch (e) {
             return null;
         }
+    },
+    // Decodifica il token JWT per ottenere il nome dell'utente
+    getUserName() {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.firstName || payload.sub || 'Utente';
+        } catch (e) {
+            return null;
+        }
     }
 };

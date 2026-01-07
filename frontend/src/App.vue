@@ -11,6 +11,7 @@
         <router-link v-if="isOrganizer" to="/create-event">Crea Evento</router-link>
         <router-link v-if="!isAuthenticated" to="/login">Accedi</router-link>
         <router-link v-if="!isAuthenticated" to="/register" class="cta-button">Registrati</router-link>
+        <span v-if="isAuthenticated" class="user-name">{{ userName }}</span>
         <a v-if="isAuthenticated" @click="logout" href="#" class="cta-button">Esci</a>
       </nav>
     </div>
@@ -33,12 +34,14 @@ const route = useRoute();
 
 const isAuthenticated = ref(false);
 const isOrganizer = ref(false);
+const userName = ref('');
 const globalError = ref('');
 
 const checkAuth = () => {
   const token = localStorage.getItem('token');
   isAuthenticated.value = !!token;
   isOrganizer.value = authService.getUserRole() === 'ORGANIZER';
+  userName.value = authService.getUserName() || '';
 };
 
 watch(route, () => {
@@ -109,6 +112,17 @@ nav a:hover {
 
 nav a.router-link-exact-active {
   color: var(--text-primary);
+}
+
+.user-name {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  margin-left: 24px;
+  font-weight: 500;
+  padding: 6px 14px;
+  background: var(--bg-secondary);
+  border-radius: 980px;
+  display: inline-block;
 }
 
 .cta-button {
