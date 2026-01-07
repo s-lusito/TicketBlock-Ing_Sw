@@ -1,22 +1,41 @@
 services:
   db:
     container_name: postgres
-    image: postgres:latest
+    image: postgres:15
     environment:
-      POSTGRES_USER: team
-      POSTGRES_PASSWORD: password
-      PGDATA: /data/postgres
+      POSTGRES_DB: ticketdb
+      POSTGRES_USER: ticketuser
+      POSTGRES_PASSWORD: ticketpass
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ticketdb
     volumes:
-      - db:/data/postgres
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    networks:
-      - db
     restart: unless-stopped
 
-networks:
-    db:
-      driver: bridge
+  backend:
+    build: ./backend
+    container_name: ticketblock-backend
+    depends_on:
+      db:
+        condition: service_started
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ticketdb
+      SPRING_DATASOURCE_USERNAME: ticketuser
+      SPRING_DATASOURCE_PASSWORD: ticketpass
+      GANACHE_URL: http://host.docker.internal:7545
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: ticketbloc-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
 
 volumes:
-    db:
+  postgres_data:
