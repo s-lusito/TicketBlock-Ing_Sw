@@ -43,11 +43,26 @@
             <button 
               v-if="!isOrganizer" 
               class="buy-btn"
-              :style="event.eventSaleStatus === 'NOT_STARTED' ? { backgroundColor: '#4a4a4a', cursor: 'not-allowed' } : {}"
-              :disabled="event.eventSaleStatus === 'NOT_STARTED'"
-              @click="event.eventSaleStatus !== 'NOT_STARTED' && goToDetails(event.id)"
+              :style="['NOT_STARTED', 'SOLD_OUT', 'ENDED'].includes(event.eventSaleStatus) ? { backgroundColor: '#4a4a4a', cursor: 'not-allowed' } : {}"
+              :disabled="['NOT_STARTED', 'SOLD_OUT', 'ENDED'].includes(event.eventSaleStatus)"
+              @click="!['NOT_STARTED', 'SOLD_OUT', 'ENDED'].includes(event.eventSaleStatus) && goToDetails(event.id)"
             >
-              {{ event.eventSaleStatus === 'NOT_STARTED' ? 'Presto Disponibile' : 'Acquista Biglietto' }}
+              {{
+                (() => {
+                  switch (event.eventSaleStatus) {
+                    case 'NOT_STARTED':
+                      return 'Presto Disponibile';
+                    case 'ONGOING':
+                      return 'Acquista Biglietto';
+                    case 'SOLD_OUT':
+                      return 'Sold Out';
+                    case 'ENDED':
+                      return 'Vendite Chiuse';
+                    default:
+                      return 'Acquista Biglietto';
+                  }
+                })()
+              }}
             </button>
             <button v-else @click="goToDetails(event.id)" class="buy-btn" style="background-color: #666;">Vedi dettagli</button>
           </div>

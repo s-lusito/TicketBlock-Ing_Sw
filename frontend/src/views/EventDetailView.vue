@@ -12,7 +12,11 @@
     <div v-else class="event-content">
       <div class="event-header">
         <div class="header-content">
-          <span class="event-badge">In Arrivo</span>
+
+          <span class="event-badge">              {{
+              event.eventSaleStatus === 'NOT_STARTED' ? 'Presto Disponibile' : 'Vendite Aperte'
+            }}
+</span>
           <h1 class="event-title">{{ event.name }}</h1>
           <div class="event-meta">
             <div class="meta-item">
@@ -260,7 +264,7 @@ const handleDelete = async () => {
     router.push('/events');
   } catch (err) {
     console.error(err);
-    alert('Errore durante l\'eliminazione dell\'evento.');
+    alert("Impossibile eliminare l'evento: biglietti già venduti.");
   }
 };
 
