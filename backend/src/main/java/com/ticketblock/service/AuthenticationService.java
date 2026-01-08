@@ -34,6 +34,7 @@ public class AuthenticationService {
 
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("role", user.getRole());
+        extraClaims.put("firstName", user.getFirstName());
 
         var jwt = jwtService.generateToken(extraClaims, user);
         return AuthenticationResponse.builder().token(jwt).build();
@@ -69,6 +70,7 @@ public class AuthenticationService {
 
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("role", user.getRole());
+        extraClaims.put("firstName", user.getFirstName());
 
         var jwt = jwtService.generateToken(extraClaims, user);
         return AuthenticationResponse.builder().token(jwt).build();

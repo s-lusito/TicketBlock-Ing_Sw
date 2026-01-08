@@ -1,7 +1,7 @@
 package com.ticketblock.service;
 
-import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
-import com.ticketblock.ApplicationEvent.TicketResoldEvent;
+import com.ticketblock.applicationEvent.TicketPurchasedEvent;
+import com.ticketblock.applicationEvent.TicketResoldEvent;
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
@@ -115,14 +115,20 @@ public class TicketService {
                                 ticket.getResellable(),
                                 ticket.getEvent().getName()
                         ).send();
-                        if(receipt.isStatusOK()){
+
+                        if(receipt != null && receipt.isStatusOK()){
                             BigInteger blockchainTicketId = ticketContract.getTicketIdFromReceipt(receipt);
-                            log.info("Mint ticket with id:" + blockchainTicketId );
+                            log.info("Mint ticket successful with id: {}", blockchainTicketId );
 
                             ticket.setBlockchainId(blockchainTicketId);
+                        } else {
+                            String status = receipt != null ? receipt.getStatus() : "null receipt";
+                            log.error("Blockchain transaction failed with status: {}", status);
+                            throw new BlockchainException("Blockchain transaction failed during minting");
                         }
                     } catch (Exception e) {
-                        throw new BlockchainException("Error while minting ticket");
+                        log.error("Exception during minting ticket: {}", e.getMessage(), e);
+                        throw new BlockchainException("Error while minting ticket: " + e.getMessage(), "Error while minting ticket:");
                     }
                 } else  {
                     boolean isAlreadyOwnedInBlockchain = ticketContract.verifyTicketOwnership( // verifica il
@@ -133,17 +139,25 @@ public class TicketService {
                     );
                     if (!isAlreadyOwnedInBlockchain) {
                         try {
-                            ticketContract.transferTicket(
+                            TransactionReceipt receipt = ticketContract.transferTicket(
                                     loggedUser.getWallet().getAddress(),
                                     ticket.getBlockchainId()
                             ).send();
-                            log.info("Tranfer ticket");
-                        } catch (Exception e) {
-                            throw new BlockchainException("Error while transfering ticket");
-                        }
-                    }
 
-                }
+                                if (receipt != null && receipt.isStatusOK()) {
+                                    log.info("Transfer ticket successful for blockchainId: {}", ticket.getBlockchainId());
+                                } else {
+                                    String status = receipt != null ? receipt.getStatus() : "null receipt";
+                                    log.error("Blockchain transfer failed with status: {}", status);
+                                    throw new BlockchainException("Blockchain transaction failed during transfer");
+                                }
+                            } catch (Exception e) {
+                                log.error("Exception during transferring ticket {}: {}", ticket.getBlockchainId(), e.getMessage(), e);
+                                throw new BlockchainException("Error while transferring ticket: " + e.getMessage(), "Error while transferring ticket");
+                            }
+                        }
+
+                    }
                 ticket.setOwner(loggedUser); // imposto il proprietario
 
             }

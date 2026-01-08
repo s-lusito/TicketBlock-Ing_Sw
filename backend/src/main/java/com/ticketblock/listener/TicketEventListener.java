@@ -1,6 +1,6 @@
 package com.ticketblock.listener;
 
-import com.ticketblock.ApplicationEvent.TicketSaleEvent;
+import com.ticketblock.applicationEvent.TicketSaleEvent;
 import com.ticketblock.service.EventService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;

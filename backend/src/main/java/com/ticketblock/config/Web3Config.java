@@ -15,9 +15,9 @@ import java.math.BigInteger;
 public class Web3Config {
 
     @Bean
-    public Web3j web3j() {
+    public Web3j web3j(@Value("${blockchain.ganache-url}") String ganacheUrl) {
         return Web3j.build(
-                new HttpService("http://127.0.0.1:7545") // Ganache
+                new HttpService(ganacheUrl) // Ganache
         );
     }
 
