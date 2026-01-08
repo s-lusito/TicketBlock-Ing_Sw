@@ -24,7 +24,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ticketdb
       SPRING_DATASOURCE_USERNAME: ticketuser
       SPRING_DATASOURCE_PASSWORD: ticketpass
-      GANACHE_URL: http://host.docker.internal:7545
+
+      GANACHE_URL: "http://host.docker.internal:7545"
+      PRIVATE_KEY: "0xBbc7085EC0249405C0b07Dc9a68Dfa54B4328120"
+      CONTRACT_ADDRESS: "0xBbc7085EC0249405C0b07Dc9a68Dfa54B4328120"
       # 1. Imposta il fuso orario a livello OS del container
       TZ: Europe/Rome
       # 2. Forza Java a usare l'orario italiano (fondamentale per i filtri data)

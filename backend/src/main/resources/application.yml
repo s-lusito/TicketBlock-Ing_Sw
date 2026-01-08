@@ -23,9 +23,9 @@ logging:
       ticketblock: DEBUG
 
 blockchain:
-  contract-address: "0xBbc7085EC0249405C0b07Dc9a68Dfa54B4328120"
-  private-key: "0x85b8908ba489508907bafde88e7a081f0f9b2c4582652bc0937f38c68c84e8cb"
-  ganache-url: "http://192.168.1.10:7545"
+  contract-address: ${CONTRACT_ADDRESS}
+  private-key: ${PRIVATE_KEY}
+  ganache-url: ${GANACHE_URL}
 
 
 
