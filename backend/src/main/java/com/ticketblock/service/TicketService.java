@@ -1,7 +1,7 @@
 package com.ticketblock.service;
 
-import com.ticketblock.ApplicationEvent.TicketPurchasedEvent;
-import com.ticketblock.ApplicationEvent.TicketResoldEvent;
+import com.ticketblock.applicationEvent.TicketPurchasedEvent;
+import com.ticketblock.applicationEvent.TicketResoldEvent;
 import com.ticketblock.dto.Request.PurchaseTicketRequest;
 import com.ticketblock.dto.Response.PurchaseTicketResponse;
 import com.ticketblock.dto.Response.TicketDto;
