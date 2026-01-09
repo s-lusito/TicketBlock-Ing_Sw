@@ -1,19 +1,13 @@
 package com.ticketblock.controller;
 
-import com.ticketblock.dto.Request.PurchaseTicketRequest;
-import com.ticketblock.dto.Response.PurchaseTicketResponse;
-import com.ticketblock.dto.Response.TicketDto;
 import com.ticketblock.dto.Response.UserDto;
-import com.ticketblock.service.TicketService;
 import com.ticketblock.service.UserService;
-import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

@@ -13,9 +13,13 @@
       <div class="event-header">
         <div class="header-content">
 
-          <span class="event-badge">              {{
-              event.eventSaleStatus === 'NOT_STARTED' ? 'Presto Disponibile' : 'Vendite Aperte'
-            }}
+         <span class="event-badge">
+  {{
+             event.eventSaleStatus === 'NOT_STARTED' ? 'Presto Disponibile' :
+                 event.eventSaleStatus === 'SOLD_OUT'     ? 'Sold out' :
+                     event.eventSaleStatus === 'ENDED'        ? 'Vendite chiuse' :
+                         'Vendite Aperte'
+           }}
 </span>
           <h1 class="event-title">{{ event.name }}</h1>
           <div class="event-meta">
@@ -54,11 +58,30 @@
         <div class="sidebar">
           <div class="ticket-card card">
             <h3>Acquista Biglietti</h3>
-            <p class="card-subtitle">Scegli fino a 4 biglietti da acquistare</p>
-            <button v-if="!isOrganizer" class="buy-btn primary large-btn" @click="openPurchaseModal">
+
+            <p class="card-subtitle" v-if="event.eventSaleStatus === 'NOT_STARTED'">
+              Vendite apriranno <span>{{ formattedSaleDate }}</span>
+
+            </p>
+
+            <p class="card-subtitle" v-else-if="event?.eventSaleStatus === 'SOLD_OUT'">Sold out</p>
+            <p class="card-subtitle" v-else-if="event?.eventSaleStatus === 'ENDED'">Vendite chiuse</p>
+            <p class="card-subtitle" v-else>Scegli fino a 4 biglietti da acquistare</p>
+
+            <button
+                v-if="!isOrganizer && event?.eventSaleStatus !== 'NOT_STARTED' && event?.eventSaleStatus !== 'SOLD_OUT' && event?.eventSaleStatus !== 'ENDED'"
+                class="buy-btn primary large-btn"
+                @click="openPurchaseModal"
+            >
               Seleziona Biglietti
             </button>
-            <button v-else class="buy-btn" style="background-color: #333; color: #fff; cursor: not-allowed; opacity: 0.7;" disabled>
+
+            <button
+                v-else
+                class="buy-btn"
+                style="background-color: #333; color: #fff; cursor: not-allowed; opacity: 0.7;"
+                disabled
+            >
               Acquisto non disponibile
             </button>
           </div>
@@ -253,6 +276,24 @@ const event = ref(null);
 const loading = ref(true);
 const error = ref('');
 const isOrganizer = computed(() => authService.getUserRole() === 'ORGANIZER');
+
+// Nel tuo componente Vue (script)
+const formattedSaleDate = computed(() => {
+  if (!event.value?.saleStartDate) {
+    return 'data non disponibile';
+  }
+  
+  // Dividiamo la stringa "YYYY-MM-DD" per evitare problemi di fuso orario
+  const [year, month, day] = event.value.saleStartDate.split('-').map(Number);
+  const date = new Date(year, month - 1, day); // month è 0-indexed in JS
+  
+  return date.toLocaleDateString('it-IT', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+});
 
 // Elimina l'evento (solo organizzatori)
 const handleDelete = async () => {

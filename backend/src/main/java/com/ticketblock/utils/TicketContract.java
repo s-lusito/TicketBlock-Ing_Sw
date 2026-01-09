@@ -1,15 +1,9 @@
 package com.ticketblock.utils;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import com.ticketblock.exception.BlockchainException;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.*;
-import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.abi.datatypes.generated.Uint8;
 import org.web3j.crypto.Credentials;
@@ -17,7 +11,10 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.Contract;
-import org.web3j.tx.TransactionManager;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class TicketContract extends Contract {

@@ -1,15 +1,12 @@
 package com.ticketblock.dto.Request;
 
-import com.ticketblock.utils.TimeSlot;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.NumberFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +19,7 @@ public class EventCreationRequest {
 
     @Size(max = 2000, message = "Description must not exceed 2000 characters")
     private String description;
-    @NotNull
+    @NotNull @FutureOrPresent
     private LocalDate date;
     @PositiveOrZero
     @Min(value = 32, message = "Time slot range is: 8.00(32) - 23.00(92)")

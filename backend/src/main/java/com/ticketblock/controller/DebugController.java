@@ -1,14 +1,10 @@
 package com.ticketblock.controller;
 
-import com.ticketblock.dto.Response.AuthenticationResponse;
 import com.ticketblock.entity.Event;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.repository.EventRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

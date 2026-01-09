@@ -3,17 +3,14 @@ package com.ticketblock.repository;
 import com.ticketblock.entity.Event;
 import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
-import com.ticketblock.entity.enumeration.RowSector;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import jakarta.persistence.LockModeType;
-import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Integer> {
