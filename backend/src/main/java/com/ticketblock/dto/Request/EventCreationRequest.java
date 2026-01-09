@@ -19,7 +19,7 @@ public class EventCreationRequest {
 
     @Size(max = 2000, message = "Description must not exceed 2000 characters")
     private String description;
-    @NotNull
+    @NotNull @FutureOrPresent
     private LocalDate date;
     @PositiveOrZero
     @Min(value = 32, message = "Time slot range is: 8.00(32) - 23.00(92)")
