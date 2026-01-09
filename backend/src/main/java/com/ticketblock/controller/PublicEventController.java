@@ -1,13 +1,11 @@
 package com.ticketblock.controller;
 
-import com.ticketblock.dto.Request.EventCreationRequest;
 import com.ticketblock.dto.Response.EventDto;
 import com.ticketblock.dto.Response.TicketDto;
 import com.ticketblock.entity.enumeration.EventSaleStatus;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import com.ticketblock.service.EventService;
 import com.ticketblock.service.TicketService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,5 @@
 package com.ticketblock.service;
 
-import java.util.HashMap;
-import java.util.Map;
 import com.ticketblock.dto.Request.AuthenticationRequest;
 import com.ticketblock.dto.Request.RegisterRequest;
 import com.ticketblock.dto.Response.AuthenticationResponse;
@@ -16,6 +14,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

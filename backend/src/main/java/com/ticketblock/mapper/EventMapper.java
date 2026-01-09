@@ -7,9 +7,6 @@ import com.ticketblock.exception.InvalidDateAndTimeException;
 import com.ticketblock.utils.MoneyHelper;
 import com.ticketblock.utils.TimeSlot;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 public class EventMapper {
     public static EventDto toDto(Event event) {
         return EventDto.builder()
