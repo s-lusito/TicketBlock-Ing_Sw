@@ -2,7 +2,7 @@
   <header class="navbar">
     <div class="container nav-content">
       <router-link to="/" class="logo">
-        <img src="@/assets/logo-custom.jpg" alt="BlockTicket Logo" style="height: 70px; width: auto; object-fit: contain;" />
+        <img src="@/assets/logo.png" alt="TicketBlock Logo" style="height: 70px; width: auto; object-fit: contain;" />
       </router-link>
       <nav>
         <router-link to="/events">Eventi</router-link>
