@@ -525,7 +525,7 @@ const handlePurchase = async () => {
       availableTickets.value = availableTickets.value.filter(t => t.status !== 'SOLD');
       
       showModal.value = false; // Changed from showPurchaseModal.value to showModal.value
-      alert('Biglietti acquistati con successo! (Nota: Blockchain non connessa)');
+      alert('Biglietti non acquistati (Nota: Blockchain non connessa)');
       return; 
     }
 

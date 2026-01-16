@@ -5,10 +5,13 @@ import com.ticketblock.entity.Ticket;
 import com.ticketblock.entity.User;
 import com.ticketblock.entity.enumeration.TicketStatus;
 import jakarta.persistence.LockModeType;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,7 +24,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
     List<Ticket> findByEventIdAndOptionalTicketStatus(@Param("eventId") Integer eventId,
                                                       @Param("ticketStatus") TicketStatus ticketStatus);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE) // serve per bloccare letture e scritture sui record selezionati
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+        // serve per bloccare letture e scritture sui record selezionati
     List<Ticket> findAllByIdIn(List<Integer> ids);
 
     boolean findAllByOwnerAndEvent(User owner, Event event);
@@ -32,11 +36,13 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     /**
      * Tickets sold by Organizer (Resold tickets do not count) counted by price
+     *
      * @param event
      * @return
      */
     @Query("""
-    SELECT COUNT(t)
+
+            SELECT COUNT(t)
     FROM Ticket t
     WHERE t.event = :event
       AND t.owner IS NOT NULL
@@ -51,5 +57,16 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
       AND t.owner IS NOT NULL
     """)
     Integer countSoldTicketsByEvent(@Param("event") Event event);
-}
 
+    @Modifying
+    @Transactional
+    @Query("""
+     UPDATE Ticket t
+    SET t.ticketStatus = com.ticketblock.entity.enumeration.TicketStatus.SOLD
+    WHERE t.owner IS NOT NULL AND t.ticketStatus = com.ticketblock.entity.enumeration.TicketStatus.AVAILABLE
+
+"""
+)
+    int updateAllResellingTicketStatusToSold();
+
+}
