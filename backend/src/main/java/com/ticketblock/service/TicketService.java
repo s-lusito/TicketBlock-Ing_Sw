@@ -223,7 +223,6 @@ public class TicketService {
 
         ticket.setResellable(false);
         ticket.setTicketStatus(TicketStatus.AVAILABLE);
-        ticket.setOwner(null);
 
         ticketRepository.save(ticket);
         applicationEventPublisher.publishEvent(new TicketResoldEvent(this, ticket.getEvent()));
